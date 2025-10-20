@@ -1,0 +1,20 @@
+Package: GCubeR
+Title: Estimation of Forest Volume, Biomass, and Carbon
+Version: 0.0.0.9000
+Authors@R: 
+    person("Juliette", "Defontaine", role = c("aut")),
+    person("David", "Linchant", role = c("aut")),
+    person("Samuel", "Douin", role = c("aut")),
+    person("Timon", "Luizi", role = c("aut")),
+    person("Pierre", "Bosman", email = "pierre.bosman@student.uliege.be", role = c("aut", "cre"))
+Description: An R package designed for the reliable and standardized estimation of forest metrics
+    (volume, biomass, carbon) based on sound statistical standards. The tool is modular
+    to allow the transparent integration of bibliographical or user-defined allometric 
+    equations.
+License: MIT
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
+Imports:
+    dplyr,
+    rlang
