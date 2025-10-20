@@ -10,7 +10,7 @@ You can install the development version of GCubeR directly from your GitLab repo
 # Assurez-vous d'avoir 'devtools' installé
 # install.packages("devtools") 
 
-devtools::install_gitlab("Samuel.Douin/lainchant") 
+devtools::install_gitlab("David.Linchant/gcuber") 
 # Cette commande télécharge et installe le package depuis votre dépôt.
 ```
 ## Instructions for Developers (ULiège Team)
