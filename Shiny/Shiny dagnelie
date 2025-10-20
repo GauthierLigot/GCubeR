@@ -1,0 +1,481 @@
+##############################################################
+# Application Shiny - Tarifs Dagnelie
+# Auteur : Timon LUIZI
+# DATE last modif : 20-10-2025 
+##############################################################
+
+##############################################################
+# 0️⃣ - EN-TÊTE ET INSTALLATION DES PACKAGES
+##############################################################
+
+# Installation si nécessaire
+if (!requireNamespace("dagnelie", quietly = TRUE)) {
+  if (!requireNamespace("devtools", quietly = TRUE)) install.packages("devtools")
+  devtools::install_github("gauthierLigot/dagnelie")
+}
+
+# Chargement des packages
+library(shiny)
+library(shinythemes)
+library(dagnelie)
+library(readxl)
+library(writexl)
+# [AJOUT] stringr requis par guess_sep()
+if (!requireNamespace("stringr", quietly = TRUE)) install.packages("stringr")
+library(stringr)
+
+##############################################################
+# 1️⃣ - DONNÉES DE RÉFÉRENCE : LISTE DES ESPÈCES
+##############################################################
+
+# Liste officielle des codes et noms français complets
+species_codes <- data.frame(
+  code = as.character(c(
+    1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,
+    24,25,26,27,28,29,30,31,32,33,34,35,
+    41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,
+    110,120,150,210,220
+  )),
+  nom = c(
+    "Chênes indigènes","Chêne rouge","Hêtre","Érable sycomore","Frêne","Ormes","Merisier","Aubépines",
+    "Prunellier","Feuillus divers","Bouleau","Aulne blanc","Aulne glutineux","Charme","Châtaignier",
+    "Érable plane","Érable champêtre","Sorbier","Marronnier","Noisetier","Noyers",
+    "Peuplier hybride","Peuplier tremble","Robinier","Saule marsault","Autres saules",
+    "Tilleuls","Pommier","Poirier","Alisiers","Sureaux","Bourdaine","Cerisiers",
+    "Épicéa commun","Épicéa de Sitka","Sapin de Douglas","Mélèze","Pin sylvestre",
+    "Pin noir Autriche","Pin noir de Corse","Pin weymouth","Sapin pectiné",
+    "Sapin de Vancouver","Autres sapins","Cyprès","Tsuga","Thuya","Autres résineux","If",
+    "Toutes essences feuillues","Toutes essences résineuses","Feuillus nobles","Autres feuillus","Autres résineux"
+  ),
+  stringsAsFactors = FALSE
+)
+
+# Codes agrégés (catégories). Par défaut on les bloque en calcul unitaire.
+aggregate_codes <- c("110","120","150","210","220")
+
+
+
+##############################################################
+# 2) FONCTIONS UTILITAIRES
+##############################################################
+
+# 2.1) Aides générales ---------------------------------------
+has_name <- function(x) is.character(x) && length(x) == 1 && !is.na(x) && nzchar(x)
+
+parse_vector <- function(txt) {
+  if (is.null(txt) || !nzchar(trimws(txt))) return(NULL)
+  t <- trimws(txt)
+  if (grepl(",", t, fixed = TRUE)) {
+    parts <- trimws(strsplit(t, ",", fixed = TRUE)[[1]])
+    nums  <- suppressWarnings(as.numeric(parts))
+    if (!any(is.na(nums))) return(nums)
+    return(parts)
+  }
+  v <- suppressWarnings(as.numeric(t))
+  if (!is.na(v)) return(v)
+  t
+}
+
+recycle_to <- function(x, n) {
+  if (is.null(x)) return(rep(NA, n))
+  if (length(x) == n) return(x)
+  if (length(x) == 1) return(rep(x, n))
+  stop("Longueurs incompatibles : ", length(x), " vs ", n)
+}
+
+# 2.2) Mapping des arguments réels des fonctions tarif --------
+# élargi pour couvrir plusieurs conventions possibles.
+detect_mapping <- function(f) {
+  fn <- names(formals(f))
+  fn <- setdiff(fn, "...")
+  circ_names <- c("C130","c130","circ","CBH","cbh","C","G","g","Circonference","circonference")
+  h_names    <- c("H","h","Htot","Hdom","Hd","height","Ht","Hauteur","hauteur")
+  sp_names   <- c("speciesCode","species","sp","essence","espece","code","Code")
+  list(
+    circ = intersect(circ_names, fn)[1],
+    h    = intersect(h_names,    fn)[1],
+    sp   = intersect(sp_names,   fn)[1],
+    all  = fn
+  )
+}
+
+# 2.3) Lecture robuste de CSV / XLSX -------------------------
+# - Détecte automatiquement le séparateur si "auto".
+# - Permet de forcer ; , ou tab.
+guess_sep <- function(path, nlines = 5) {
+  con <- file(path, "r"); on.exit(close(con))
+  lines <- readLines(con, n = nlines, warn = FALSE)
+  counts <- c(
+    semicolon = sum(stringr::str_count(lines, ";")),
+    comma     = sum(stringr::str_count(lines, ",")),
+    tab       = sum(stringr::str_count(lines, "\t"))
+  )
+  names(which.max(counts))
+}
+
+read_table_any <- function(path, ext = "csv", sep_choice = c("auto","; ",", ","tab")) {
+  sep_choice <- match.arg(sep_choice)
+  if (tolower(ext) == "xlsx") {
+    return(as.data.frame(readxl::read_excel(path)))
+  }
+  if (sep_choice == "auto") {
+    which <- guess_sep(path)
+  } else {
+    which <- switch(sep_choice, "; " = "semicolon", ", " = "comma", "tab" = "tab")
+  }
+  sep <- switch(which, semicolon = ";", comma = ",", tab = "\t")
+  utils::read.table(path, header = TRUE, sep = sep, quote = "\"", dec = ".", stringsAsFactors = FALSE, check.names = FALSE)
+}
+
+
+##############################################################
+# 3️⃣ - INTERFACE UTILISATEUR (UI)
+##############################################################
+
+ui <- fluidPage(
+  theme = shinytheme("flatly"),
+  titlePanel("Tarifs de cubage (package dagnelie)"),
+  
+  navbarPage(
+    title = "Outils de cubage",
+    
+    # --- 3.1 Onglet 1 : Arbre unique ---
+    tabPanel(
+      "Arbre unique",
+      sidebarLayout(
+        sidebarPanel(
+          helpText("Saisis un arbre (tu peux donner plusieurs C130 séparés par des virgules : 100,110,125)."),
+          selectInput("tarif_uni", "Choisir la fonction tarif :", choices = c("tarif1","tarif2","tarif3","tarif4")),
+          textInput("C130_uni", "Circonférence à 1.30 m (cm)", value = "100"),
+          uiOutput("h_ui"),  # le champ sera rendu par le serveur selon le tarif
+          #conditionalPanel(
+          #condition = "true",  # on laisse le champ, mais on ne l'exigera QUE si la fonction le demande
+          #textInput("H_uni", "Hauteur totale (m)", value = "20")
+          #),
+          textInput("species_uni", "speciesCode (voir l’onglet Codes essences)", value = "3"),
+          actionButton("calc_uni", "Calculer (arbre unique)", class = "btn btn-primary"),
+          checkboxInput("show_call_uni", "Afficher l'appel R", TRUE),
+          #helpText("Note : H n'est exigée que si la fonction tarif la demande réellement.")
+        ),
+        mainPanel(
+          h3("Résultat"),
+          verbatimTextOutput("result_msg_uni"),
+          tableOutput("result_table_uni"),
+          conditionalPanel(
+            condition = "input.show_call_uni == true",
+            h4("Appel R"),
+            verbatimTextOutput("appel_uni")
+          ),
+          hr(),
+          h4("Aide intégrée"),
+          uiOutput("help_uni")
+        )
+      )
+    ),
+    
+    # 3.2) Onglet Jeu de données ------------------------------
+    tabPanel(
+      "Jeu de données",
+      sidebarLayout(
+        sidebarPanel(
+          fileInput("file_up", "Fichier (.xlsx ou .csv)", accept = c(".xlsx",".csv",".CSV",".XLSX")),
+          radioButtons("sep_choice", "Séparateur colonnes", inline = TRUE,
+                       choices = c("Auto" = "auto", "Point-virgule ;" = "; ", "Virgule ," = ", ", "Tabulation" = "tab"),
+                       selected = "auto"),
+          uiOutput("mapping_ui"),
+          actionButton("calc_batch", "Calculer (lot d’arbres)", class = "btn btn-primary"),
+          hr(),
+          downloadButton("dl_template_xlsx", "Télécharger modèle Excel"),
+          downloadButton("dl_results", "Télécharger résultats CSV")
+        ),
+        mainPanel(
+          h3("Aperçu du fichier importé"),
+          tableOutput("preview"),
+          hr(),
+          h3("Résultats"),
+          tableOutput("result_table_batch"),
+          verbatimTextOutput("result_msg_batch")
+        )
+      )
+    ),
+    
+    # --- 3.3 Onglet 3 : Codes essences ---
+    tabPanel(
+      "Codes essences",
+      fluidRow(
+        column(
+          12,
+          h3("Liste des codes d’espèces disponibles"),
+          tableOutput("codes_table"),
+          p(em("Note :"), "utilise ces codes dans le champ speciesCode (arbre unique ou fichier).")
+        )
+      )
+    )
+  )
+)
+
+##############################################################
+# 4) SERVER
+##############################################################
+server <- function(input, output, session) {
+  
+  # [AJOUT] Champ de hauteur dynamique selon le tarif choisi (en dehors du calcul)
+  output$h_ui <- renderUI({
+    if (identical(input$tarif_uni, "tarif1")) return(NULL)                         # pas de H pour tarif1
+    if (identical(input$tarif_uni, "tarif2")) {
+      return(textInput("H_uni", "Hauteur dominante (Hdom) en m", value = "20"))   # libellé Hdom pour tarif2
+    }
+    textInput("H_uni", "Hauteur totale (m)", value = "20")                         # sinon H totale
+  })
+  
+  # 4.1) Calcul ARBRE UNIQUE ---------------------------------
+  calc_res_uni <- eventReactive(input$calc_uni, {
+    f  <- get(input$tarif_uni, envir = asNamespace("dagnelie"))
+    mp <- detect_mapping(f)  # noms réels des arguments
+    
+    # Saisies
+    C130_v    <- parse_vector(input$C130_uni)
+    H_v_input <- parse_vector(input$H_uni)
+    sp_v_raw  <- if (nzchar(input$species_uni)) trimws(input$species_uni) else NULL
+    
+    # Validation de base
+    validate(need(!is.null(C130_v), "C130 manquant."))
+    validate(need(has_name(mp$circ), paste0("Ce tarif n’a pas d’argument de circonférence reconnu (trouvé: ", paste(mp$all, collapse=", "), ").")))
+    
+    # ----
+    #   # [AJOUT] Validation de H selon le tarif
+    #   if (has_name(mp$h)) {
+    #     validate(need(!is.null(H_v_input),
+    #                   if (identical(input$tarif_uni, "tarif2"))
+    #                     "Hdom requise pour ce tarif (Hauteur dominante)."
+    #                   else
+    #                     "Hauteur requise pour ce tarif."
+    #     ))
+    #   }
+    # ----
+    # [AJOUT] Validation de H selon le tarif (version active)
+    if (has_name(mp$h)) {
+      validate(need(!is.null(H_v_input),
+                    if (identical(input$tarif_uni, "tarif2"))
+                      "Hdom requise pour ce tarif (Hauteur dominante)."
+                    else
+                      "Hauteur requise pour ce tarif."
+      ))
+    }
+    
+    # H n'est requise que si la fonction A effectivement un paramètre de hauteur
+    #if (has_name(mp$h)) {
+    #  validate(need(!is.null(H_v_input), "Hauteur requise pour ce tarif (paramètre de hauteur détecté)."))
+    #}
+    # ----
+    
+    # speciesCode requis uniquement si la fonction a un paramètre 'espèce'
+    if (has_name(mp$sp)) {
+      validate(need(!is.null(sp_v_raw), "speciesCode requis pour ce tarif."))
+      validate(need(!(sp_v_raw %in% aggregate_codes),
+                    paste0("Le code '", sp_v_raw, "' est une catégorie agrégée et n’est pas accepté pour les calculs unitaires.")))
+    } else {
+      sp_v_raw <- NULL
+    }
+    
+    # Harmonisation longueurs
+    n <- max(length(C130_v), if (has_name(mp$h)) length(H_v_input) else 1, if (!is.null(sp_v_raw)) 1 else 1)
+    C130_v <- recycle_to(C130_v, n)
+    if (has_name(mp$h)) H_v <- recycle_to(H_v_input, n) else H_v <- rep(NA, n)
+    sp_v <- if (!is.null(sp_v_raw)) rep(sp_v_raw, n) else rep(NA_character_, n)
+    
+    # Checks numériques simples
+    validate(need(all(is.numeric(C130_v)), "C130 doit être numérique (ou liste de nombres)."))
+    if (has_name(mp$h)) {
+      validate(need(all(is.numeric(H_v)), "H doit être numérique (ou liste de nombres)."))
+      validate(need(all(H_v > 0, na.rm = TRUE), "H doit être > 0."))
+    }
+    validate(need(all(C130_v > 0), "C130 doit être > 0."))
+    
+    # Calcul ligne à ligne
+    vols <- numeric(n); msgs <- character(n)
+    for (i in seq_len(n)) {
+      args_i <- list()
+      if (has_name(mp$circ)) args_i[[mp$circ]] <- as.numeric(C130_v[i])
+      if (has_name(mp$h)    && !is.na(H_v[i])) args_i[[mp$h]]    <- as.numeric(H_v[i])
+      if (has_name(mp$sp)   && !is.na(sp_v[i])) {
+        sval <- as.character(sp_v[i])
+        if (grepl("^[0-9]+$", sval)) sval <- as.numeric(sval)
+        args_i[[mp$sp]] <- sval   # speciesCode prioritaire si présent
+      }
+      
+      res_i <- tryCatch(do.call(f, args_i), error = function(e) e)
+      if (inherits(res_i, "error")) {
+        vols[i] <- NA_real_; msgs[i] <- conditionMessage(res_i)
+      } else {
+        vols[i] <- suppressWarnings(as.numeric(res_i))[1]
+        msgs[i] <- if (is.na(vols[i])) "Résultat non-numérique" else "OK"
+      }
+    }
+    
+    #    data.frame(
+    #      C130        = C130_v,
+    #      H           = if (has_name(mp$h)) H_v else NA,
+    #      
+    #      speciesCode = if (has_name(mp$sp)) sp_v else NA,
+    #      volume      = vols,
+    #      statut      = msgs,
+    #      check.names = FALSE
+    #    )
+    # ----
+    #   # [AJOUT] data.frame corrigé (version finale)
+    data.frame(
+      C130        = C130_v,
+      H           = if (has_name(mp$h)) H_v else NA,
+      speciesCode = if (has_name(mp$sp)) sp_v else NA,
+      volume      = vols,
+      statut      = msgs,
+      check.names = FALSE
+    )
+  }, ignoreInit = TRUE)
+  #     ---------------------------------
+  
+  #  ---------------------------
+  output$result_table_uni <- renderTable({ req(calc_res_uni()); calc_res_uni() })
+  output$result_msg_uni <- renderPrint({
+    req(calc_res_uni())
+    ok <- sum(calc_res_uni()$statut == "OK"); n <- nrow(calc_res_uni())
+    if (ok == n) cat("✅ Calcul réussi.") else cat("⚠️", n - ok, "ligne(s) en erreur. Voir 'statut'.")
+  })
+  output$appel_uni <- renderText({
+    req(calc_res_uni())
+    df <- calc_res_uni()[1, ]
+    # On reconstruit un appel "propre" avec seulement les arguments existants
+    parts <- c(paste0("C130=", df$C130[1]))
+    # if (!is.na(df$H[1])) parts <- c(parts, paste0("H=", df$H[1]))
+    # [AJOUT] Affiche "Hdom" si tarif2, sinon "H"
+    if (!is.na(df$H[1])) {
+      parts <- c(parts, paste0(if (identical(input$tarif_uni, "tarif2")) "Hdom" else "H", "=", df$H[1]))
+    }
+    if (!is.na(df$speciesCode[1])) {
+      sc <- as.character(df$speciesCode[1])
+      parts <- c(parts, paste0("speciesCode=", if (grepl("^[0-9]+$", sc)) sc else paste0("'", sc, "'")))
+    }
+    paste0(input$tarif_uni, "(", paste(parts, collapse = ", "), ")")
+  })
+  output$help_uni <- renderUI({
+    txt <- tryCatch(paste(capture.output(utils::help(input$tarif_uni, package = "dagnelie")), collapse = "\n"),
+                    error = function(e) "Aide indisponible.")
+    tags$details(tags$summary(paste0("Afficher l’aide de ", input$tarif_uni)), tags$pre(txt))
+  })
+  
+  # 4.2) Import & mapping (JEU DE DONNÉES) -------------------
+  dat_raw <- reactive({
+    req(input$file_up)
+    ext <- tools::file_ext(input$file_up$name)
+    read_table_any(input$file_up$datapath, ext = ext, sep_choice = input$sep_choice)
+  })
+  output$preview <- renderTable({ req(dat_raw()); head(dat_raw(), 10) })
+  
+  output$mapping_ui <- renderUI({
+    req(dat_raw())
+    cols <- names(dat_raw())
+    tagList(
+      selectInput("col_tarif", "Colonne du tarif (ou fixe)", choices = c("<fixe>", cols), selected = "<fixe>"),
+      conditionalPanel(
+        condition = "input.col_tarif == '<fixe>'",
+        selectInput("tarif_fix", "Tarif fixe :", choices = c("tarif1","tarif2","tarif3","tarif4"), selected = "tarif1")
+      ),
+      selectInput("col_C130", "Colonne C130 (cm) :", choices = cols),
+      selectInput("col_H",    "Colonne H (m) :", choices = c("", cols), selected = ""),
+      selectInput("col_species", "Colonne speciesCode :", choices = c("", cols), selected = "")
+    )
+  })
+  
+  # 4.3) Calcul batch ----------------------------------------
+  calc_res_batch <- eventReactive(input$calc_batch, {
+    df <- dat_raw()
+    validate(need(!is.null(input$col_C130) && nzchar(input$col_C130), "Sélectionne la colonne C130."))
+    tarif_vec  <- if (input$col_tarif == "<fixe>") rep(input$tarif_fix, nrow(df)) else as.character(df[[input$col_tarif]])
+    C130_vec   <- df[[input$col_C130]]
+    H_vec      <- if (nzchar(input$col_H)) df[[input$col_H]] else rep(NA, nrow(df))
+    species_vec<- if (nzchar(input$col_species)) as.character(df[[input$col_species]]) else rep(NA_character_, nrow(df))
+    
+    # Détection & calcul par ligne
+    out <- vector("list", nrow(df))
+    for (i in seq_len(nrow(df))) {
+      tarif_i <- as.character(tarif_vec[i])
+      f <- tryCatch(get(tarif_i, envir = asNamespace("dagnelie")), error = function(e) NULL)
+      if (is.null(f)) { out[[i]] <- list(volume = NA, statut = paste0("Tarif inconnu: ", tarif_i)); next }
+      mp <- detect_mapping(f)
+      
+      args_i <- list()
+      if (has_name(mp$circ)) args_i[[mp$circ]] <- as.numeric(C130_vec[i])
+      if (has_name(mp$h) && !is.na(H_vec[i])) args_i[[mp$h]] <- as.numeric(H_vec[i])
+      
+      if (has_name(mp$sp) && !is.na(species_vec[i]) && nzchar(species_vec[i])) {
+        # blocage des catégories agrégées
+        if (species_vec[i] %in% aggregate_codes) {
+          out[[i]] <- list(volume = NA, statut = paste0("speciesCode agrégé non accepté: ", species_vec[i])); next
+        }
+        sval <- species_vec[i]
+        if (grepl("^[0-9]+$", sval)) sval <- as.numeric(sval)
+        args_i[[mp$sp]] <- sval
+      }
+      
+      res_i <- tryCatch(do.call(f, args_i), error = function(e) e)
+      if (inherits(res_i, "error")) {
+        out[[i]] <- list(volume = NA_real_, statut = conditionMessage(res_i))
+      } else {
+        v <- suppressWarnings(as.numeric(res_i))[1]
+        out[[i]] <- list(volume = v, statut = if (is.na(v)) "Résultat non-numérique" else "OK")
+      }
+    }
+    
+    data.frame(
+      tarif       = tarif_vec,
+      C130        = C130_vec,
+      H           = if (nzchar(input$col_H)) H_vec else NA,
+      speciesCode = species_vec,
+      volume      = sapply(out, `[[`, "volume"),
+      statut      = sapply(out, `[[`, "statut"),
+      check.names = FALSE
+    )
+  }, ignoreInit = TRUE)
+  
+  output$result_table_batch <- renderTable({ req(calc_res_batch()); head(calc_res_batch(), 50) })
+  output$result_msg_batch <- renderPrint({
+    req(calc_res_batch())
+    ok <- sum(calc_res_batch()$statut == "OK"); n <- nrow(calc_res_batch())
+    cat("Lignes OK :", ok, "/", n, " | Lignes en erreur :", n - ok, "\n")
+    if (any(calc_res_batch()$statut != "OK")) cat("⚠️ Voir la colonne 'statut' pour le détail.")
+  })
+  
+  # 4.4) Téléchargements -------------------------------------
+  output$dl_template_xlsx <- downloadHandler(
+    filename = function() "template_cubage.xlsx",
+    content = function(file) {
+      tpl <- data.frame(
+        tarif       = c("tarif1","tarif2","tarif3"),
+        C130        = c(100, 120, 110),
+        H           = c(NA,  20,  25),   # H si le tarif la demande
+        speciesCode = c("3","41","3"),   # Hêtre, Épicéa commun, Hêtre (exemples)
+        stringsAsFactors = FALSE
+      )
+      writexl::write_xlsx(tpl, path = file)
+    }
+  )
+  
+  output$dl_results <- downloadHandler(
+    filename = function() "resultats_cubage.csv",
+    content = function(file) {
+      req(calc_res_batch())
+      write.csv(calc_res_batch(), file, row.names = FALSE, fileEncoding = "UTF-8")
+    }
+  )
+  
+  # 4.5) Codes essences (table fournie) -----------------------
+  output$codes_table <- renderTable({
+    species_codes
+  })
+}
+
+##############################################################
+# 5) LANCEMENT
+##############################################################
+shinyApp(ui = ui, server = server)
