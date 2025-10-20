@@ -17,7 +17,7 @@ devtools::install_gitlab("Samuel.Douin/lainchant")
 
 This section is addressed to the project's developers and details how to retrieve the team's configured project.
 
-1.  Clone the Project:Use RStudio: `File` > `New Project` > `Version Control` > `Git`. Paste your GitLab repository URL: `https://gitlab.uliege.be/Samuel.Douin/lainchant`
+1.  Clone the Project:Use RStudio: `File` > `New Project` > `Version Control` > `Git`. Paste your GitLab repository URL: `https://gitlab.uliege.be/David.Linchant/gcuber`
 2.  Open:** Open the `GCubeR.Rproj` file.
 3.  Synchronization:
     * Before Coding:Perform a Pull to fetch the latest changes from the team.
