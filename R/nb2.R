@@ -18,7 +18,7 @@
 gcbr <- function(data, 
                  method = c("all","Biomasse_Valet","Volume_Vallet"), 
                  na_action = c("error", "omit"), 
-                 output) {
+                 output = NULL) {
   
   na_action <- match.arg(na_action)
   method <- match.arg(method) #si rien de spécifié en méthode il prend la valeur "all"  
@@ -59,12 +59,11 @@ gcbr <- function(data,
          "\n Veuillez lire la liste d'essence dans ?nb2 ou sélectionner une essence de substitution")
   }
   
-  
   ## --- 4) Table d'équations 
-  if (!exists("équations_GCubeR", inherits = TRUE)) {
+  if (!exists("e_quations_GCubeR", inherits = TRUE)) {
     stop("La table interne 'équations_GCubeR' est introuvable.")
   }
-  eq <- `équations_GCubeR`
+  eq <- `e_quations_GCubeR`
   nline <- nrow(data)
   
   # TRAITEMENT DES DONNEES ------------------------------------------------------
