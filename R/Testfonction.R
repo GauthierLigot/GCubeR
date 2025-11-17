@@ -85,4 +85,4 @@ LAINCHANT <- function(data, method, na_action = c("error", "omit")) {
   out$Volume <- Volume
   out
 }
-#changement pour voir si ca marche
+#changement pour voir si ca ss
