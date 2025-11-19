@@ -1,34 +1,31 @@
-# Chargement des données
-data <- data.frame(
-  Volume = c(1.2, 0.8, 2.5),
-  ESS = c("PICEA_ABIES", "QUERCUS_ROBUR", "PINUS_SYLVESTRIS")
-)
-
-dens_table <- data.frame(
-  species_code = c("PICEA_ABIES", "QUERCUS_ROBUR", "PINUS_SYLVESTRIS"),
-  density = c(400, 650, 500),
-  type = c("conifère", "feuillu", "conifère")
-)
-
-# Calcul
-resultats <- biomasse_calc(data, dens_table)
-
-
-
 biomasse_calc <- function(data,
-                          dens_table,
+                          density_table,
                           na_action = c("error", "omit"),
                           output = NULL) {
   
   na_action <- match.arg(na_action)
-  
+
+  # récupérer le fichier des densité
+  path_density <- file.path("data-raw", "density_table.csv")
+  density_table <- read_delim(
+    file = path_density,
+    delim = ";",
+    locale = locale(decimal_mark = ",", encoding = "UTF-8"),
+    trim_ws = TRUE,
+    show_col_types = FALSE
+  )
   # Vérification des colonnes
-  stopifnot(is.data.frame(data))
+  stopifnot(is.data.frame(data), is.data.frame(density_table))
   needed <- c("Volume", "ESS")
   miss <- setdiff(needed, names(data))
   if (length(miss) > 0) {
-    stop("Colonnes manquantes : ", paste(miss, collapse = ", "))
+    stop("Colonnes manquantes dans 'data' : ", paste(miss, collapse = ", "))
   }
+  
+  # Nettoyage des ESS
+  data <- data %>% mutate(ESS = toupper(trimws(ESS)))
+  density_table <- density_table %>% mutate(ESS = toupper(trimws(ESS)),
+                                      con_feu = tolower(trimws(con_feu)))
   
   # Gestion des NA
   idx_keep <- rep(TRUE, nrow(data))
@@ -40,17 +37,13 @@ biomasse_calc <- function(data,
   data <- data[idx_keep, ]
   
   # Vérification des essences
-  mauvaises <- setdiff(unique(data$ESS), dens_table$species_code)
+  mauvaises <- setdiff(unique(data$ESS), density_table$ESS)
   if (length(mauvaises) > 0) {
     stop("Essences inconnues : ", paste(mauvaises, collapse = ", "))
   }
   
-  # Initialisation des colonnes
-  data$Bag   <- NA_real_
-  data$Bbg   <- NA_real_
-  data$Btot  <- NA_real_
-  data$C     <- NA_real_
-  data$CO2   <- NA_real_
+  # Jointure directe
+  data <- left_join(data, density_table %>% select(ESS, density, con_feu), by = "ESS")
   
   # Constantes
   a_bbg <- 1.0587
@@ -59,33 +52,28 @@ biomasse_calc <- function(data,
   a_C   <- 0.475
   a_CO2 <- 44 / 12
   
-  # Boucle
-  for (i in seq_len(nrow(data))) {
-    ess <- data$ESS[i]
-    vol <- data$Volume[i]
-    
-    ligne_dens <- dens_table[dens_table$species_code == ess, ]
-    dens <- as.numeric(ligne_dens$density)
-    type <- tolower(ligne_dens$type)
-    
-    FEB <- if (type == "conifère") 1.3 else if (type == "feuillu") 1.56 else NA
-    if (is.na(FEB)) {
-      warning("Type inconnu pour l'essence ", ess)
-      next
-    }
-    
-    Bag <- vol * FEB * dens
-    Bbg <- exp(-a_bbg + b_bbg * log(Bag) + c_bbg)
-    Btot <- Bag + Bbg
-    C <- Btot * a_C
-    CO2 <- C * a_CO2
-    
-    data$Bag[i]  <- Bag
-    data$Bbg[i]  <- Bbg
-    data$Btot[i] <- Btot
-    data$C[i]    <- C
-    data$CO2[i]  <- CO2
+  # Calcul vectorisé
+  data <- data %>%
+    mutate(
+      FEB = case_when(
+        con_feu == "conifere" ~ 1.3,
+        con_feu == "feuillu"  ~ 1.56,
+        TRUE ~ NA_real_
+      ),
+      Bag = Volume * FEB * density,
+      Bbg = exp(-a_bbg + b_bbg * log(Bag) + c_bbg),
+      Btot = Bag + Bbg,
+      C = Btot * a_C,
+      CO2 = C * a_CO2
+    )
+  
+  # Avertissement si type inconnu
+  if (any(is.na(data$FEB))) {
+    warning("Certains types (con_feu) sont inconnus ou mal orthographiés.")
   }
+  
+  # Suppression des colonnes intermédiaires
+  data <- data %>% select(-any_of(c("density", "con_feu", "FEB")))
   
   # Export ou affichage
   if (!is.null(output)) {
@@ -94,7 +82,7 @@ biomasse_calc <- function(data,
   } else {
     print(data)
   }
-  
   return(data)
 }
 
+resultats <- biomasse_calc(data, density_table)

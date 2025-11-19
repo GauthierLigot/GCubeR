@@ -1,0 +1,50 @@
+species_fr;ESS;con_feu;density
+Chêne indigène;QUERCUS;feuillu;0,56
+Chene sessile;QUERCUS_PETRAEA;feuillu;0,58
+Chene pedonculé;QUERCUS_ROBUR;feuillu;0,54
+Chene pubescent;QUERCUS_PUBESCENS;feuillu;0,65
+Chene rouge;QUERCUS_RUBRA;feuillu;0,56
+Hetre;FAGUS_SYLVATICA;feuillu;0,55
+Erable sycomore;ACER_PSEUDOPLATANUS;feuillu;0,51
+Frene;FRAXINUS_EXCELSIOR;feuillu;0,56
+Orme;ULMUS_MINOR;feuillu;0,52
+Merisier;PRUNUS_AVIUM;feuillu;0,5
+Aubépine;CRATAEGUS_MONOGYNA;feuillu;0,6
+Prunellier;PRUNUS_SPINOSA;feuillu;0,58
+Bouleau;BETULA_PENDULA;feuillu;0,52
+Aulne blanc;ALNUS_INCANA;feuillu;0,42
+Aulne glutineux;ALNUS_GLUTINOSA;feuillu;0,42
+Charme;CARPINUS_BETULUS;feuillu;0,61
+Chataignier;CASTANEA_SATIVA;feuillu;0,47
+Erable champetre;ACER_CAMPESTRE;feuillu;0,56
+Sorbier;SORBUS_AUCUPARIA;feuillu;0,62
+Marronnier;AESCULUS_HIPPOCASTANUM;feuillu;0,5
+Noisetier;CORYLUS_AVELLANA;feuillu;0,52
+Noyer;JUGLANS_REGIA;feuillu;0,52
+Peuplier hybride;POPULUS_X_CANADENSIS;feuillu;0,35
+Peuplier tremble;POPULUS_TREMULA;feuillu;0,38
+Robinier;ROBINIA_PSEUDOACACIA;feuillu;0,58
+Saule marsault;SALIX_CAPREA ;feuillu;0,37
+Autre saule;SALIX;feuillu;0,37
+Tilleuls;TILIA_CORDATA;feuillu;0,43
+Pommier;MALUS_DOMESTICA;feuillu;0,55
+Poirier;PYRUS_COMMUNIS;feuillu;0,56
+Alisier;SORBUS_TERMINALIS;feuillu;0,62
+Sureaux;SAMBUCUS_NIGRA;feuillu;0,45
+Bourdaine;FRANGULA_ALNUS;feuillu;0,48
+Cerisier;PRUNUS_CERASUS;feuillu;0,56
+Epicea commun;PICEA_ABIES;conifere;0,37
+Epicea de sitka;PICEA_SITCHENSIS;conifere;0,36
+Spain de douglas;PSEUDOTSUGA_MENZIESII;conifere;0,43
+Meleze;LARIX_DECIDUA;conifere;0,48
+Pin sylvestre;PINUS_SYLVESTRIS;conifere;0,44
+Pin maritime;PINUS_PINASTER;conifere;0,46
+Pin noir d’Autriche;PINUS_NIGRA;conifere;0,46
+Pin noir de corse;PINUS_NIGRA_SUBSP_CORSICANA;conifere;0,46
+Pin weymouth;PINUS_STROBUS;conifere;0,34
+Sapin pectiné;ABIES_ALBA;conifere;0,38
+Sapin de vancouver;ABIES_GRANDIS;conifere;0,36
+Cypres;CUPRESSUS_SEMPERVIRENS;conifere;0,4
+Tsuga;TSUGA_CANADENSIS;conifere;0,42
+Thuya;THUJA_PLICATA;conifere;0,4
+If;TAXUS_BACCATA;conifere;0,58
