@@ -4,6 +4,10 @@ data <- data.frame(
   ESS = c("PICEA_ABIES", "QUERCUS_ROBUR", "PINUS_SYLVESTRIS")
 )
 
+# Chargement des library
+library(readr)
+library(dplyr)
+
 #Fonction
 biomasse_calc <- function(data,
                           density_table,
@@ -78,9 +82,6 @@ biomasse_calc <- function(data,
   if (any(is.na(data$FEB))) {
     warning("Certains types (con_feu) sont inconnus ou mal orthographiés.")
   }
-  
-  # Suppression des colonnes intermédiaires
-  data <- data %>% select(-any_of(c("density", "con_feu", "FEB")))
   
   # Export ou affichage
   if (!is.null(output)) {
