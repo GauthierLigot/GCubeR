@@ -1,14 +1,14 @@
-biomasse_calc <- function(data,
+biomass_calc <- function(data,
                           na_action = c("error", "omit"),
                           output = NULL) {
   
   na_action <- match.arg(na_action)
   
-  # Chargement des packages
+  # Load required packages
   library(dplyr)
   library(readr)
   
-  # Lecture du fichier de densité
+  # Read density file
   path_density <- file.path("data-raw", "density_table.csv")
   density_table <- read_delim(
     file = path_density,
@@ -18,60 +18,60 @@ biomasse_calc <- function(data,
     show_col_types = FALSE
   )
   
-  # Vérification des colonnes
+  # Check required columns
   stopifnot(is.data.frame(data), is.data.frame(density_table))
   needed <- c("Vc22", "Vta", "ESS")
   miss <- setdiff(needed, names(data))
   if (length(miss) > 0) {
-    stop("Colonnes manquantes dans 'data' : ", paste(miss, collapse = ", "))
+    stop("Missing columns 'data' : ", paste(miss, collapse = ", "))
   }
   
-  # Nettoyage
+  # Clean species names
   data <- data %>% mutate(ESS = toupper(trimws(ESS)))
   density_table <- density_table %>% mutate(
     ESS = toupper(trimws(ESS)),
-    con_feu = tolower(trimws(con_feu)),
+    con_broad = tolower(trimws(con_broad)),
     density = as.numeric(gsub(",", ".", as.character(density)))
   )
   
-  # Gestion des NA
+  # Handle missing values
   idx_keep <- rep(TRUE, nrow(data))
   if (na_action == "omit") {
     idx_keep <- complete.cases(data[, needed])
   } else if (anyNA(data$Vc22) || anyNA(data$Vta) || anyNA(data$ESS)) {
-    stop("NA détectés dans Vc22/Vta/ESS. Utilise na_action='omit' pour les ignorer.")
+    stop("Missing values detected in Vc22/Vta/ESS. Use na_action = 'omit' to ignore them.")
   }
   data <- data[idx_keep, ]
   
-  # Vérification des essences
+  # Check species validity
   mauvaises <- setdiff(unique(data$ESS), density_table$ESS)
   if (length(mauvaises) > 0) {
-    stop("Essences inconnues : ", paste(mauvaises, collapse = ", "))
+    stop("Unknown species : ", paste(mauvaises, collapse = ", "))
   }
   
-  # Jointure
-  data <- left_join(data, density_table %>% select(ESS, density, con_feu), by = "ESS")
+  # Join with density table
+  data <- left_join(data, density_table %>% select(ESS, density, con_broad), by = "ESS")
   
-  # Constantes
+  # Constants
   a_bbg <- 1.0587
   b_bbg <- 0.8836
   c_bbg <- 0.2840
   a_C   <- 0.475
   a_CO2 <- 44 / 12
   
-  # Espèces Vallet
+  # Species compatible with Vallet method
   vallet_species <- c(
     "PICEA_ABIES", "QUERCUS_ROBUR", "FAGUS_SYLVATICA",
     "PINUS_SYLVESTRIS", "PINUS_PINASTER", "ABIES_ALBA",
     "PSEUDOTSUGA_MENZIESII"
   )
   
-  # Calculs séparés pour CNIEFEB et Vallet
+  # Separate calculations for CNIEFEB and Vallet
   data <- data %>%
     mutate(
       FEB = case_when(
-        con_feu == "conifere" ~ 1.3,
-        con_feu == "feuillu"  ~ 1.56,
+        con_broad == "conifer" ~ 1.3,
+        con_broad == "broadleaf"  ~ 1.56,
         TRUE ~ NA_real_
       ),
       # CNIEFEB
@@ -81,7 +81,7 @@ biomasse_calc <- function(data,
       C_CNIEFEB = Btot_CNIEFEB * a_C,
       CO2_CNIEFEB = C_CNIEFEB * a_CO2,
       
-      # Vallet (si espèce compatible)
+      # Vallet (if species compatible)
       Bag_Vallet = if_else(ESS %in% vallet_species, Vta * density, NA_real_),
       Bbg_Vallet = if_else(!is.na(Bag_Vallet), exp(-a_bbg + b_bbg * log(Bag_Vallet) + c_bbg), NA_real_),
       Btot_Vallet = Bag_Vallet + Bbg_Vallet,
@@ -89,10 +89,10 @@ biomasse_calc <- function(data,
       CO2_Vallet = C_Vallet * a_CO2
     )
   
-  # Export ou affichage
+  # Export or display results
   if (!is.null(output)) {
-    write.csv(data, file = output, row.names = FALSE)
-    message("Fichier écrit : ", normalizePath(output, winslash = "/"))
+    write_delim(data, file = output, delim = ";", na = "", col_names = TRUE)
+    message("File written : ", normalizePath(output, winslash = "/"))
   } else {
     print(data)
   }
@@ -100,15 +100,24 @@ biomasse_calc <- function(data,
   return(data)
 }
 
-# Données test
+# Test data
 data <- data.frame(
   ESS = c(
-    "PICEA_ABIES", "QUERCUS_ROBUR", "FAGUS_SYLVATICA", "PINUS_SYLVESTRIS",  # Vallet compatibles
-    "BETULA_PENDULA", "ROBINIA_PSEUDOACACIA", "TILIA_CORDATA"              # CNIEFEB uniquement
+    "PICEA_ABIES", "QUERCUS_ROBUR", "FAGUS_SYLVATICA", "PINUS_SYLVESTRIS",  # Vallet-compatible species
+    "BETULA_PENDULA", "ROBINIA_PSEUDOACACIA", "TILIA_CORDATA"              # CNIEFEB-only species
   ),
-  Vc22 = c(1.2, 0.8, 1.5, 2.0, 1.1, 0.9, 1.3),  # volume tronc
-  Vta  = c(1.6, 1.1, 2.0, 2.5, 1.4, 1.2, 1.6)   # volume total aérien
+  Vc22 = c(1.2, 0.8, 1.5, 2.0, 1.1, 0.9, 1.3),  # trunk volume
+  Vta  = c(1.6, 1.1, 2.0, 2.5, 1.4, 1.2, 1.6)   # total aboveground volume
 )
 
-resultats <- biomasse_calc(data)
+# Run biomass calculation
+output_path <- "results.csv"
+results <- biomass_calc(data, output = output_path)
+
+if (file.exists(output_path)) {
+  message("✅ CSV file successfully created.")
+} else {
+  warning("⚠️ CSV file was not created.")
+}
+
 
