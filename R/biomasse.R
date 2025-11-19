@@ -1,3 +1,10 @@
+# Données test
+data <- data.frame(
+  Volume = c(1.2, 0.8, 2.5),
+  ESS = c("PICEA_ABIES", "QUERCUS_ROBUR", "PINUS_SYLVESTRIS")
+)
+
+#Fonction
 biomasse_calc <- function(data,
                           density_table,
                           na_action = c("error", "omit"),
