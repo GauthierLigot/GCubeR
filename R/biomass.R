@@ -160,9 +160,9 @@ biomass_calc <- function(data,
   data <- data[idx_keep, ]
   
   ## Check species validity ----
-  mauvaises <- setdiff(unique(data$species_code), density_table$species_code)
-  if (length(mauvaises) > 0) {
-    stop("Unknown species : ", paste(mauvaises, collapse = ", "))
+  wrong <- setdiff(unique(data$species_code), density_table$species_code)
+  if (length(wrong) > 0) {
+    stop("Unknown species : ", paste(wrong, collapse = ", "))
   }
   
   ## Merge with density table ----
