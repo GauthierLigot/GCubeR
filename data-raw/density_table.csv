@@ -1,4 +1,4 @@
-species_fr;ESS;con_broad;density
+species_fr;species_code;con_broad;density
 Chêne indigène;QUERCUS;broadleaf;0,56
 Chene sessile;QUERCUS_PETRAEA;broadleaf;0,58
 Chene pedonculé;QUERCUS_ROBUR;broadleaf;0,54
