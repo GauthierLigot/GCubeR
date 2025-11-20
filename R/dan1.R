@@ -40,7 +40,7 @@ dan1 <- function(data,
 
   if (length(wrong) > 0) {
     stop("Unknown species : ", paste(wrong, collapse=", "),
-        "\n You can find the list of available species in the helper (?gcbrdan)")
+        "\n You can find the list of available species in the helper (?dan1)")
   }
 
   # Preparation of the df ----
