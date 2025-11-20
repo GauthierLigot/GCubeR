@@ -219,7 +219,6 @@ biomass_calc <- function(data,
   } else {
     print(data)
   }
-  
   return(data)
 }
 
