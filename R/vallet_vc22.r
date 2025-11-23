@@ -11,7 +11,7 @@
 #'   will be written to this file using semicolon (;) as a delimiter. NA values are
 #'   written as empty strings (""). Defaults to \code{NULL}.
 #'
-#' @return The resulting data frame with the new column \code{v_vc22} 
+#' @return The resulting data frame with the new column \code{vallet_vc22} 
 #'   (Commercial Volume in **m³**).
 #'
 #' @details
@@ -31,11 +31,11 @@
 #' )
 #' 
 #' # Expect negative/unrealistic results due to coefficient incompatibility
-#' results_console <- v_vc22(data_test_vc22)
+#' results_console <- vallet_vc22(data_test_vc22)
 #' print(results_console)
 #'
 #' @export
-v_vc22 <- function(data,
+vallet_vc22 <- function(data,
                       na_action = c("error", "omit"),
                       output = NULL) {
   
@@ -125,14 +125,14 @@ v_vc22 <- function(data,
       vc22_dm3 = term1_a + (term2_bc * term3_geom),
       
       # Convert to m³ (Final Unit)
-      v_vc22 = vc22_dm3 / 1000 # dm³ -> m³
+      vallet_vc22 = vc22_dm3 / 1000 # dm³ -> m³
     ) %>%
     # Remove temporary columns
     select(-starts_with("coeff_"), -vc22_dm3, -starts_with("term"))
   
   # FINAL STEP: Set VC22 to NA for all identified invalid rows
   if (length(rows_to_invalidate) > 0) {
-    data$v_vc22[rows_to_invalidate] <- NA
+    data$vallet_vc22[rows_to_invalidate] <- NA
   }
   
   # OUTPUT ----

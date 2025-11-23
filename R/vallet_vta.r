@@ -15,7 +15,7 @@
 #'   will be written to this file using semicolon (;) as a delimiter. NA values are
 #'   written as empty strings (""). Defaults to \code{NULL}.
 #'
-#' @return The resulting data frame (same as the printed data) with the new columns \code{form} (Form Factor) and \code{v_vta} (Total Aboveground Volume in **m³**)..
+#' @return The resulting data frame (same as the printed data) with the new columns \code{form} (Form Factor) and \code{vallet_vta} (Total Aboveground Volume in **m³**)..
 #'
 #' @details
 #' The model is only valid for trees with a circumference at 1.30m (\code{c130}) of at least **45 cm**.
@@ -37,13 +37,13 @@
 #' )
 #' 
 #' # Case 1: Print results to console (default)
-#' results_console <- v_vta(data_test)
+#' results_console <- vallet_vta(data_test)
 #' 
 #' # Case 2: Write results to a file
-#' # v_vta(data_test, output = "vta_results.csv")
+#' # vallet_vta(data_test, output = "vta_results.csv")
 #'
 #' @export
-v_vta <- function(data,
+vallet_vta <- function(data,
                      na_action = c("error", "omit"),
                      output = NULL) { 
   
@@ -130,14 +130,14 @@ v_vta <- function(data,
       form = (a + (b * c130) + term1_c) * term2_d, 
       
       # Step 2: Calculate VTA
-      v_vta = form * (pi / 40000) * (c130^2) * htot
+      vallet_vta = form * (pi / 40000) * (c130^2) * htot
     ) %>%
-    # Remove temporary columns, coefficients, keeping 'form' and 'v_vta'
+    # Remove temporary columns, coefficients, keeping 'form' and 'vallet_vta'
     select(-starts_with("coeff_"), -a, -b, -c, -d, -starts_with("term"))
   
   # Final step: Set vta and form factor to NA for all identified invalid rows
   if (length(rows_to_invalidate) > 0) {
-    data$v_vta[rows_to_invalidate] <- NA
+    data$vallet_vta[rows_to_invalidate] <- NA
     data$form[rows_to_invalidate] <- NA
   }
   

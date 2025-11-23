@@ -1,6 +1,6 @@
 #' Volume Estimation Using the Algan Method
 #'
-#' Computes aerial total volume (`a_vta`) and merchantable volume (`a_v_merch`)
+#' Computes aerial total volume (`algan_vta`) and merchantable volume (`algan_vmerch`)
 #' according to the Algan method. The function validates input data, ensures
 #' required columns are present and applies formulas only to compatible species.
 #'
@@ -10,8 +10,8 @@
 #'   - `htot`: total tree height (m).
 #'
 #' @return A data frame with the original input columns plus two new outputs:
-#' - `a_vta`: aerial total volume (m³). Computed only for `"ABIES_ALBA"`, `NA` otherwise.
-#' - `a_v_merch`: merchantable volume (m³). Computed only for compatible species
+#' - `algan_vta`: aerial total volume (m³). Computed only for `"ABIES_ALBA"`, `NA` otherwise.
+#' - `algan_vmerch`: merchantable volume (m³). Computed only for compatible species
 #'   (`ABIES_ALBA`, `PICEA_ABIES`, `ALNUS_GLUTINOSA`, `PRUNUS_AVIUM`, `BETULA_SP`),
 #'   `NA` otherwise.
 #'
@@ -19,9 +19,9 @@
 #' - Input `dbh` must be in centimeters (cm). The function converts it internally to meters.
 #' - Input `htot` must be in meters (m).
 #' - Formula for aerial total volume (only `"ABIES_ALBA"`):
-#'   \deqn{a_vta = 0.4 * (dbh/100)^2 * htot}
+#'   \deqn{algan_vta = 0.4 * (dbh/100)^2 * htot}
 #' - Formula for merchantable volume (compatible species):
-#'   \deqn{a_v_merch = 0.33 * (dbh/100)^2 * htot}
+#'   \deqn{algan_vmerch = 0.33 * (dbh/100)^2 * htot}
 #' - Resulting volumes are expressed in cubic meters (m³).
 #' - If required columns are missing or non-numeric, the function stops with an error.
 #' - Both output columns are always created to ensure consistency for downstream functions.
@@ -34,12 +34,12 @@
 #'   dbh = c(30, 25, 20, 40),   # cm
 #'   htot = c(20, 18, 15, 22)   # m
 #' )
-#' algan_volume(df)
+#' algan_vta_vmerch(df)
 #'
 #' @export
  
 # VOLUME CALCULATION WITH ALGAN METHOD ----
-algan_volume <- function(data) {
+algan_vta_vmerch <- function(data) {
   
   # INPUT CHECKS ----
   ## Required columns ----
@@ -66,19 +66,19 @@ algan_volume <- function(data) {
   }
   
   # CONSTANTS ----
-  coef_v_merch = 0.33
+  coef_vmerch = 0.33
   coef_vta = 0.4
   
   # OUTPUT ----
   data <- data %>%
     dplyr::mutate(
       dbh_m = dbh / 100,  # cm → m
-      a_v_merch = dplyr::if_else(
+      algan_vmerch = dplyr::if_else(
         species_code %in% merch_species,
-        coef_v_merch * (dbh_m^2) * htot,
+        coef_vmerch * (dbh_m^2) * htot,
         NA_real_
       ),
-      a_vta = dplyr::if_else(
+      algan_vta = dplyr::if_else(
         species_code == "ABIES_ALBA",
         coef_vta * (dbh_m^2) * htot,
         NA_real_
