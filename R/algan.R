@@ -37,42 +37,50 @@
 #' algan_volume(df)
 #'
 #' @export
+ 
+# VOLUME CALCULATION WITH ALGAN METHOD ----
 algan_volume <- function(data) {
   
-  # Required columns ----
+  # INPUT CHECKS ----
+  ## Required columns ----
   required_cols <- c("species_code", "dbh", "htot")
   missing_cols <- setdiff(required_cols, names(data))
   if (length(missing_cols) > 0) {
     stop("Missing required columns: ", paste(missing_cols, collapse = ", "))
   }
   
-  # Validate numeric inputs ----
+  ## Validate numeric inputs ----
   if (!is.numeric(data$dbh)) stop("'dbh' must be numeric (cm).")
   if (!is.numeric(data$htot)) stop("'htot' must be numeric (m).")
   
-  # Clean species names ----
+  ## Clean species names ----
   data <- data %>% dplyr::mutate(species_code = toupper(trimws(species_code)))
   
-  # Define compatible species ----
+  ## Define compatible species ----
   merch_species <- c("ABIES_ALBA", "PICEA_ABIES", "ALNUS_GLUTINOSA", "PRUNUS_AVIUM", "BETULA_SP")
   
-  # Identify incompatible species ----
+  ## Identify incompatible species ----
   incompatible <- setdiff(unique(data$species_code), c("ABIES_ALBA", merch_species))
   if (length(incompatible) > 0) {
     message("⚠️ Algan method not defined for species: ", paste(incompatible, collapse = ", "))
   }
-  # Create output columns ----
+  
+  # CONSTANTS ----
+  coef_v_merch = 0.33
+  coef_vta = 0.4
+  
+  # OUTPUT ----
   data <- data %>%
     dplyr::mutate(
       dbh_m = dbh / 100,  # cm → m
       a_v_merch = dplyr::if_else(
         species_code %in% merch_species,
-        0.33 * (dbh_m^2) * htot,
+        coef_v_merch * (dbh_m^2) * htot,
         NA_real_
       ),
       a_vta = dplyr::if_else(
         species_code == "ABIES_ALBA",
-        0.4 * (dbh_m^2) * htot,
+        coef_vta * (dbh_m^2) * htot,
         NA_real_
       )
     )

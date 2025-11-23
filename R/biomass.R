@@ -89,7 +89,7 @@
 #' }
 #'
 #' @export
-#' 
+ 
 # BIOMASS CALCULATION ----
 biomass_calc <- function(data,
                          na_action = c("error", "omit"),
@@ -172,7 +172,7 @@ biomass_calc <- function(data,
   ## Check species validity ----
   wrong <- setdiff(unique(data$species_code), density_table$species_code)
   if (length(wrong) > 0) {
-    stop("Unknown species : ", paste(wrong, collapse = ", "))
+    message("Unknown species : ", paste(wrong, collapse = ", "))
   }
   
   ## Merge with density table ----
