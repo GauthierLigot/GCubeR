@@ -120,6 +120,7 @@ v_rondeux_larch <- function(data,
   data$vtot_rondeux <- NA_real_
   data$vc22_rondeux <- NA_real_
   
+  
   # --- COMPUTE VOLUMES FOR LARCH ----
   idx <- which(is_larch)
   
@@ -134,11 +135,22 @@ v_rondeux_larch <- function(data,
     data$vc22_rondeux[idx] <- a_vc22 + b_vc22 * c130_sq * htot
   }
   
+  # --- INVALIDATE RESULTS FOR C130 OUT OF RANGE ----
+  if (length(rows_c130_out) > 0) {
+    data$vtot_rondeux[rows_c130_out] <- NA
+    data$vc22_rondeux[rows_c130_out] <- NA
+  }
+  
   return(data)
 }
 
-# Invalidate results for c130 out of range
-if (length(rows_c130_out) > 0) {
-  data$vtot_rondeux[rows_c130_out] <- NA
-  data$vc22_rondeux[rows_c130_out] <- NA
-}
+
+
+df_test <- data.frame(
+  species_code = "LARIX_DECIDUA",
+  c130 = 50,
+  htot = 20
+)
+devtools::load_all()
+v_rondeux_larch(df_test)
+
