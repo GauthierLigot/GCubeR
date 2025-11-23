@@ -15,7 +15,7 @@
 #'   will be written to this file using semicolon (;) as a delimiter. NA values are
 #'   written as empty strings (""). Defaults to \code{NULL}.
 #'
-#' @return The resulting data frame (same as the printed data).
+#' @return The resulting data frame (same as the printed data) with the new columns \code{form} (Form Factor) and \code{v_vta} (Total Aboveground Volume in **m³**)..
 #'
 #' @details
 #' The model is only valid for trees with a circumference at 1.30m (\code{c130}) of at least **45 cm**.
@@ -137,7 +137,7 @@ v_vta <- function(data,
   
   # Final step: Set vta and form factor to NA for all identified invalid rows
   if (length(rows_to_invalidate) > 0) {
-    data$vta_vallet[rows_to_invalidate] <- NA
+    data$v_vta[rows_to_invalidate] <- NA
     data$form[rows_to_invalidate] <- NA
   }
   
