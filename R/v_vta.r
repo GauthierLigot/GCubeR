@@ -1,4 +1,4 @@
-#' @title Calculate Total Aboveground Volume (VTA) Vallet Method
+#' @title Calculate Total Aboveground Volume (VTA) Vallet Method 
 #' 
 #' @description Computes the total aboveground volume (VTA) for trees based on
 #'   the circumference at 1.30m (c130) and total height (htot) using the

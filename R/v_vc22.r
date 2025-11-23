@@ -81,7 +81,7 @@ v_vc22 <- function(data,
     ),
     error = function(e) {
       stop("Failed to load coefficient file 'vallet_vc22.csv' from 'data-raw' directory. Error: ", e$message)
-    }
+    } 
   )
   
   # Coalesce NA coefficients to 0 for calculation 
