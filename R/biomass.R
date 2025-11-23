@@ -32,18 +32,28 @@
 #'
 #' ### CNIEFEB method outputs (if `vc22` is available):
 #' - `cniefeb_bag`: aboveground biomass in tonnes of dry matter (t).
+#'   \deqn{cniefeb_bag = vc22 * feb * density}
 #' - `cniefeb_bbg`: belowground biomass in tonnes of dry matter (t).
+#'   \deqn{cniefeb_bbg = exp(-a_bbg + b_bbg * log(cniefeb_bag) + c_bbg)}
 #' - `cniefeb_btot`: total biomass in tonnes of dry matter (t).
+#'   \deqn{cniefeb_btot = cniefeb_bag + cniefeb_bbg}
 #' - `cniefeb_c`: carbon stock in tonnes of carbon (t C).
+#'   \deqn{cniefeb_c = cniefeb_btot * a_c}
 #' - `cniefeb_co2`: CO₂ equivalent in tonnes of CO₂ (t CO₂).
+#'   \deqn{cniefeb_co2 = cniefeb_c * a_co2}
 #'
 #' ### Vallet method outputs (if `v_vta` is available and species is compatible):
 #' - `vallet_bag`: aboveground biomass in tonnes of dry matter (t).
+#'   \deqn{vallet_bag = v_vta * density}
 #' - `vallet_bbg`: belowground biomass in tonnes of dry matter (t).
+#'   \deqn{vallet_bbg = exp(-a_bbg + b_bbg * log(vallet_bag) + c_bbg)}
 #' - `vallet_btot`: total biomass in tonnes of dry matter (t).
+#'   \deqn{vallet_btot = vallet_bag + vallet_bbg}
 #' - `vallet_c`: carbon stock in tonnes of carbon (t C).
+#'   \deqn{vallet_c = vallet_btot * a_c}
 #' - `vallet_co2`: CO₂ equivalent in tonnes of CO₂ (t CO₂).
-#' 
+#'   \deqn{vallet_co2 = vallet_c * a_co2}
+#'
 #' @details
 #' The function supports two biomass estimation methods: CNIEFEB and Vallet.
 #' 
@@ -221,4 +231,3 @@ biomass_calc <- function(data,
   }
   return(data)
 }
-
