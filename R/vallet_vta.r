@@ -1,4 +1,4 @@
-#' @title Calculate Total Aboveground Volume (VTA)
+#' @title Calculate Total Aboveground Volume (VTA) Vallet Method
 #' 
 #' @description Computes the total aboveground volume (VTA) for trees based on
 #'   the circumference at 1.30m (c130) and total height (htot) using the
@@ -11,9 +11,11 @@
 #'   core required values are explicitly \code{NA}. \code{"omit"} removes rows with missing core data. 
 #'   Note: Model constraint violation (\code{c130} < 45 cm) and unknown species are always
 #'   handled by setting VTA and Form Factor to NA, preserving input values.
+#' @param output Optional file path (string). If provided, the resulting data frame
+#'   will be written to this file using semicolon (;) as a delimiter. NA values are
+#'   written as empty strings (""). Defaults to \code{NULL}.
 #'
-#' @return A data frame with the original data plus new columns for the calculated 
-#'   \code{form} factor and the total volume \code{vta_vallet} (in m³).
+#' @return The resulting data frame (same as the printed data).
 #'
 #' @details
 #' The model is only valid for trees with a circumference at 1.30m (\code{c130}) of at least **45 cm**.
@@ -30,23 +32,26 @@
 #' @examples
 #' data_test <- data.frame(
 #'   species_code = c("PICEA_ABIES", "FAGUS_SYLVATICA", "UNKNOWN_SPECIES", "QUERCUS_ROBUR"),
-#'   c130 = c(60, 80, 50, 40), # c130=40 is below 45cm constraint
+#'   c130 = c(60, 80, 50, 40), 
 #'   htot = c(25, 18, 20, 22)
 #' )
 #' 
-#' # The function runs, and handles invalid/unknown data with NA and warnings
-#' results <- vta_calc(data_test)
-#' print(results)
+#' # Case 1: Print results to console (default)
+#' results_console <- v_vta(data_test)
+#' 
+#' # Case 2: Write results to a file
+#' # v_vta(data_test, output = "vta_results.csv")
 #'
 #' @export
-vta_calc <- function(data,
-                     na_action = c("error", "omit")) {
+v_vta <- function(data,
+                     na_action = c("error", "omit"),
+                     output = NULL) { 
   
   na_action <- match.arg(na_action)
   
   # MODEL VALIDATION CONSTANT
   min_c130 <- 45
-  rows_to_invalidate <- numeric(0) # Initialize vector to store indices of rows to invalidate
+  rows_to_invalidate <- numeric(0)
   
   # INPUT CHECKS & DATA PREPARATION ----
   required_columns <- c("species_code", "c130", "htot")
@@ -63,14 +68,13 @@ vta_calc <- function(data,
                    " tree(s) have c130 < ", min_c130, " cm. Form factor and VTA will be set to NA for these rows: ",
                    paste(rows_too_small, collapse = ", ")), call. = FALSE)
     
-    # Store indices to set results to NA later
     rows_to_invalidate <- c(rows_to_invalidate, rows_too_small)
   }
   
   ## Load Coefficients Table ----
   path_coeffs <- file.path("data-raw", "vallet_vta.csv")
   
-  vallet_coeffs <- tryCatch(
+  vallet_coeff <- tryCatch(
     read_delim(
       file = path_coeffs,
       delim = ";",
@@ -93,7 +97,7 @@ vta_calc <- function(data,
   ## Clean species names and join ----
   data <- data %>%
     mutate(species_code = toupper(trimws(species_code))) %>%
-    left_join(vallet_coeffs, by = "species_code")
+    left_join(vallet_coeff, by = "species_code")
   
   ## Check for unknown species (missing coefficients) ----
   rows_unknown_species <- which(is.na(data$coeff_a))
@@ -102,8 +106,8 @@ vta_calc <- function(data,
     wrong_species <- data[rows_unknown_species, ] %>%
       pull(species_code) %>%
       unique()
-    warning("Unknown species (missing VTA coefficients): ", paste(wrong_species, collapse = ", "),
-            ". Form factor and VTA will be set to NA for these rows.", call. = FALSE)
+    warning("Unknown species (missing vta coefficients): ", paste(wrong_species, collapse = ", "),
+            ". Form factor and vta will be set to NA for these rows.", call. = FALSE)
   }
   
   # Combine all rows where the VTA/Form calculation must be NA (unknown species + c130 constraint)
@@ -126,17 +130,24 @@ vta_calc <- function(data,
       form = (a + (b * c130) + term1_c) * term2_d, 
       
       # Step 2: Calculate VTA
-      vta_vallet = form * (pi / 40000) * (c130^2) * htot
+      v_vta = form * (pi / 40000) * (c130^2) * htot
     ) %>%
-    # Remove only temporary columns, keeping 'form'
+    # Remove temporary columns, coefficients, keeping 'form' and 'v_vta'
     select(-starts_with("coeff_"), -a, -b, -c, -d, -starts_with("term"))
   
-  # FINAL STEP: Set VTA and form factor to NA for all identified invalid rows
+  # Final step: Set vta and form factor to NA for all identified invalid rows
   if (length(rows_to_invalidate) > 0) {
     data$vta_vallet[rows_to_invalidate] <- NA
-    data$form[rows_to_invalidate] <- NA 
+    data$form[rows_to_invalidate] <- NA
   }
   
   # OUTPUT ----
+  if (!is.null(output)) { # <-- LOGIQUE AJOUTÉE
+    write_delim(data, file = output, delim = ";", na = "", col_names = TRUE)
+    message("File written: ", normalizePath(output, winslash = "/"))
+  } else {
+    print(data)
+  }
+  
   return(data)
 }
