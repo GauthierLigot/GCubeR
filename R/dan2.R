@@ -172,8 +172,9 @@ dagnelie_tarif2 <- function(data,
   # Iteration ----
   data$tarif2 <- with(
     data,
-    coeff_a + coeff_b * c130 + coeff_c * c130^2 + coeff_d * c130^3 + coeff_e*htot*c130 + coeff_f* htot * c130^2
+    coeff_a + coeff_b * c130 + coeff_c * c130^2 + coeff_d * c130^3 + coeff_e*htot + coeff_f* htot * c130^2
   )
   
+  data <- data[, c("species_code", "c130","htot", "tarif2")]
   return(data)
 }
