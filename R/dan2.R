@@ -1,7 +1,7 @@
-#' Single-entry Dagnelie volume (tarif 1)
+#' Single-entry Dagnelie volume (tarif 2)
 #'
 #' Computes the standing volume \eqn{v_{c,22}} (in cubic metres per tree) using
-#' Dagnelie's single-entry tarif 1 equations. The volume is calculated from the
+#' Dagnelie's two-entry tarif 2 equations. The volume is calculated from the
 #' stem circumference at 1.30 m (\code{c130}, in cm) and the tree species, using
 #' species-specific polynomial coefficients stored in \code{dan2}.
 #'
@@ -41,6 +41,7 @@
 #'
 #' @param data A \code{data.frame} containing at least the columns
 #'   \code{c130} (stem circumference at 1.30 m, in cm) and
+#'   \code{htot} (hight of the tree)
 #'   \code{species_code} (character code of the tree species).
 #' @param output Optional character string controlling the format of the output.
 #'   Currently ignored; the function always returns the input data frame with
