@@ -24,7 +24,7 @@
 #' The Form Factor (\code{form}) is calculated as:
 #' $$\text{form} = (a + b \cdot c_{130} + c \cdot \frac{\sqrt{c_{130}}}{h_{tot}}) \cdot (1 + \frac{d}{c_{130}^2})$$
 #' The Total Aboveground Volume (\code{VTA}) is then:
-#' $$\text{VTA} = \text{form} \cdot \frac{\pi}{40000} \cdot c_{130}^2 \cdot h_{tot}$$
+#' $$\text{VTA} = \text{form} \cdot \frac{1}{\pi \cdot 40000} \cdot c_{130}^2 \cdot h_{tot}$$
 #' Coefficients a, b, c, d are loaded from the \code{vallet_vta.csv} file.
 #'
 #' @import dplyr readr
@@ -130,7 +130,7 @@ vallet_vta <- function(data,
       form = (a + (b * c130) + term1_c) * term2_d, 
       
       # Step 2: Calculate VTA
-      vallet_vta = form * (pi / 40000) * (c130^2) * htot
+      vallet_vta = form * (1 /pi *40000) * (c130^2) * htot
     ) %>%
     # Remove temporary columns, coefficients, keeping 'form' and 'vallet_vta'
     select(-starts_with("coeff_"), -a, -b, -c, -d, -starts_with("term"))
