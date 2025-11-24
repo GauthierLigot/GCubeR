@@ -142,7 +142,7 @@ vallet_vta <- function(data,
   }
   
   # OUTPUT ----
-  if (!is.null(output)) { # <-- LOGIQUE AJOUTÉE
+  if (!is.null(output)) { 
     write_delim(data, file = output, delim = ";", na = "", col_names = TRUE)
     message("File written: ", normalizePath(output, winslash = "/"))
   } else {
