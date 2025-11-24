@@ -130,7 +130,7 @@ vallet_vta <- function(data,
       form = (a + (b * c130) + term1_c) * term2_d, 
       
       # Step 2: Calculate VTA
-      vallet_vta = form * (1 /pi *40000) * (c130^2) * htot
+      vallet_vta = form * (1 /(pi *40000)) * (c130^2) * htot
     ) %>%
     # Remove temporary columns, coefficients, keeping 'form' and 'vallet_vta'
     select(-starts_with("coeff_"), -a, -b, -c, -d, -starts_with("term"))
