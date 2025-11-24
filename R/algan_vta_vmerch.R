@@ -22,6 +22,9 @@
 #'   \deqn{algan_vta = 0.4 * (dbh/100)^2 * htot}
 #' - Formula for merchantable volume (compatible species):
 #'   \deqn{algan_vmerch = 0.33 * (dbh/100)^2 * htot}
+#'   - Domain of application:
+#'   - For `"ABIES_ALBA"` and `"PICEA_ABIES"`, the Algan method is valid only if `dbh > 15 cm`.
+#'   - For other compatible species (`ALNUS_GLUTINOSA`, `PRUNUS_AVIUM`, `BETULA_SP`), no minimum dbh threshold is applied.
 #' - Resulting volumes are expressed in cubic meters (m³).
 #' - If required columns are missing or non-numeric, the function stops with an error.
 #' - Both output columns are always created to ensure consistency for downstream functions.
@@ -65,6 +68,13 @@ algan_vta_vmerch <- function(data) {
     message("⚠️ Algan method not defined for species: ", paste(incompatible, collapse = ", "))
   }
   
+  ## DOMAIN CHECK ----
+  rows_outside_domain <- which(data$species_code %in% c("ABIES_ALBA", "PICEA_ABIES") & data$dbh <= 15)
+  if (length(rows_outside_domain) > 0) {
+    message("⚠️ The following rows are outside the domain of application (dbh ≤ 15 cm for ABIES_ALBA or PICEA_ABIES): ",
+            paste(rows_outside_domain, collapse = ", "))
+  }
+  
   # CONSTANTS ----
   coef_vmerch = 0.33
   coef_vta = 0.4
@@ -74,7 +84,8 @@ algan_vta_vmerch <- function(data) {
     dplyr::mutate(
       dbh_m = dbh / 100,  # cm → m
       algan_vmerch = dplyr::if_else(
-        species_code %in% merch_species,
+        species_code %in% merch_species & 
+          !(species_code %in% c("ABIES_ALBA", "PICEA_ABIES") & dbh <= 15),
         coef_vmerch * (dbh_m^2) * htot,
         NA_real_
       ),
