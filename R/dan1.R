@@ -72,14 +72,13 @@ dagnelie_tarif1 <- function(data,
   
   ## Species management ---- 
   wrong <- setdiff(unique(data$species_code),
-                   c("QUERCUS_SP", "QUERCUS_RUBRA", "FAGUS_SYLVATICA",
-                     "ACER_PSEUDOPLATANUS","FRAXINUS_EXCELSIOR","ULMUS_SP",
-                     "PRUNUS_SP","ALNUS_GLUTINOSA","PICEA_ABIES",
-                     "PSEUDOTSUGA_MENZIESII","LARIX_SP","PINUS_SYLVESTRIS",
-                     "BETULA_SP"))
+                   c("QUERCUS_PETRAEA","QUERCUS_ROBUR","QUERCUS_SP", "QUERCUS_RUBRA", 
+                     "FAGUS_SYLVATICA","ACER_PSEUDOPLATANUS","FRAXINUS_EXCELSIOR",
+                     "ULMUS_SP","PRUNUS_SP","ALNUS_GLUTINOSA","PICEA_ABIES",
+                     "PSEUDOTSUGA_MENZIESII","LARIX_SP","PINUS_SYLVESTRIS","BETULA_SP"))
   
   if (length(wrong) > 0) {
-    stop("Unknown species : ", paste(wrong, collapse=", "),
+    warning("Unknown species : ", paste(wrong, collapse=", "),
          "\n You can find the list of available species in the helper (?dan1)")
   }
   
