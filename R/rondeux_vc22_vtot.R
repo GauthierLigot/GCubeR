@@ -1,8 +1,8 @@
 #' @title Calculate Total and Commercial Stem Volume (Rondeux, larch)
 #'
 #' @description
-#' Computes the total stem volume (\code{vtot_rondeux}) and the commercial
-#' stem volume at 22 cm (\code{vc22_rondeux}) for larch trees according to
+#' Computes the total stem volume (\code{rondeux_vtot}) and the commercial
+#' stem volume at 22 cm (\code{rondeux_vc22}) for larch trees according to
 #' Rondeux equations, based on the circumference at 1.30 m (\code{c130}, in cm)
 #' and the total height (\code{htot}, in meters).
 #'
@@ -38,8 +38,8 @@
 #' @return
 #' A data frame identical to \code{data}, with two added columns:
 #' \itemize{
-#'   \item \code{vtot_rondeux}: total stem volume (m³)
-#'   \item \code{vc22_rondeux}: commercial stem volume at 22 cm (m³)
+#'   \item \code{rondeux_vtot}: total stem volume (m³)
+#'   \item \code{rondeux_vc22}: commercial stem volume at 22 cm (m³)
 #' }
 #'
 #' @examples
@@ -52,7 +52,7 @@
 #' v_rondeux_larch(df)
 #'
 #' @export
-v_rondeux_larch <- function(data,
+rondeux_vc22_vtot <- function(data,
                             na_action = c("error", "omit")) {
   
   na_action <- match.arg(na_action)
@@ -106,51 +106,37 @@ v_rondeux_larch <- function(data,
   data$species_code <- toupper(trimws(data$species_code))
   
   # --- IDENTIFY LARCH ROWS ----
-  is_larch <- data$species_code %in% c("LARIX_DECIDUA", "LARIX_SPP")
-  
-  if (any(!is_larch)) {
-    warning(
-      "Rondeux larch equations apply only to species_code 'LARIX_DECIDUA' or 'LARIX_SPP'. ",
-      "Non-larch rows will receive NA volumes.",
-      call. = FALSE
-    )
-  }
-  
-  # --- INITIALIZE RESULT COLUMNS ----
-  data$vtot_rondeux <- NA_real_
-  data$vc22_rondeux <- NA_real_
-  
-  
-  # --- COMPUTE VOLUMES FOR LARCH ----
+  is_larch <- data$species_code %in% c("LARIX_DECIDUA", "LARIX_SP")
   idx <- which(is_larch)
   
+  # --- RETURN EARLY IF NO LARCH ----
+  if (length(idx) == 0) {
+    message("⚠️ No compatible species (LARIX_DECIDUA or LARIX_SP) found. No Rondeux volume columns created.")
+    return(data)
+  }
+  
+  # --- COMPUTE VOLUMES FOR LARCH ----
+
   if (length(idx) > 0) {
     c130_sq <- data$c130[idx]^2
     htot    <- data$htot[idx]
     
+    # --- INITIALIZE RESULT COLUMNS ----
+    data$rondeux_vtot <- NA_real_
+    data$rondeux_vc22 <- NA_real_
+    
     # total volume
-    data$vtot_rondeux[idx] <- a_vtot * c130_sq * htot
+    data$rondeux_vtot[idx] <- a_vtot * c130_sq * htot
     
     # commercial volume 22 cm
-    data$vc22_rondeux[idx] <- a_vc22 + b_vc22 * c130_sq * htot
+    data$rondeux_vc22[idx] <- a_vc22 + b_vc22 * c130_sq * htot
   }
   
   # --- INVALIDATE RESULTS FOR C130 OUT OF RANGE ----
   if (length(rows_c130_out) > 0) {
-    data$vtot_rondeux[rows_c130_out] <- NA
-    data$vc22_rondeux[rows_c130_out] <- NA
+    data$rondeux_vtot[rows_c130_out] <- NA
+    data$rondeux_vc22[rows_c130_out] <- NA
   }
   
   return(data)
 }
-
-
-
-df_test <- data.frame(
-  species_code = "LARIX_DECIDUA",
-  c130 = 50,
-  htot = 20
-)
-devtools::load_all()
-v_rondeux_larch(df_test)
-
