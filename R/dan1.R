@@ -103,6 +103,13 @@ dagnelie_tarif1 <- function(data, output = NULL) {
     coeff_a + coeff_b * c130 + coeff_c * c130^2 + coeff_d * c130^3
   )
   
-  data <- data[, c("species_code", "c130", "tarif1")]
+  ## Remove technical columns from dan1, keep everything else + tarif1 ----
+  data <- dplyr::select(
+    data,
+    -dplyr::any_of(c("coeff_a", "coeff_b", "coeff_c", "coeff_d",
+                     "min_c130", "max_c130"))
+  )
+  
   return(data)
+  
 }
