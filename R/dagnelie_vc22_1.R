@@ -97,8 +97,8 @@ dagnelie_tarif1 <- function(data, output = NULL) {
     )
   }
   
-  ## Compute dagnelie_vc22_1 ----
-  data$dagnelie_vc22_1 <- with(
+  ## Compute tarif1 ----
+  data$tarif1 <- with(
     data,
     coeff_a + coeff_b * c130 + coeff_c * c130^2 + coeff_d * c130^3
   )
