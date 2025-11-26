@@ -20,7 +20,7 @@
 #' }
 #'
 #' @section Supported species:
-#' The following species codes are currently supported by \code{dagnelie_tarif2}:
+#' The following species codes are currently supported by \code{dagnelie_vc22_2}:
 #' \itemize{
 #'   \item \code{"QUERCUS_PETRAEA"}
 #'   \item \code{"QUERCUS_ROBUR"}
@@ -74,8 +74,8 @@
 #'   species_code = c("PINUS_SYLVESTRIS", "QUERCUS_RUBRA",
 #'                    "QUERCUS_SP", "FAGUS_SYLVATICA")
 #' )
-#' dagnelie_tarif2(data = df)
-dagnelie_tarif2 <- function(data, 
+#' dagnelie_vc22_2(data = df)
+dagnelie_vc22_2 <- function(data, 
                             output = NULL){ 
   
   # Validation of the Dataframe  ----
@@ -170,11 +170,11 @@ dagnelie_tarif2 <- function(data,
   }
   
   ## Initialisation des colonnes de sortie ----
-  data$tarif_2  <- NA_real_
+  data$dagnelie_vc22_2  <- NA_real_
   nline <- nrow(data)
   
   # Iteration ----
-  data$tarif_2 <- with(
+  data$dagnelie_vc22_2 <- with(
     data,
     coeff_a + coeff_b * c130 + coeff_c * c130^2 + coeff_d * c130^3 + coeff_e*htot + coeff_f* htot * c130^2
   )

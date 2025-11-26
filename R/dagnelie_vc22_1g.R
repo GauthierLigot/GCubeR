@@ -20,7 +20,7 @@
 #' }
 #'
 #' @section Supported species:
-#' The following species codes are currently supported by \code{dagnelie_tarif1g}:
+#' The following species codes are currently supported by \code{dagnelie_vc22_1g}:
 #' \itemize{
 #'   \item \code{"QUERCUS_PETRAEA"}
 #'   \item \code{"QUERCUS_ROBUR"}
@@ -52,7 +52,7 @@
 #'     \item the joined columns from \code{dan1g}
 #'           (\code{coeff_a}, \code{coeff_b}, \code{coeff_c}, \code{coeff_d},
 #'           \code{min_c130}, \code{max_c130}),
-#'     \item \code{tarif1g}: the Dagnelie non parametric volume \eqn{v_{c,22}}
+#'     \item \code{dagnelie_vc22_1g}: the Dagnelie non parametric volume \eqn{v_{c,22}}
 #'           in m\eqn{^3} per tree.
 #'   }
 #'
@@ -74,8 +74,8 @@
 #'   species_code = c("PINUS_SYLVESTRIS", "QUERCUS_RUBRA",
 #'                    "QUERCUS_SP", "FAGUS_SYLVATICA")
 #' )
-#' dagnelie_tarif1g(data = df)
-dagnelie_tarif1g <- function(data, 
+#' dagnelie_vc22_1g(data = df)
+dagnelie_vc22_1g <- function(data, 
                             output = NULL){ 
   
   # Validation of the Dataframe  ----
@@ -101,7 +101,7 @@ dagnelie_tarif1g <- function(data,
   
   if (length(wrong) > 0) {
     warning("Unknown species : ", paste(wrong, collapse=", "),
-            "\n You can find the list of available species in the helper (?dagnelie_tarif1g)")
+            "\n You can find the list of available species in the helper (?dagnelie_vc22_1g)")
   }
   
   ## Load dan2 ----
@@ -167,11 +167,11 @@ dagnelie_tarif1g <- function(data,
   }
   
   ## Initialisation des colonnes de sortie ----
-  data$tarif_1g  <- NA_real_
+  data$dagnelie_vc22_1g  <- NA_real_
   nline <- nrow(data)
   
   # Iteration ----
-  data$tarif_1g <- with(
+  data$dagnelie_vc22_1g <- with(
     data,
     coeff_a + coeff_b * c130 + coeff_c * c130^2 + coeff_d * c130^3 + coeff_e*hdom + coeff_f* hdom * c130^2
   )

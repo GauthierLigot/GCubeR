@@ -26,7 +26,7 @@
 #' }
 #'
 #' @section Supported species:
-#' The following species codes are supported by \code{dagnelie_tarif1}:
+#' The following species codes are supported by \code{dagnelie_vc22_1}:
 #' \itemize{
 #'   \item \code{"QUERCUS_PETRAEA"}
 #'   \item \code{"QUERCUS_ROBUR"}
@@ -56,7 +56,7 @@
 #' @return A \code{data.frame} identical to the input \code{data} but augmented with:
 #'   \itemize{
 #'     \item species-specific coefficients and validity ranges,
-#'     \item \code{tarif1}: the computed Dagnelie tarif-1 volume (m\eqn{^3} per tree).
+#'     \item \code{dagnelie_vc22_1}: the computed Dagnelie tarif-1 volume (m\eqn{^3} per tree).
 #'   }
 #'
 #' @details
@@ -76,9 +76,9 @@
 #'   species_code = c("PINUS_SYLVESTRIS", "QUERCUS_RUBRA",
 #'                    "QUERCUS_SP", "FAGUS_SYLVATICA")
 #' )
-#' dagnelie_tarif1(df)
+#' dagnelie_vc22_1(df)
 
-dagnelie_tarif1 <- function(data, output = NULL) {
+dagnelie_vc22_1 <- function(data, output = NULL) {
   
   ## Validation of the Dataframe ----
   stopifnot(is.data.frame(data))
@@ -159,13 +159,13 @@ dagnelie_tarif1 <- function(data, output = NULL) {
     )
   }
   
-  ## Compute tarif1 ----
-  data$tarif1 <- with(
+  ## Compute dagnelie_vc22_1 ----
+  data$dagnelie_vc22_1 <- with(
     data,
     coeff_a + coeff_b * c130 + coeff_c * c130^2 + coeff_d * c130^3
   )
   
-  ## Remove technical columns from dan1, keep everything else + tarif1 ----
+  ## Remove technical columns from dan1, keep everything else + dagnelie_vc22_1 ----
   data <- dplyr::select(
     data,
     -dplyr::any_of(c("coeff_a", "coeff_b", "coeff_c", "coeff_d",

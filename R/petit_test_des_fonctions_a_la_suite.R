@@ -6,9 +6,6 @@
  )
  
  # Case 1: Print results to console (default)
- data <- dagnelie_tarif1(data)
- data <- dagnelie_tarif2(data)
- data <- dagnelie_tarif1b(data)
  data <- add_c130_dbh(data)
  data <- vallet_vta(data)
  data <- vallet_vc22(data)
@@ -16,6 +13,7 @@
  data <- algan_vta_vmerch(data)
  data  <- bouvard_vta(data)
  data <- dagnelie_vc22_1(data)
+ data <- dagnelie_vc22_1g(data)
  data<- dagnelie_vc22_2(data)
  data <- biomass_calc(data) 
 
