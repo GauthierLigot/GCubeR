@@ -1,7 +1,7 @@
-#' Single-entry Dagnelie volume (tarif 2)
+#' Single-entry Dagnelie volume (tarif 1b)
 #'
 #' Computes the standing volume \eqn{v_{c,22}} (in cubic metres per tree) using
-#' Dagnelie's two-entry tarif 2 equations. The volume is calculated from the
+#' Dagnelie's non parametric equations. The volume is calculated from the
 #' stem circumference at 1.30 m (\code{c130}, in cm) and the tree species, using
 #' species-specific polynomial coefficients stored in \code{dan2}.
 #'
@@ -41,7 +41,7 @@
 #'
 #' @param data A \code{data.frame} containing at least the columns
 #'   \code{c130} (stem circumference at 1.30 m, in cm) and
-#'   \code{htot} (hight of the tree)
+#'   \code{hdom} (hight of the tree)
 #'   \code{species_code} (character code of the tree species).
 #' @param output Optional character string controlling the format of the output.
 #'   Currently ignored; the function always returns the input data frame with
@@ -70,27 +70,24 @@
 #' @examples
 #' df <- data.frame(
 #'   c130         = c(145, 156, 234, 233),
-#'   htot            = c(25, 23, 45, 34),
+#'   hdom            = c(25, 23, 45, 34),
 #'   species_code = c("PINUS_SYLVESTRIS", "QUERCUS_RUBRA",
 #'                    "QUERCUS_SP", "FAGUS_SYLVATICA")
 #' )
-#' dagnelie_tarif2(data = df)
-dagnelie_tarif2 <- function(data, 
+#' dagnelie_tarif1b(data = df)
+dagnelie_tarif1b <- function(data, 
                             output = NULL){ 
   
   # Validation of the Dataframe  ----
   ##  Field needed ----
   stopifnot(is.data.frame(data))
-  needed <- c("c130","htot","species_code")           #required names 
+  needed <- c("c130","hdom","species_code")           #required names 
   miss <- setdiff(needed, names(data))
   if (length(miss) > 0) {         
     stop("Missing column : ", paste(miss, collapse = ", "))
   }
-  if (!is.numeric(data$c130) && !is.numeric(data$htot)) {      #numeric data
+  if (!is.numeric(data$c130) && !is.numeric(data$hdom)) {      #numeric data
     stop("c130 must be numeric")
-  }
-  if (!is.numeric(data$htot) && !is.numeric(data$htot)) {      #numeric data
-    stop("htot must be numeric")
   }
   
   ## Species management ---- 
@@ -104,13 +101,13 @@ dagnelie_tarif2 <- function(data,
   
   if (length(wrong) > 0) {
     warning("Unknown species : ", paste(wrong, collapse=", "),
-            "\n You can find the list of available species in the helper (?dan2)")
+            "\n You can find the list of available species in the helper (?dagnelie_tarif1b)")
   }
   
   ## Load dan2 ----
-  path_dan2 <- file.path("data-raw", "dan2.csv")
+  path_dan1b <- file.path("data-raw", "dan1b.csv")
   dan2 <- readr::read_delim(
-    file = path_dan2,
+    file = path_dan1b,
     delim = ";",
     locale = readr::locale(decimal_mark = ".", encoding = "UTF-8"),
     trim_ws = TRUE,
@@ -170,13 +167,13 @@ dagnelie_tarif2 <- function(data,
   }
   
   ## Initialisation des colonnes de sortie ----
-  data$tarif_2  <- NA_real_
+  data$tarif_1b  <- NA_real_
   nline <- nrow(data)
   
   # Iteration ----
-  data$tarif_2 <- with(
+  data$tarif_1b <- with(
     data,
-    coeff_a + coeff_b * c130 + coeff_c * c130^2 + coeff_d * c130^3 + coeff_e*htot + coeff_f* htot * c130^2
+    coeff_a + coeff_b * c130 + coeff_c * c130^2 + coeff_d * c130^3 + coeff_e*hdom + coeff_f* hdom * c130^2
   )
   
   ## Remove technical columns from dan1, keep everything else + tarif1 ----

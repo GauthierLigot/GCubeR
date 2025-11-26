@@ -15,7 +15,13 @@
 #'
 #' @import dplyr
 #' @export
-#'
+#' @examples
+#' df <- data.frame(
+#'   c130         = c(145, 156, 234, 233),
+#'   species_code = c("PINUS_SYLVESTRIS", "QUERCUS_RUBRA",
+#'                    "QUERCUS_SP", "FAGUS_SYLVATICA")
+#' )
+#' dagnelie_tarif1(data = df)
 dagnelie_tarif1 <- function(data, output = NULL) {
   
   ## Validation of the Dataframe ----
@@ -46,7 +52,7 @@ dagnelie_tarif1 <- function(data, output = NULL) {
   dan1 <- readr::read_delim(
     file = path_dan1,
     delim = ";",
-    locale = readr::locale(decimal_mark = ",", encoding = "UTF-8"),
+    locale = readr::locale(decimal_mark = ".", encoding = "UTF-8"),
     trim_ws = TRUE,
     show_col_types = FALSE
   )
