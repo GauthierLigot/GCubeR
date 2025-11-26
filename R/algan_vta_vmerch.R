@@ -79,22 +79,28 @@ algan_vta_vmerch <- function(data) {
   coef_vmerch = 0.33
   coef_vta = 0.4
   
-  # OUTPUT ----
-  data <- data %>%
-    dplyr::mutate(
-      dbh_m = dbh / 100,  # cm → m
-      algan_vmerch = dplyr::if_else(
-        species_code %in% merch_species & 
-          !(species_code %in% c("ABIES_ALBA", "PICEA_ABIES") & dbh <= 15),
-        coef_vmerch * (dbh_m^2) * htot,
-        NA_real_
-      ),
-      algan_vta = dplyr::if_else(
-        species_code == "ABIES_ALBA",
-        coef_vta * (dbh_m^2) * htot,
-        NA_real_
-      )
-    )
+  # VMERCH: create only if at least one compatible row ----
+  vmerch_idx <- which(
+    (data$species_code %in% merch_species) &
+      !(data$species_code %in% c("ABIES_ALBA", "PICEA_ABIES") & data$dbh <= 15)
+  )
+  
+  if (length(vmerch_idx) > 0) {
+    data$algan_vmerch <- NA_real_
+    data$algan_vmerch[vmerch_idx] <- coef_vmerch * ( (data$dbh[vmerch_idx] / 100)^2 ) * data$htot[vmerch_idx]
+  } else {
+    message("⚠️ No compatible species found for Algan merchantable volume (vmerch). No column created.")
+  }
+  
+  # VTA: create only if at least one compatible row ----
+  vta_idx <- which(data$species_code == "ABIES_ALBA" & data$dbh > 15)
+  
+  if (length(vta_idx) > 0) {
+    data$algan_vta <- NA_real_
+    data$algan_vta[vta_idx] <- coef_vta * ( (data$dbh[vta_idx] / 100)^2 ) * data$htot[vta_idx]
+  } else {
+    message("⚠️ No compatible species found for Algan aerial total volume (vta). No column created.")
+  }
   
   return(data)
 }
