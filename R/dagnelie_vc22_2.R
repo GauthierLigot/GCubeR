@@ -16,11 +16,11 @@
 #'   \item issues a warning for trees whose \code{c130} is outside the species-
 #'         specific range,
 #'   \item computes tarif 1 volume as:
-#'         \deqn{v_{c,22} = a + b \cdot c130 + c \cdot c130^2 + d \cdot c130^3.}
+#'         \deqn{v_{c,22} = a + b \cdot c130 + c \cdot c130^2 + d \cdot c130^3 + e \cdot htot + f \cdot c130^2 \cdot htot.}
 #' }
 #'
 #' @section Supported species:
-#' The following species codes are currently supported by \code{dagnelie_tarif1}:
+#' The following species codes are currently supported by \code{dagnelie_tarif2}:
 #' \itemize{
 #'   \item \code{"QUERCUS_PETRAEA"}
 #'   \item \code{"QUERCUS_ROBUR"}

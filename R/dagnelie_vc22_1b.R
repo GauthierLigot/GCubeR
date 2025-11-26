@@ -3,24 +3,24 @@
 #' Computes the standing volume \eqn{v_{c,22}} (in cubic metres per tree) using
 #' Dagnelie's non parametric equations. The volume is calculated from the
 #' stem circumference at 1.30 m (\code{c130}, in cm) and the tree species, using
-#' species-specific polynomial coefficients stored in \code{dan2}.
+#' species-specific polynomial coefficients stored in \code{dan1b}.
 #'
 #' The function:
 #' \itemize{
 #'   \item checks that the input data frame contains the required columns
 #'         \code{c130} and \code{species_code},
-#'   \item validates that all species are available in the \code{dan2} table,
-#'   \item merges the input data with \code{dan2} to retrieve the coefficients
+#'   \item validates that all species are available in the \code{dan1b} table,
+#'   \item merges the input data with \code{dan1b} to retrieve the coefficients
 #'         \code{coeff_a}, \code{coeff_b}, \code{coeff_c}, \code{coeff_d} and
 #'         the valid range \code{min_c130}, \code{max_c130},
 #'   \item issues a warning for trees whose \code{c130} is outside the species-
 #'         specific range,
-#'   \item computes tarif 1 volume as:
-#'         \deqn{v_{c,22} = a + b \cdot c130 + c \cdot c130^2 + d \cdot c130^3.}
+#'   \item computes tarif 1b volume as:
+#'         \deqn{v_{c,22} = a + b \cdot c130 + c \cdot c130^2 + d \cdot c130^3 + e \cdot hdom + f \cdot c130^2 \cdot hdom.}
 #' }
 #'
 #' @section Supported species:
-#' The following species codes are currently supported by \code{dagnelie_tarif1}:
+#' The following species codes are currently supported by \code{dagnelie_tarif1b}:
 #' \itemize{
 #'   \item \code{"QUERCUS_PETRAEA"}
 #'   \item \code{"QUERCUS_ROBUR"}
@@ -49,15 +49,15 @@
 #'
 #' @return A \code{data.frame} identical to \code{data} but augmented with:
 #'   \itemize{
-#'     \item the joined columns from \code{dan2}
+#'     \item the joined columns from \code{dan1b}
 #'           (\code{coeff_a}, \code{coeff_b}, \code{coeff_c}, \code{coeff_d},
 #'           \code{min_c130}, \code{max_c130}),
-#'     \item \code{tarif1}: the Dagnelie single-entry volume \eqn{v_{c,22}}
+#'     \item \code{tarif1b}: the Dagnelie non parametric volume \eqn{v_{c,22}}
 #'           in m\eqn{^3} per tree.
 #'   }
 #'
 #' @details
-#' Species codes must match those available in the \code{dan2} reference table.
+#' Species codes must match those available in the \code{dan1b} reference table.
 #' If one or more species are not found, the function issues a warning. For trees
 #' where \code{c130} is outside the species-specific range
 #' \code{[min_c130, max_c130]}, a warning is issued, but the volume is still
