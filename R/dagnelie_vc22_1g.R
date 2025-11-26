@@ -1,26 +1,26 @@
-#' Single-entry Dagnelie volume (tarif 1b)
+#' Single-entry Dagnelie volume (tarif 1g)
 #'
 #' Computes the standing volume \eqn{v_{c,22}} (in cubic metres per tree) using
 #' Dagnelie's non parametric equations. The volume is calculated from the
 #' stem circumference at 1.30 m (\code{c130}, in cm) and the tree species, using
-#' species-specific polynomial coefficients stored in \code{dan1b}.
+#' species-specific polynomial coefficients stored in \code{dan1g}.
 #'
 #' The function:
 #' \itemize{
 #'   \item checks that the input data frame contains the required columns
 #'         \code{c130} and \code{species_code},
-#'   \item validates that all species are available in the \code{dan1b} table,
-#'   \item merges the input data with \code{dan1b} to retrieve the coefficients
+#'   \item validates that all species are available in the \code{dan1g} table,
+#'   \item merges the input data with \code{dan1g} to retrieve the coefficients
 #'         \code{coeff_a}, \code{coeff_b}, \code{coeff_c}, \code{coeff_d} and
 #'         the valid range \code{min_c130}, \code{max_c130},
 #'   \item issues a warning for trees whose \code{c130} is outside the species-
 #'         specific range,
-#'   \item computes tarif 1b volume as:
+#'   \item computes tarif 1g volume as:
 #'         \deqn{v_{c,22} = a + b \cdot c130 + c \cdot c130^2 + d \cdot c130^3 + e \cdot hdom + f \cdot c130^2 \cdot hdom.}
 #' }
 #'
 #' @section Supported species:
-#' The following species codes are currently supported by \code{dagnelie_tarif1b}:
+#' The following species codes are currently supported by \code{dagnelie_tarif1g}:
 #' \itemize{
 #'   \item \code{"QUERCUS_PETRAEA"}
 #'   \item \code{"QUERCUS_ROBUR"}
@@ -49,15 +49,15 @@
 #'
 #' @return A \code{data.frame} identical to \code{data} but augmented with:
 #'   \itemize{
-#'     \item the joined columns from \code{dan1b}
+#'     \item the joined columns from \code{dan1g}
 #'           (\code{coeff_a}, \code{coeff_b}, \code{coeff_c}, \code{coeff_d},
 #'           \code{min_c130}, \code{max_c130}),
-#'     \item \code{tarif1b}: the Dagnelie non parametric volume \eqn{v_{c,22}}
+#'     \item \code{tarif1g}: the Dagnelie non parametric volume \eqn{v_{c,22}}
 #'           in m\eqn{^3} per tree.
 #'   }
 #'
 #' @details
-#' Species codes must match those available in the \code{dan1b} reference table.
+#' Species codes must match those available in the \code{dan1g} reference table.
 #' If one or more species are not found, the function issues a warning. For trees
 #' where \code{c130} is outside the species-specific range
 #' \code{[min_c130, max_c130]}, a warning is issued, but the volume is still
@@ -74,8 +74,8 @@
 #'   species_code = c("PINUS_SYLVESTRIS", "QUERCUS_RUBRA",
 #'                    "QUERCUS_SP", "FAGUS_SYLVATICA")
 #' )
-#' dagnelie_tarif1b(data = df)
-dagnelie_tarif1b <- function(data, 
+#' dagnelie_tarif1g(data = df)
+dagnelie_tarif1g <- function(data, 
                             output = NULL){ 
   
   # Validation of the Dataframe  ----
@@ -101,13 +101,13 @@ dagnelie_tarif1b <- function(data,
   
   if (length(wrong) > 0) {
     warning("Unknown species : ", paste(wrong, collapse=", "),
-            "\n You can find the list of available species in the helper (?dagnelie_tarif1b)")
+            "\n You can find the list of available species in the helper (?dagnelie_tarif1g)")
   }
   
   ## Load dan2 ----
-  path_dan1b <- file.path("data-raw", "dan1b.csv")
+  path_dan1g <- file.path("data-raw", "dan1g.csv")
   dan2 <- readr::read_delim(
-    file = path_dan1b,
+    file = path_dan1g,
     delim = ";",
     locale = readr::locale(decimal_mark = ".", encoding = "UTF-8"),
     trim_ws = TRUE,
@@ -167,11 +167,11 @@ dagnelie_tarif1b <- function(data,
   }
   
   ## Initialisation des colonnes de sortie ----
-  data$tarif_1b  <- NA_real_
+  data$tarif_1g  <- NA_real_
   nline <- nrow(data)
   
   # Iteration ----
-  data$tarif_1b <- with(
+  data$tarif_1g <- with(
     data,
     coeff_a + coeff_b * c130 + coeff_c * c130^2 + coeff_d * c130^3 + coeff_e*hdom + coeff_f* hdom * c130^2
   )
