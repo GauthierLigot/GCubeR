@@ -1,6 +1,6 @@
 #' Volume Estimation Using the Algan Method
 #'
-#' Computes aerial total volume (`algan_vta`) and merchantable volume (`algan_vmerch`)
+#' Computes aerial total volume (`algan_vta`) and merchantable volume (`algan_vc22`)
 #' according to the Algan method. The function validates input data, ensures
 #' required columns are present and applies formulas only to compatible species.
 #'
@@ -11,7 +11,7 @@
 #'
 #' @return A data frame with the original input columns plus two new outputs:
 #' - `algan_vta`: aerial total volume (m³). Computed only for `"ABIES_ALBA"`, `NA` otherwise.
-#' - `algan_vmerch`: merchantable volume (m³). Computed only for compatible species
+#' - `algan_vc22`: merchantable volume (m³). Computed only for compatible species
 #'   (`ABIES_ALBA`, `PICEA_ABIES`, `ALNUS_GLUTINOSA`, `PRUNUS_AVIUM`, `BETULA_SP`),
 #'   `NA` otherwise.
 #'
@@ -21,7 +21,7 @@
 #' - Formula for aerial total volume (only `"ABIES_ALBA"`):
 #'   \deqn{algan_vta = 0.4 * (dbh/100)^2 * htot}
 #' - Formula for merchantable volume (compatible species):
-#'   \deqn{algan_vmerch = 0.33 * (dbh/100)^2 * htot}
+#'   \deqn{algan_vc22 = 0.33 * (dbh/100)^2 * htot}
 #'   - Domain of application:
 #'   - For `"ABIES_ALBA"` and `"PICEA_ABIES"`, the Algan method is valid only if `dbh > 15 cm`.
 #'   - For other compatible species (`ALNUS_GLUTINOSA`, `PRUNUS_AVIUM`, `BETULA_SP`), no minimum dbh threshold is applied.
@@ -37,12 +37,12 @@
 #'   dbh = c(30, 25, 20, 40),   # cm
 #'   htot = c(20, 18, 15, 22)   # m
 #' )
-#' algan_vta_vmerch(df)
+#' algan_vta_vc22(df)
 #'
 #' @export
  
 # VOLUME CALCULATION WITH ALGAN METHOD ----
-algan_vta_vmerch <- function(data) {
+algan_vta_vc22 <- function(data) {
   
   # INPUT CHECKS ----
   ## Required columns ----
@@ -76,20 +76,20 @@ algan_vta_vmerch <- function(data) {
   }
   
   # CONSTANTS ----
-  coef_vmerch = 0.33
+  coef_vc22 = 0.33
   coef_vta = 0.4
   
-  # VMERCH: create only if at least one compatible row ----
-  vmerch_idx <- which(
+  # vc22: create only if at least one compatible row ----
+  vc22_idx <- which(
     (data$species_code %in% merch_species) &
       !(data$species_code %in% c("ABIES_ALBA", "PICEA_ABIES") & data$dbh <= 15)
   )
   
-  if (length(vmerch_idx) > 0) {
-    data$algan_vmerch <- NA_real_
-    data$algan_vmerch[vmerch_idx] <- coef_vmerch * ( (data$dbh[vmerch_idx] / 100)^2 ) * data$htot[vmerch_idx]
+  if (length(vc22_idx) > 0) {
+    data$algan_vc22 <- NA_real_
+    data$algan_vc22[vc22_idx] <- coef_vc22 * ( (data$dbh[vc22_idx] / 100)^2 ) * data$htot[vc22_idx]
   } else {
-    message("⚠️ No compatible species found for Algan merchantable volume (vmerch). No column created.")
+    message("⚠️ No compatible species found for Algan merchantable volume (vc22). No column created.")
   }
   
   # VTA: create only if at least one compatible row ----

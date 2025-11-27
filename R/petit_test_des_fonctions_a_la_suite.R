@@ -10,7 +10,7 @@
  data <- vallet_vta(data)
  data <- vallet_vc22(data)
  data <- rondeux_vc22_vtot(data)
- data <- algan_vta_vmerch(data)
+ data <- algan_vta_vc22(data)
  data  <- bouvard_vta(data)
  data <- dagnelie_vc22_1(data)
  data <- dagnelie_vc22_1g(data)

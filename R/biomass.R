@@ -13,6 +13,7 @@
 #'         (priority order: `dagnelie_vc22_2` > `dagnelie_vc22_1g` > `dagnelie_vc22_1`)
 #'       - Vallet equation: `vallet_vc22`
 #'       - Rondeux equation: `rondeux_vc22`
+#'       - Algan equation: `algan_vc22`
 #'     - For Vallet method (total aboveground volume): `vallet_vta`
 #'
 #'   If multiple trunk volumes are provided, CNIEFEB is computed separately for each source.
@@ -25,7 +26,7 @@
 #'
 #' @return A data frame with one row per tree, including:
 #' - `species_code`: species name in uppercase Latin format.
-#' - `dagnelie_vc22_1`, `dagnelie_vc22_1g`, `dagnelie_vc22_2`, `vallet_vc22`, `rondeux_vc22`:
+#' - `dagnelie_vc22_1`, `dagnelie_vc22_1g`, `dagnelie_vc22_2`, `vallet_vc22`, `rondeux_vc22`,`algan_vc22`:
 #'   optional trunk volume inputs (in m³).
 #' - `vallet_vta`: optional total aboveground volume (in m³) for Vallet method.
 #' - `vc22_dagnelie`: selected trunk volume used for CNIEFEB (Dagnelie), based on priority.
@@ -41,6 +42,10 @@
 #' - From Rondeux trunk volume (`rondeux_vc22`):
 #'   - `cniefeb_rondeux_bag`, `cniefeb_rondeux_bbg`, `cniefeb_rondeux_btot`,
 #'     `cniefeb_rondeux_c`, `cniefeb_rondeux_co2`
+#' - From Algan trunk volume (`algan_vc22`):
+#'   - `cniefeb_algan_bag`, `cniefeb_algan_bbg`, `cniefeb_algan_btot`,
+#'     `cniefeb_algan_c`, `cniefeb_algan_co2`
+
 #'
 #' ### Vallet method outputs (if `vallet_vta` is available and species is compatible):
 #' - `vallet_bag`, `vallet_bbg`, `vallet_btot`, `vallet_c`, `vallet_co2`
@@ -54,7 +59,7 @@
 #'   - `feb = 1.56` for broadleaves
 #' - Dagnelie trunk volume (`vc22_dagnelie`) is automatically selected from the best available column,
 #'   in the following priority: `dagnelie_vc22_2` > `dagnelie_vc22_1g` > `dagnelie_vc22_1`.
-#' - CNIEFEB outputs are computed separately for each trunk volume source (Dagnelie, Vallet, Rondeux).
+#' - CNIEFEB outputs are computed separately for each trunk volume source (Dagnelie, Vallet, Rondeux, Algan).
 #' - Vallet method is applied only to a predefined list of compatible species using `vallet_vta`.
 #' - If required columns are missing, the corresponding method is skipped with a warning.
 #' - Warnings are also displayed if trunk volume columns exist but contain missing values (`NA`).
@@ -73,6 +78,7 @@
 #'   dagnelie_vc22_1 = c(NA, 0.9, NA),
 #'   vallet_vc22 = c(NA, 1.2, NA),
 #'   rondeux_vc22 = c(NA, NA, 1.0),
+#'   algan_vc22 = c(NA,0.8,NA),
 #'   vallet_vta = c(1.5, NA, 1.3)
 #' )
 #'
@@ -157,6 +163,15 @@ biomass_calc <- function(data,
     }
   }
   
+  #### Notify per-row missing values for Algan vc22 ----
+  if ("algan_vc22" %in% names(data)) {
+    rows_missing_algan <- which(is.na(data$algan_vc22))
+    if (length(rows_missing_algan) > 0) {
+      message("⚠️ The following rows have no trunk volume values in column 'algan_vc22'. CNIEFEB (Algan) will be skipped for these rows: ",
+              paste(rows_missing_algan, collapse = ", "))
+    }
+  }
+  
   ## Clean species names ----
   data <- data %>% mutate(species_code = toupper(trimws(species_code)))
   density_table <- density_table %>% mutate(
@@ -214,6 +229,10 @@ biomass_calc <- function(data,
     message("⚠️ Column 'rondeux_vc22' not found. CNIEFEB (Rondeux) will be skipped.")
   }
   
+  ## Ensure algan_vc22 exists to avoid errors in CNIEFEB (Algan) ----
+  if (!"algan_vc22" %in% names(data)) {
+    message("⚠️ Column 'algan_vc22' not found. CNIEFEB (Algan) will be skipped.")
+  }
   
   # CONSTANTS ----
   a_bbg <- 1.0587
@@ -273,7 +292,17 @@ if ("rondeux_vc22" %in% names(data)) {
         cniefeb_rondeux_co2 = cniefeb_rondeux_c * a_co2
       )
     }
-    
+  ### CNIEFEB for Algan vc22 ----
+  if ("algan_vc22" %in% names(data)) {
+    data <- data %>% mutate(
+      cniefeb_algan_bag = algan_vc22 * feb * density,
+      cniefeb_algan_bbg = exp(-a_bbg + b_bbg * log(cniefeb_algan_bag) + c_bbg),
+      cniefeb_algan_btot = cniefeb_algan_bag + cniefeb_algan_bbg,
+      cniefeb_algan_c = cniefeb_algan_btot * a_c,
+      cniefeb_algan_co2 = cniefeb_algan_c * a_co2
+    )
+  }
+  
    ### Vallet method ----
   if ("vallet_vta" %in% names(data)) {
     data <- data %>%
