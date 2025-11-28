@@ -44,8 +44,8 @@
 #'
 #' @export
 vallet_vta <- function(data,
-                     na_action = c("error", "omit"),
-                     output = NULL) { 
+                       na_action = c("error", "omit"),
+                       output = NULL) { 
   
   na_action <- match.arg(na_action)
   
