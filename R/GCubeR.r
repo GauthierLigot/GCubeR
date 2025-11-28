@@ -1,4 +1,4 @@
-#' GCuber main workflow
+#' GCubeR main workflow
 #'
 #' Orchestrates the GCubeR pipeline by sequentially applying allometric
 #' conversion and biomass/volume functions to a user-provided dataset.
@@ -64,7 +64,7 @@ GCuber <- function(data) {
     stop("Missing column 'species_code'.")
   }
   
-  data <- c150_to_c130(data)  
+  data <- c150_c130(data)  
   data <- add_c130_dbh(data)
   data <- dagnelie_vc22_1(data)
   data <- dagnelie_vc22_1g(data)
