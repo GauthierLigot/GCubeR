@@ -14,6 +14,7 @@
  data  <- bouvard_vta(data)
  data <- dagnelie_vc22_1(data)
  data <- dagnelie_vc22_1g(data)
- data<- dagnelie_vc22_2(data)
+ data <- dagnelie_vc22_2(data)
+ data <- dagnelie_br(data)
  data <- biomass_calc(data) 
 

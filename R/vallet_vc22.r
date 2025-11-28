@@ -36,8 +36,8 @@
 #'
 #' @export
 vallet_vc22 <- function(data,
-                      na_action = c("error", "omit"),
-                      output = NULL) {
+                        na_action = c("error", "omit"),
+                        output = NULL) {
   
   na_action <- match.arg(na_action)
   
@@ -109,6 +109,12 @@ vallet_vc22 <- function(data,
   
   rows_to_invalidate <- unique(c(rows_to_invalidate, rows_unknown_species))
   
+  ## If no compatible rows, skip calculation ----
+  compatible_idx <- which(!is.na(data$coeff_b) & data$dbh >= min_dbh)
+  if (length(compatible_idx) == 0) {
+    message("⚠️ No compatible species found for Vallet merchantable volume (vc22). No column created.")
+    return(data %>% select(-starts_with("coeff_")))
+  }
   
   # VC22 CALCULATION ----
   
