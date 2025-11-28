@@ -114,7 +114,7 @@ dagnelie_vc22_1g <- function(data,
     show_col_types = FALSE
   )
   
-  ## Merge with density table ----
+  ## Merge with dan1g ----
   data <- dplyr::left_join(
     data,
     dan2 %>% dplyr::select(

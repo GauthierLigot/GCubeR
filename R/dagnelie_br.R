@@ -135,16 +135,6 @@ dagnelie_br <- function(data,
             "\nYou can find the list of available species in ?dan1")
   }
   
-  ## Load dan1 ----
-  path_dan1 <- file.path("data-raw", "danbr.csv")
-  dan1 <- readr::read_delim(
-    file = path_dan1,
-    delim = ";",
-    locale = readr::locale(decimal_mark = ".", encoding = "UTF-8"),
-    trim_ws = TRUE,
-    show_col_types = FALSE
-  )
-  
   ## Merge with coefficients ----
   data <- dplyr::left_join(
     data,

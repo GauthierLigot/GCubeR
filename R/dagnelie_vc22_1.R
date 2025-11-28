@@ -103,17 +103,8 @@ dagnelie_vc22_1 <- function(data, output = NULL) {
             "\nYou can find the list of available species in ?dan1")
   }
   
-  ## Load dan1 ----
-  path_dan1 <- file.path("data-raw", "dan1.csv")
-  dan1 <- readr::read_delim(
-    file = path_dan1,
-    delim = ";",
-    locale = readr::locale(decimal_mark = ".", encoding = "UTF-8"),
-    trim_ws = TRUE,
-    show_col_types = FALSE
-  )
-  
-  ## Merge with coefficients ----
+ 
+  ## Merge with dan1 ----
   data <- dplyr::left_join(
     data,
     dan1 %>% dplyr::select(

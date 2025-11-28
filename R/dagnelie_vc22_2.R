@@ -107,17 +107,7 @@ dagnelie_vc22_2 <- function(data,
             "\n You can find the list of available species in the helper (?dan2)")
   }
   
-  ## Load dan2 ----
-  path_dan2 <- file.path("data-raw", "dan2.csv")
-  dan2 <- readr::read_delim(
-    file = path_dan2,
-    delim = ";",
-    locale = readr::locale(decimal_mark = ".", encoding = "UTF-8"),
-    trim_ws = TRUE,
-    show_col_types = FALSE
-  )
-  
-  ## Merge with density table ----
+  ## Merge with dan2 ----
   data <- dplyr::left_join(
     data,
     dan2 %>% dplyr::select(
