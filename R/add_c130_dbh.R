@@ -31,18 +31,41 @@
 #' 
 # FUNCTION ----
 add_c130_dbh <- function(data) {
-  if (!"c130" %in% names(data) && !"dbh" %in% names(data)) {
+  # Vérifier que c'est bien un data.frame
+  stopifnot(is.data.frame(data))
+  
+  # Cas 1 : aucune des deux colonnes
+  if (!("c130" %in% names(data)) && !("dbh" %in% names(data))) {
     stop("Data must contain either a 'c130' or a 'dbh' column.")
   }
   
+  # Cas 2 : c130 existe mais pas dbh
   if ("c130" %in% names(data) && !"dbh" %in% names(data)) {
     data$dbh <- data$c130 / pi
     message("✅ 'dbh' column added from 'c130'.")
   }
   
+  # Cas 3 : dbh existe mais pas c130
   if ("dbh" %in% names(data) && !"c130" %in% names(data)) {
     data$c130 <- data$dbh * pi
     message("✅ 'c130' column added from 'dbh'.")
+  }
+  
+  # Cas 4 : les deux colonnes existent
+  if ("dbh" %in% names(data) && "c130" %in% names(data)) {
+    # Compléter les NA de c130 à partir de dbh
+    idx_c130_na <- which(is.na(data$c130) & !is.na(data$dbh))
+    if (length(idx_c130_na) > 0) {
+      data$c130[idx_c130_na] <- data$dbh[idx_c130_na] * pi
+      message("⚠️ ", length(idx_c130_na), " valeurs de 'c130' complétées à partir de 'dbh'.")
+    }
+    
+    # Compléter les NA de dbh à partir de c130
+    idx_dbh_na <- which(is.na(data$dbh) & !is.na(data$c130))
+    if (length(idx_dbh_na) > 0) {
+      data$dbh[idx_dbh_na] <- data$c130[idx_dbh_na] / pi
+      message("⚠️ ", length(idx_dbh_na), " valeurs de 'dbh' complétées à partir de 'c130'.")
+    }
   }
   
   return(data)
