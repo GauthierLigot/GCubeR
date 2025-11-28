@@ -29,7 +29,7 @@
 #' - If required columns are missing or non-numeric, the function stops with an error.
 #' - Both output columns are always created to ensure consistency for downstream functions.
 #'   
-#' @importFrom dplyr
+#' @importFrom dplyr mutate select left_join
 #' 
 #' @examples
 #' df <- data.frame(

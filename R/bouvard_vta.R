@@ -23,7 +23,7 @@
 #' - The output column is created only if at least one `"QUERCUS_SP"` row is present,
 #'   otherwise a warning message is displayed and no column is added.
 #'
-#' @importFrom dplyr
+#' @importFrom dplyr mutate select left_join
 #'
 #' @examples
 #' df <- data.frame(
