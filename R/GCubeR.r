@@ -1,6 +1,6 @@
-#' GCubeR main workflow
+#' gcuber main workflow
 #'
-#' Orchestrates the GCubeR pipeline by sequentially applying allometric
+#' Orchestrates the gcuber pipeline by sequentially applying allometric
 #' conversion and biomass/volume functions to a user-provided dataset.
 #'
 #' @description
@@ -53,11 +53,11 @@
 #'   htot = c(25, 30, 28),
 #'   hdom = c(NA, 32, NA)
 #' )
-#' GCuber(df)
+#' gcuber(df)
 #'
 #' @export
 
-GCuber <- function(data) {
+gcuber <- function(data) {
   stopifnot(is.data.frame(data))
   
   if (!"species_code" %in% names(data)) {
