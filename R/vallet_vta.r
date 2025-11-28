@@ -71,33 +71,17 @@ vallet_vta <- function(data,
     rows_to_invalidate <- c(rows_to_invalidate, rows_too_small)
   }
   
-  ## Load Coefficients Table ----
-  path_coeffs <- file.path("data-raw", "vallet_vta.csv")
-  
-  vallet_coeff <- tryCatch(
-    read_delim(
-      file = path_coeffs,
-      delim = ";",
-      locale = locale(decimal_mark = ",", encoding = "UTF-8"),
-      col_types = cols_only(
-        species_code = col_character(),
-        coeff_a = col_double(),
-        coeff_b = col_double(),
-        coeff_c = col_double(),
-        coeff_d = col_double()
-      ),
-      trim_ws = TRUE,
-      show_col_types = FALSE
-    ),
-    error = function(e) {
-      stop("Failed to load coefficient file 'vallet_vta.csv' from 'data-raw' directory. Error: ", e$message)
-    }
-  )
-  
   ## Clean species names and join ----
   data <- data %>%
     mutate(species_code = toupper(trimws(species_code))) %>%
-    left_join(vallet_coeff, by = "species_code")
+    left_join(val_vta, by = "species_code") %>%
+    mutate(
+      coeff_a = suppressWarnings(as.numeric(coeff_a)),
+      coeff_b = suppressWarnings(as.numeric(coeff_b)),
+      coeff_c = suppressWarnings(as.numeric(coeff_c)),
+      coeff_d = suppressWarnings(as.numeric(coeff_d))
+    )
+  
   
   ## Check for unknown species (missing coefficients) ----
   rows_unknown_species <- which(is.na(data$coeff_a))

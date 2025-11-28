@@ -62,39 +62,10 @@ vallet_vc22 <- function(data,
     rows_to_invalidate <- c(rows_to_invalidate, rows_too_small)
   }
   
-  ## Load Coefficients Table ----
-  path_coeffs <- file.path("data-raw", "vallet_vc22.csv") 
-  
-  vallet_coeff <- tryCatch(
-    read_delim(
-      file = path_coeffs,
-      delim = ";",
-      locale = locale(decimal_mark = ",", encoding = "UTF-8"),
-      col_types = cols_only(
-        species_code = col_character(),
-        coeff_a = col_double(),
-        coeff_b = col_double(),
-        coeff_c = col_double()
-      ),
-      trim_ws = TRUE,
-      show_col_types = FALSE
-    ),
-    error = function(e) {
-      stop("Failed to load coefficient file 'vallet_vc22.csv' from 'data-raw' directory. Error: ", e$message)
-    } 
-  )
-  
-  # Coalesce NA coefficients to 0 for calculation 
-  vallet_coeff <- vallet_coeff %>%
-    mutate(
-      coeff_a = coalesce(coeff_a, 0),
-      coeff_c = coalesce(coeff_c, 0)
-    )
-  
   ## Clean species names and join ----
   data <- data %>%
     mutate(species_code = toupper(trimws(species_code))) %>%
-    left_join(vallet_coeff, by = "species_code")
+    left_join(val_vc22, by = "species_code")
   
   ## Check for unknown species (missing coefficients) ----
   rows_unknown_species <- which(is.na(data$coeff_b))

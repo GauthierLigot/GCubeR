@@ -99,16 +99,6 @@ biomass_calc <- function(data,
   
   na_action <- match.arg(na_action)
   # INPUT CHECKS ----  
-  ## Load density table ----
-  path_density <- file.path("data-raw", "density_table.csv")
-  density_table <- read_delim(
-    file = path_density,
-    delim = ";",
-    locale = locale(decimal_mark = ",", encoding = "UTF-8"),
-    trim_ws = TRUE,
-    show_col_types = FALSE
-  )
-  
   ## vc22 selection and validation for Dagnelie ----
   ### Define required and candidate columns ----
   required_columns <- c("species_code")
@@ -136,7 +126,7 @@ biomass_calc <- function(data,
     }
   }
   
-  #### Notify per-row missing vc22 values (Dagnelie only) ----
+  #### Notify per-row missing  ----
   if (length(vc22_available) > 0) {
     rows_missing_vc22 <- which(rowSums(!is.na(data[vc22_available])) == 0)
     if (length(rows_missing_vc22) > 0) {
@@ -145,7 +135,6 @@ biomass_calc <- function(data,
     }
   }
   
-  #### Notify per-row missing values for Vallet vc22 ----
   if ("vallet_vc22" %in% names(data)) {
     rows_missing_vallet <- which(is.na(data$vallet_vc22))
     if (length(rows_missing_vallet) > 0) {
@@ -154,7 +143,6 @@ biomass_calc <- function(data,
     }
   }
   
-  #### Notify per-row missing values for Rondeux vc22 ----
   if ("rondeux_vc22" %in% names(data)) {
     rows_missing_rondeux <- which(is.na(data$rondeux_vc22))
     if (length(rows_missing_rondeux) > 0) {
@@ -163,7 +151,6 @@ biomass_calc <- function(data,
     }
   }
   
-  #### Notify per-row missing values for Algan vc22 ----
   if ("algan_vc22" %in% names(data)) {
     rows_missing_algan <- which(is.na(data$algan_vc22))
     if (length(rows_missing_algan) > 0) {
@@ -178,6 +165,13 @@ biomass_calc <- function(data,
     species_code = toupper(trimws(species_code)),
     con_broad = tolower(trimws(con_broad)),
     density = as.numeric(gsub(",", ".", as.character(density)))
+  )
+  
+  ## Merge with density table ----
+  data <- left_join(
+    data,
+    density_table %>% select(species_code, density, con_broad),
+    by = "species_code"
   )
   
   ## Handle missing values ----
@@ -211,25 +205,19 @@ biomass_calc <- function(data,
     message("Unknown species : ", paste(wrong, collapse = ", "))
   }
   
-  ## Merge with density table ----
-  data <- left_join(data, density_table %>% select(species_code, density, con_broad), by = "species_code")
-  
-  ## Ensure vallet_vta exists to avoid errors in Vallet method ----
+  ## Ensure data exists to avoid errors  ----
   if (!"vallet_vta" %in% names(data)) {
     message("⚠️ Column 'vallet_vta' not found. Vallet method will be skipped.")
   }
   
-  ## Ensure vallet_vc22 exists to avoid errors in CNIEFEB (Vallet) ----
   if (!"vallet_vc22" %in% names(data)) {
     message("⚠️ Column 'vallet_vc22' not found. CNIEFEB (Vallet) will be skipped.")
   }
   
-  ## Ensure rondeux_vc22 exists to avoid errors in CNIEFEB (Rondeux) ----
   if (!"rondeux_vc22" %in% names(data)) {
     message("⚠️ Column 'rondeux_vc22' not found. CNIEFEB (Rondeux) will be skipped.")
   }
   
-  ## Ensure algan_vc22 exists to avoid errors in CNIEFEB (Algan) ----
   if (!"algan_vc22" %in% names(data)) {
     message("⚠️ Column 'algan_vc22' not found. CNIEFEB (Algan) will be skipped.")
   }
@@ -259,7 +247,7 @@ biomass_calc <- function(data,
       )
     )
       
-    ### CNIEFEB for Dagnelie vc22 ----
+    ### CNIEFEB calculations ----
 if ("vc22_dagnelie" %in% names(data)) {
   data <- data %>%
     mutate(
@@ -271,7 +259,6 @@ if ("vc22_dagnelie" %in% names(data)) {
     )
 }
 
-    ### --- CNIEFEB for Vallet vc22 ----
 if ("vallet_vc22" %in% names(data)) {
       data <- data %>% mutate(
         cniefeb_vallet_bag = vallet_vc22 * feb * density,
@@ -282,7 +269,6 @@ if ("vallet_vc22" %in% names(data)) {
       )
     }
     
-    ### --- CNIEFEB for Rondeux vc22 ----
 if ("rondeux_vc22" %in% names(data)) {
       data <- data %>% mutate(
         cniefeb_rondeux_bag = rondeux_vc22 * feb * density,
@@ -292,7 +278,7 @@ if ("rondeux_vc22" %in% names(data)) {
         cniefeb_rondeux_co2 = cniefeb_rondeux_c * a_co2
       )
     }
-  ### CNIEFEB for Algan vc22 ----
+
   if ("algan_vc22" %in% names(data)) {
     data <- data %>% mutate(
       cniefeb_algan_bag = algan_vc22 * feb * density,
