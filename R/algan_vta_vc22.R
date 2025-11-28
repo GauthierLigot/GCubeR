@@ -42,7 +42,9 @@
 #' @export
  
 # VOLUME CALCULATION WITH ALGAN METHOD ----
-algan_vta_vc22 <- function(data) {
+algan_vta_vc22 <- function(data,
+                           na_action = c("error", "omit"),
+                           output = NULL) {
   
   # INPUT CHECKS ----
   ## Required columns ----
@@ -60,10 +62,10 @@ algan_vta_vc22 <- function(data) {
   data <- data %>% dplyr::mutate(species_code = toupper(trimws(species_code)))
   
   ## Define compatible species ----
-  merch_species <- c("ABIES_ALBA", "PICEA_ABIES", "ALNUS_GLUTINOSA", "PRUNUS_AVIUM", "BETULA_SP")
+  vc22_species <- c("ABIES_ALBA", "PICEA_ABIES", "ALNUS_GLUTINOSA", "PRUNUS_AVIUM", "BETULA_SP")
   
   ## Identify incompatible species ----
-  incompatible <- setdiff(unique(data$species_code), c("ABIES_ALBA", merch_species))
+  incompatible <- setdiff(unique(data$species_code), c("ABIES_ALBA", vc22_species))
   if (length(incompatible) > 0) {
     message("⚠️ Algan method not defined for species: ", paste(incompatible, collapse = ", "))
   }
@@ -81,7 +83,7 @@ algan_vta_vc22 <- function(data) {
   
   # vc22: create only if at least one compatible row ----
   vc22_idx <- which(
-    (data$species_code %in% merch_species) &
+    (data$species_code %in% vc22_species) &
       !(data$species_code %in% c("ABIES_ALBA", "PICEA_ABIES") & data$dbh <= 15)
   )
   

@@ -34,7 +34,9 @@
 #' bouvard_vta(df)
 #'
 #' @export
-bouvard_vta <- function(data) {
+bouvard_vta <- function(data,
+                        na_action = c("error", "omit"),
+                        output = NULL) {
   
   # INPUT CHECKS ----
   required_cols <- c("species_code", "dbh", "htot")
