@@ -53,7 +53,8 @@
 #'
 #' @export
 rondeux_vc22_vtot <- function(data,
-                            na_action = c("error", "omit")) {
+                              na_action = c("error", "omit"),
+                              output = NULL) {
   
   na_action <- match.arg(na_action)
   
@@ -78,7 +79,7 @@ rondeux_vc22_vtot <- function(data,
                            (data$c130 < min_c130 | data$c130 > max_c130))
   
   if (length(rows_c130_out) > 0) {
-    warning(
+    message(
       paste0("Circumference constraint violated: ",
              length(rows_c130_out), 
              " tree(s) have c130 < ", min_c130, 
@@ -94,7 +95,7 @@ rondeux_vc22_vtot <- function(data,
   core_na <- which(is.na(data$c130) | is.na(data$htot))
   if (length(core_na) > 0) {
     if (na_action == "error") {
-      stop("Missing values detected in 'c130' or 'htot' for rows: ",
+      message("Missing values detected in 'c130' or 'htot' for rows: ",
            paste(core_na, collapse = ", "),
            ". Provide complete data or use na_action = 'omit'.")
     } else {
@@ -136,6 +137,11 @@ rondeux_vc22_vtot <- function(data,
   if (length(rows_c130_out) > 0) {
     data$rondeux_vtot[rows_c130_out] <- NA
     data$rondeux_vc22[rows_c130_out] <- NA
+  }
+  # If all results are NA, drop columns ----
+  if (all(is.na(data$rondeux_vtot)) & all(is.na(data$rondeux_vc22))) {
+    message("⚠️ No valid Rondeux volumes computed. Columns not created.")
+    data <- data %>% dplyr::select(-dplyr::matches("rondeux_"))
   }
   
   return(data)

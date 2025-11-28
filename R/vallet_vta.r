@@ -113,6 +113,12 @@ vallet_vta <- function(data,
   # Combine all rows where the VTA/Form calculation must be NA (unknown species + c130 constraint)
   rows_to_invalidate <- unique(c(rows_to_invalidate, rows_unknown_species))
   
+  ## If no compatible rows, skip calculation ----
+  compatible_idx <- which(!is.na(data$coeff_a) & data$c130 >= min_c130)
+  if (length(compatible_idx) == 0) {
+    message("⚠️ No compatible species found for Vallet VTA method. No column created.")
+    return(data %>% select(-starts_with("coeff_")))
+  }
   
   # VTA CALCULATION ----
   

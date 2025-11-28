@@ -22,21 +22,53 @@
 #' @section Supported species:
 #' The following species codes are currently supported by \code{dagnelie_vc22_1g}:
 #' \itemize{
-#'   \item \code{"QUERCUS_PETRAEA"}
-#'   \item \code{"QUERCUS_ROBUR"}
 #'   \item \code{"QUERCUS_SP"}
+#'   \item \code{"QUERCUS_ROBUR"}
+#'   \item \code{"QUERCUS_PETRAEA"}
+#'   \item \code{"QUERCUS_PUBESCENS"}
 #'   \item \code{"QUERCUS_RUBRA"}
 #'   \item \code{"FAGUS_SYLVATICA"}
 #'   \item \code{"ACER_PSEUDOPLATANUS"}
 #'   \item \code{"FRAXINUS_EXCELSIOR"}
 #'   \item \code{"ULMUS_SP"}
-#'   \item \code{"PRUNUS_SP"}
+#'   \item \code{"PRUNUS_AVIUM"}
+#'   \item \code{"BETULA_SP"}
 #'   \item \code{"ALNUS_GLUTINOSA"}
 #'   \item \code{"PICEA_ABIES"}
 #'   \item \code{"PSEUDOTSUGA_MENZIESII"}
 #'   \item \code{"LARIX_SP"}
 #'   \item \code{"PINUS_SYLVESTRIS"}
-#'   \item \code{"BETULA_SP"}
+#'   \item \code{"CRATAEGUS_SP"}
+#'   \item \code{"PRUNUS_SP"}
+#'   \item \code{"CARPINUS_SP"}
+#'   \item \code{"CASTANEA_SATIVA"}
+#'   \item \code{"CORYLUS_AVELLANA"}
+#'   \item \code{"MALUS_SP"}
+#'   \item \code{"PYRUS_SP"}
+#'   \item \code{"SORBUS_ARIA"}
+#'   \item \code{"SAMBUCUS_SP"}
+#'   \item \code{"RHAMNUS_FRANGULA"}
+#'   \item \code{"PRUNUS_CERASUS"}
+#'   \item \code{"ALNUS_INCANA"}
+#'   \item \code{"POPULUSxCANADENSIS"}
+#'   \item \code{"POPULUS_TREMULA"}
+#'   \item \code{"PINUS_NIGRA"}
+#'   \item \code{"PINUS_LARICIO"}
+#'   \item \code{"TAXUS_BACCATA"}
+#'   \item \code{"ACER_PLATANOIDES"}
+#'   \item \code{"ACER_CAMPESTRE"}
+#'   \item \code{"SORBUS_AUCUPARIA"}
+#'   \item \code{"JUNGLANS_SP"}
+#'   \item \code{"TILLIA_SP"}
+#'   \item \code{"PICEA_SITCHENSIS"}
+#'   \item \code{"ABIES_ALBA"}
+#'   \item \code{"TSUGA_CANADENSIS"}
+#'   \item \code{"ABIES_GRANDIS"}
+#'   \item \code{"CUPRESSUS_SP"}
+#'   \item \code{"THUJA_PLICATA"}
+#'   \item \code{"AESCULUS_HIPPOCASTANUM"}
+#'   \item \code{"ROBINIA_PSEUDOACACIA"}
+#'   \item \code{"SALIX_SP"}
 #' }
 #'
 #' @param data A \code{data.frame} containing at least the columns
@@ -75,8 +107,9 @@
 #'                    "QUERCUS_SP", "FAGUS_SYLVATICA")
 #' )
 #' dagnelie_vc22_1g(data = df)
-dagnelie_vc22_1g <- function(data, 
-                            output = NULL){ 
+dagnelie_vc22_1g <- function(data,
+                             na_action = c("error", "omit"),
+                             output = NULL) {
   
   # Validation of the Dataframe  ----
   ##  Field needed ----
@@ -93,10 +126,15 @@ dagnelie_vc22_1g <- function(data,
   ## Species management ---- 
   wrong <- setdiff(
     unique(data$species_code),
-    c("QUERCUS_PETRAEA","QUERCUS_ROBUR","QUERCUS_SP","QUERCUS_RUBRA",
-      "FAGUS_SYLVATICA","ACER_PSEUDOPLATANUS","FRAXINUS_EXCELSIOR",
-      "ULMUS_SP","PRUNUS_SP","ALNUS_GLUTINOSA","PICEA_ABIES",
-      "PSEUDOTSUGA_MENZIESII","LARIX_SP","PINUS_SYLVESTRIS","BETULA_SP")
+    c("QUERCUS_SP","QUERCUS_ROBUR","QUERCUS_PETRAEA","QUERCUS_PUBESCENS","QUERCUS_RUBRA","FAGUS_SYLVATICA",
+      "ACER_PSEUDOPLATANUS","FRAXINUS_EXCELSIOR","ULMUS_SP","PRUNUS_AVIUM","BETULA_SP",
+      "ALNUS_GLUTINOSA","PICEA_ABIES","PSEUDOTSUGA_MENZIESII","LARIX_SP","PINUS_SYLVESTRIS",
+      "CRATAEGUS_SP","PRUNUS_SP","CARPINUS_SP","CASTANEA_SATIVA","CORYLUS_AVELLANA","MALUS_SP",
+      "PYRUS_SP","SORBUS_ARIA","SAMBUCUS_SP","RHAMNUS_FRANGULA","PRUNUS_CERASUS","ALNUS_INCANA",
+      "POPULUSxCANADENSIS","POPULUS_TREMULA","PINUS_NIGRA","PINUS_LARICIO","TAXUS_BACCATA",
+      "ACER_PLATANOIDES","ACER_CAMPESTRE","SORBUS_AUCUPARIA","JUNGLANS_SP","TILLIA_SP",
+      "PICEA_SITCHENSIS","ABIES_ALBA","TSUGA_CANADENSIS","ABIES_GRANDIS","CUPRESSUS_SP",
+      "THUJA_PLICATA","AESCULUS_HIPPOCASTANUM","ROBINIA_PSEUDOACACIA","SALIX_SP")
   )
   
   if (length(wrong) > 0) {

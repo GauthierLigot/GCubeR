@@ -1,14 +1,14 @@
-#' Single-entry Dagnelie volume (tarif 1)
+#' Single-entry Dagnelie branch volume (tarif "br")
 #'
-#' Computes the standing volume \eqn{v_{c,22}} (in cubic metres per tree) using
-#' Dagnelie's single-entry tarif-1 equations.  
-#' The volume is derived from the stem circumference at 1.30 m (\code{c130}, in cm)
+#' Computes the branch volume \eqn{v_{br}} (in cubic metres per tree)
+#' using Dagnelie's single-entry "br" equations.  
+#' The branch volume is derived from the stem circumference at 1.30 m (\code{c130}, in cm)
 #' and the tree species, using species-specific polynomial coefficients stored
-#' in the reference table \code{dan1}.
+#' in the reference table \code{danbr}.
 #'
-#' The tarif-1 volume is calculated as:
+#' The "br" tarif branch volume is calculated as:
 #' \deqn{
-#'   v_{c,22} = a + b\,c130 + c\,c130^2 + d\,c130^3
+#'   v_{br} = a + b\,c130 + c\,c130^2 + d\,c130^3
 #' }
 #' where \eqn{a}, \eqn{b}, \eqn{c}, and \eqn{d} are species-specific coefficients.
 #'
@@ -17,63 +17,55 @@
 #'   \item checks that the input data frame contains the required
 #'         variables \code{c130} and \code{species_code},
 #'   \item validates that \code{c130} is numeric,
-#'   \item verifies that all species are available in the \code{dan1}
+#'   \item verifies that all species are available in the \code{danbr}
 #'         reference table and issues a warning otherwise,
-#'   \item merges the input with \code{dan1} to retrieve coefficients
+#'   \item merges the input with \code{danbr} to retrieve coefficients
 #'         and species-specific validity ranges (\code{min_c130}, \code{max_c130}),
 #'   \item warns when \code{c130} values fall outside the recommended range,
-#'   \item computes tarif-1 volume and returns the augmented data frame.
+#'   \item computes tarif-"br" branch volume and returns the augmented data frame.
 #' }
 #'
 #' @section Supported species:
-#' The following species codes are supported by \code{dagnelie_vc22_1}:
+#' The following species codes are supported by \code{dagnelie_br}:
 #' \itemize{
-#'   \item \code{"QUERCUS_SP"}
-#'   \item \code{"QUERCUS_ROBUR"}
-#'   \item \code{"QUERCUS_PETRAEA"}
-#'   \item \code{"QUERCUS_PUBESCENS"}
+#'   \item \code{"QUERCUS_SP"}, 
+#'   \item \code{"QUERCUS_ROBUR"}, 
+#'   \item \code{"QUERCUS_PETRAEA"}, 
+#'   \item \code{"QUERCUS_PUBESCENS"}, 
 #'   \item \code{"QUERCUS_RUBRA"}
-#'   \item \code{"FAGUS_SYLVATICA"}
-#'   \item \code{"ACER_PSEUDOPLATANUS"}
-#'   \item \code{"FRAXINUS_EXCELSIOR"}
-#'   \item \code{"ULMUS_SP"}
+#'   \item \code{"FAGUS_SYLVATICA"}, 
+#'   \item \code{"ACER_PSEUDOPLATANUS"}, 
+#'   \item \code{"FRAXINUS_EXCELSIOR"}, 
+#'   \item \code{"ULMUS_SP"}, 
 #'   \item \code{"PRUNUS_AVIUM"}
-#'   \item \code{"BETULA_SP"}
-#'   \item \code{"ALNUS_GLUTINOSA"}
-#'   \item \code{"PICEA_ABIES"}
-#'   \item \code{"PSEUDOTSUGA_MENZIESII"}
-#'   \item \code{"LARIX_SP"}
-#'   \item \code{"PINUS_SYLVESTRIS"}
+#'   \item \code{"BETULA_SP"}, 
+#'   \item \code{"ALNUS_GLUTINOSA"}, 
+#'   \item \code{"LARIX_SP"}, 
+#'   \item \code{"PINUS_SYLVESTRIS"}, 
 #'   \item \code{"CRATAEGUS_SP"}
-#'   \item \code{"PRUNUS_SP"}
-#'   \item \code{"CARPINUS_SP"}
-#'   \item \code{"CASTANEA_SATIVA"}
-#'   \item \code{"CORYLUS_AVELLANA"}
+#'   \item \code{"PRUNUS_SP"}, 
+#'   \item \code{"CARPINUS_SP"}, 
+#'   \item \code{"CASTANEA_SATIVA"}, 
+#'   \item \code{"CORYLUS_AVELLANA"}, 
 #'   \item \code{"MALUS_SP"}
-#'   \item \code{"PYRUS_SP"}
-#'   \item \code{"SORBUS_ARIA"}
-#'   \item \code{"SAMBUCUS_SP"}
-#'   \item \code{"RHAMNUS_FRANGULA"}
+#'   \item \code{"PYRUS_SP"}, 
+#'   \item \code{"SORBUS_ARIA"}, 
+#'   \item \code{"SAMBUCUS_SP"}, 
+#'   \item \code{"RHAMNUS_FRANGULA"}, 
 #'   \item \code{"PRUNUS_CERASUS"}
-#'   \item \code{"ALNUS_INCANA"}
-#'   \item \code{"POPULUSxCANADENSIS"}
-#'   \item \code{"POPULUS_TREMULA"}
-#'   \item \code{"PINUS_NIGRA"}
+#'   \item \code{"ALNUS_INCANA"}, 
+#'   \item \code{"POPULUSxCANADENSIS"}, 
+#'   \item \code{"POPULUS_TREMULA"}, 
+#'   \item \code{"PINUS_NIGRA"}, 
 #'   \item \code{"PINUS_LARICIO"}
-#'   \item \code{"TAXUS_BACCATA"}
-#'   \item \code{"ACER_PLATANOIDES"}
-#'   \item \code{"ACER_CAMPESTRE"}
-#'   \item \code{"SORBUS_AUCUPARIA"}
+#'   \item \code{"TAXUS_BACCATA"}, 
+#'   \item \code{"ACER_PLATANOIDES"}, 
+#'   \item \code{"ACER_CAMPESTRE"}, 
+#'   \item \code{"SORBUS_AUCUPARIA"}, 
 #'   \item \code{"JUNGLANS_SP"}
-#'   \item \code{"TILLIA_SP"}
-#'   \item \code{"PICEA_SITCHENSIS"}
-#'   \item \code{"ABIES_ALBA"}
-#'   \item \code{"TSUGA_CANADENSIS"}
-#'   \item \code{"ABIES_GRANDIS"}
-#'   \item \code{"CUPRESSUS_SP"}
-#'   \item \code{"THUJA_PLICATA"}
-#'   \item \code{"AESCULUS_HIPPOCASTANUM"}
-#'   \item \code{"ROBINIA_PSEUDOACACIA"}
+#'   \item \code{"TILLIA_SP"}, 
+#'   \item \code{"AESCULUS_HIPPOCASTANUM"}, 
+#'   \item \code{"ROBINIA_PSEUDOACACIA"}, 
 #'   \item \code{"SALIX_SP"}
 #' }
 #'
@@ -88,16 +80,16 @@
 #' @return A \code{data.frame} identical to the input \code{data} but augmented with:
 #'   \itemize{
 #'     \item species-specific coefficients and validity ranges,
-#'     \item \code{dagnelie_vc22_1}: the computed Dagnelie tarif-1 volume (m\eqn{^3} per tree).
+#'     \item \code{dagnelie_br}: the computed Dagnelie tarif-"br" branch volume (m\eqn{^3} per tree).
 #'   }
 #'
 #' @details
-#' If one or more species codes are not found in \code{dan1}, the function issues
+#' If one or more species codes are not found in \code{danbr}, the function issues
 #' a warning and returns \code{NA}-values for missing coefficients and volumes.  
 #' Trees with \code{c130} values outside the recommended species-specific range
-#' produce a warning but still receive a computed volume.
+#' produce a warning but still receive a computed branch volume.
 #'
-#' @seealso \code{\link{dan1}} for species-specific coefficients.
+#' @seealso \code{\link{danbr}} for species-specific coefficients.
 #'
 #' @import dplyr
 #' @export
@@ -108,11 +100,13 @@
 #'   species_code = c("PINUS_SYLVESTRIS", "QUERCUS_RUBRA",
 #'                    "QUERCUS_SP", "FAGUS_SYLVATICA")
 #' )
-#' dagnelie_vc22_1(df)
+#' dagnelie_br(df)
 
-dagnelie_vc22_1 <- function(data,
-                            na_action = c("error", "omit"),
-                            output = NULL) {
+
+
+dagnelie_br <- function(data,
+                        na_action = c("error", "omit"),
+                        output = NULL) {
   
   ## Validation of the Dataframe ----
   stopifnot(is.data.frame(data))
@@ -127,13 +121,12 @@ dagnelie_vc22_1 <- function(data,
   valid_species <- c(
     c("QUERCUS_SP","QUERCUS_ROBUR","QUERCUS_PETRAEA","QUERCUS_PUBESCENS","QUERCUS_RUBRA","FAGUS_SYLVATICA",
       "ACER_PSEUDOPLATANUS","FRAXINUS_EXCELSIOR","ULMUS_SP","PRUNUS_AVIUM","BETULA_SP",
-      "ALNUS_GLUTINOSA","PICEA_ABIES","PSEUDOTSUGA_MENZIESII","LARIX_SP","PINUS_SYLVESTRIS",
-      "CRATAEGUS_SP","PRUNUS_SP","CARPINUS_SP","CASTANEA_SATIVA","CORYLUS_AVELLANA","MALUS_SP",
-      "PYRUS_SP","SORBUS_ARIA","SAMBUCUS_SP","RHAMNUS_FRANGULA","PRUNUS_CERASUS","ALNUS_INCANA",
+      "ALNUS_GLUTINOSA","LARIX_SP","PINUS_SYLVESTRIS","CRATAEGUS_SP","PRUNUS_SP",
+      "CARPINUS_SP","CASTANEA_SATIVA","CORYLUS_AVELLANA","MALUS_SP","PYRUS_SP",
+      "SORBUS_ARIA","SAMBUCUS_SP","RHAMNUS_FRANGULA","PRUNUS_CERASUS","ALNUS_INCANA",
       "POPULUSxCANADENSIS","POPULUS_TREMULA","PINUS_NIGRA","PINUS_LARICIO","TAXUS_BACCATA",
       "ACER_PLATANOIDES","ACER_CAMPESTRE","SORBUS_AUCUPARIA","JUNGLANS_SP","TILLIA_SP",
-      "PICEA_SITCHENSIS","ABIES_ALBA","TSUGA_CANADENSIS","ABIES_GRANDIS","CUPRESSUS_SP",
-      "THUJA_PLICATA","AESCULUS_HIPPOCASTANUM","ROBINIA_PSEUDOACACIA","SALIX_SP")
+      "AESCULUS_HIPPOCASTANUM","ROBINIA_PSEUDOACACIA","SALIX_SP")
   )
   
   wrong <- setdiff(unique(data$species_code), valid_species)
@@ -143,7 +136,7 @@ dagnelie_vc22_1 <- function(data,
   }
   
   ## Load dan1 ----
-  path_dan1 <- file.path("data-raw", "dan1.csv")
+  path_dan1 <- file.path("data-raw", "danbr.csv")
   dan1 <- readr::read_delim(
     file = path_dan1,
     delim = ";",
@@ -198,13 +191,13 @@ dagnelie_vc22_1 <- function(data,
     )
   }
   
-  ## Compute dagnelie_vc22_1 ----
-  data$dagnelie_vc22_1 <- with(
+  ## Compute dagnelie_br ----
+  data$dagnelie_br <- with(
     data,
     coeff_a + coeff_b * c130 + coeff_c * c130^2 + coeff_d * c130^3
   )
   
-  ## Remove technical columns from dan1, keep everything else + dagnelie_vc22_1 ----
+  ## Remove technical columns from dan1, keep everything else + dagnelie_br ----
   data <- dplyr::select(
     data,
     -dplyr::any_of(c("coeff_a", "coeff_b", "coeff_c", "coeff_d",
