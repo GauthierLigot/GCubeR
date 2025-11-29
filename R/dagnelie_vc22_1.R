@@ -84,7 +84,11 @@
 #'   }
 #' @param output Optional argument controlling output format
 #'   (currently ignored; the function always returns the augmented data frame).
-#'
+#' @param output Optional file path where the resulting data frame should be 
+#'   exported as a CSV. If NULL (default), no file is written.
+#'   Export is handled by the utility function \code{export_output()} and
+#'   failures trigger warnings without interrupting execution.
+#'   
 #' @return A \code{data.frame} identical to the input \code{data} but augmented with:
 #'   \itemize{
 #'     \item species-specific coefficients and validity ranges,
@@ -202,6 +206,8 @@ dagnelie_vc22_1 <- function(data,
                      "min_c130", "max_c130"))
   )
   
+  # exporting the file using function export_output ----
+  export_output(data, output)
   return(data)
   
 }

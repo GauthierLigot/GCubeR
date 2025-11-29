@@ -1,6 +1,6 @@
 #' Single-entry Dagnelie volume (tarif 2)
 #'
-#' Computes the standing volume \eqn{v_{c,22}} (in cubic metres per tree) using
+#' Computes the standing volume \eqn{v_{c,22}} (in cubic metres) using
 #' Dagnelie's two-entry tarif 2 equations. The volume is calculated from the
 #' stem circumference at 1.30 m (\code{c130}, in cm) and the tree species, using
 #' species-specific polynomial coefficients stored in \code{dan2}.
@@ -78,6 +78,10 @@
 #' @param output Optional character string controlling the format of the output.
 #'   Currently ignored; the function always returns the input data frame with
 #'   additional columns.
+#' @param output Optional file path where the resulting data frame should be 
+#'   exported as a CSV. If NULL (default), no file is written.
+#'   Export is handled by the utility function \code{export_output()} and
+#'   failures trigger warnings without interrupting execution.
 #'
 #' @return A \code{data.frame} identical to \code{data} but augmented with:
 #'   \itemize{
@@ -207,11 +211,14 @@ dagnelie_vc22_2 <- function(data,
     coeff_a + coeff_b * c130 + coeff_c * c130^2 + coeff_d * c130^3 + coeff_e*htot + coeff_f* htot * c130^2
   )
   
-  ## Remove technical columns from dan1, keep everything else + tarif1 ----
+  ## Remove technical columns from dan1, keep everything else + tarif2 ----
   data <- dplyr::select(
     data,
     -dplyr::any_of(c("coeff_a", "coeff_b", "coeff_c", "coeff_d","coeff_e", "coeff_f",
                      "min_c130", "max_c130"))
   )
+  # exporting the file using function export_output ----
+  export_output(data, output)
+  
   return(data)
 }

@@ -8,6 +8,10 @@
 #'   - `species_code`: species name in uppercase Latin format (e.g. `"ABIES_ALBA"`).
 #'   - `dbh`: diameter at breast height (cm).
 #'   - `htot`: total tree height (m).
+#' @param output Optional file path where the resulting data frame should be 
+#'   exported as a CSV. If NULL (default), no file is written.
+#'   Export is handled by the utility function \code{export_output()} and
+#'   failures trigger warnings without interrupting execution.
 #'
 #' @return A data frame with the original input columns plus two new outputs:
 #' - `algan_vta`: aerial total volume (m³). Computed only for `"ABIES_ALBA"`, `NA` otherwise.
@@ -29,7 +33,8 @@
 #' - If required columns are missing or non-numeric, the function stops with an error.
 #' - Both output columns are always created to ensure consistency for downstream functions.
 #'   
-#' @importFrom dplyr mutate select left_join
+#' @importFrom dplyr mutate
+#' @importFrom magrittr %>%
 #' 
 #' @examples
 #' df <- data.frame(
@@ -43,7 +48,6 @@
  
 # VOLUME CALCULATION WITH ALGAN METHOD ----
 algan_vta_vc22 <- function(data,
-                           na_action = c("error", "omit"),
                            output = NULL) {
   
   # INPUT CHECKS ----
@@ -81,28 +85,33 @@ algan_vta_vc22 <- function(data,
   coef_vc22 = 0.33
   coef_vta = 0.4
   
-  # vc22: create only if at least one compatible row ----
+  # Initialiser les colonnes de sortie à NA_real_ ----
+  data$algan_vc22 <- NA_real_
+  data$algan_vta  <- NA_real_
+  
+  # vc22 ----
   vc22_idx <- which(
     (data$species_code %in% vc22_species) &
       !(data$species_code %in% c("ABIES_ALBA", "PICEA_ABIES") & data$dbh <= 15)
   )
   
   if (length(vc22_idx) > 0) {
-    data$algan_vc22 <- NA_real_
-    data$algan_vc22[vc22_idx] <- coef_vc22 * ( (data$dbh[vc22_idx] / 100)^2 ) * data$htot[vc22_idx]
+    data$algan_vc22[vc22_idx] <- coef_vc22 * ((data$dbh[vc22_idx] / 100)^2) * data$htot[vc22_idx]
   } else {
-    message("⚠️ No compatible species found for Algan merchantable volume (vc22). No column created.")
+    message("⚠️ No compatible species found for Algan merchantable volume (vc22). All values are NA.")
   }
   
-  # VTA: create only if at least one compatible row ----
+  # vta ----
   vta_idx <- which(data$species_code == "ABIES_ALBA" & data$dbh > 15)
   
   if (length(vta_idx) > 0) {
-    data$algan_vta <- NA_real_
-    data$algan_vta[vta_idx] <- coef_vta * ( (data$dbh[vta_idx] / 100)^2 ) * data$htot[vta_idx]
+    data$algan_vta[vta_idx] <- coef_vta * ((data$dbh[vta_idx] / 100)^2) * data$htot[vta_idx]
   } else {
-    message("⚠️ No compatible species found for Algan aerial total volume (vta). No column created.")
+    message("⚠️ No compatible species found for Algan aerial total volume (vta). All values are NA.")
   }
+  
+  # exporting the file using function export_output ----
+  export_output(data, output)
   
   return(data)
 }

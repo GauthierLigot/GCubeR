@@ -68,5 +68,7 @@ add_c130_dbh <- function(data) {
     }
   }
   
+  # exporting the file using function export_output ----
+  export_output(data, output)
   return(data)
 }

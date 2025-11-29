@@ -78,7 +78,11 @@
 #' @param output Optional character string controlling the format of the output.
 #'   Currently ignored; the function always returns the input data frame with
 #'   additional columns.
-#'
+#' @param output Optional file path where the resulting data frame should be 
+#'   exported as a CSV. If NULL (default), no file is written.
+#'   Export is handled by the utility function \code{export_output()} and
+#'   failures trigger warnings without interrupting execution.
+#'   
 #' @return A \code{data.frame} identical to \code{data} but augmented with:
 #'   \itemize{
 #'     \item the joined columns from \code{dan1g}
@@ -220,5 +224,8 @@ dagnelie_vc22_1g <- function(data,
     -dplyr::any_of(c("coeff_a", "coeff_b", "coeff_c", "coeff_d","coeff_e", "coeff_f",
                      "min_c130", "max_c130"))
   )
+  
+  # exporting the file using function export_output ----
+  export_output(data, output)
   return(data)
 }

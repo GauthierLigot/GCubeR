@@ -34,6 +34,11 @@
 #' @param na_action How to handle missing essential values (\code{c130}, \code{htot}).
 #'   \code{"error"} (default) stops if missing values are detected.
 #'   \code{"omit"} removes rows with missing essential fields.
+#'   
+#' @param output Optional file path where the resulting data frame should be 
+#'   exported as a CSV. If NULL (default), no file is written.
+#'   Export is handled by the utility function \code{export_output()} and
+#'   failures trigger warnings without interrupting execution.
 #'
 #' @return
 #' A data frame identical to \code{data}, with two added columns:
@@ -144,5 +149,7 @@ rondeux_vc22_vtot <- function(data,
     data <- data %>% dplyr::select(-dplyr::matches("rondeux_"))
   }
   
+  # exporting the file using function export_output ----
+  export_output(data, output)
   return(data)
 }

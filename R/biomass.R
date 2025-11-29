@@ -22,8 +22,11 @@
 #'
 #' @param na_action How to handle missing values. `"error"` (default) stops if any required
 #'   value is missing. `"omit"` removes rows with missing values.
-#' @param output Optional file path to export the results as a CSV. If `NULL`, results are printed.
-#'
+#' @param output Optional file path where the resulting data frame should be 
+#'   exported as a CSV. If NULL (default), no file is written.
+#'   Export is handled by the utility function \code{export_output()} and
+#'   failures trigger warnings without interrupting execution.
+#'   
 #' @return A data frame with one row per tree, including:
 #' - `species_code`: species name in uppercase Latin format.
 #' - `dagnelie_vc22_1`, `dagnelie_vc22_1g`, `dagnelie_vc22_2`, `vallet_vc22`, `rondeux_vc22`,`algan_vc22`:
@@ -305,12 +308,7 @@ if ("rondeux_vc22" %in% names(data)) {
   data <- data %>%
     select(-feb, -con_broad, -density)
   
-  # OUTPUT ----
-  if (!is.null(output)) {
-    write_delim(data, file = output, delim = ";", na = "", col_names = TRUE)
-    message("File written : ", normalizePath(output, winslash = "/"))
-  } else {
-    print(data)
-  }
+  # exporting the file using function export_output ----
+  export_output(data, output)
   return(data)
 }

@@ -8,7 +8,11 @@
 #'   - `species_code`: species name in uppercase Latin format (e.g. `"QUERCUS_SP"`).
 #'   - `dbh`: diameter at breast height (cm).
 #'   - `htot`: total tree height (m).
-#'
+#' @param output Optional file path where the resulting data frame should be 
+#'   exported as a CSV. If NULL (default), no file is written.
+#'   Export is handled by the utility function \code{export_output()} and
+#'   failures trigger warnings without interrupting execution.
+#'   
 #' @return A data frame with the original input columns plus one new output:
 #' - `bouvard_vta`: aerial total volume (m³). Computed only for `"QUERCUS_SP"`,
 #'   otherwise not created.
@@ -70,5 +74,7 @@ bouvard_vta <- function(data,
   data$bouvard_vta <- NA_real_
   data$bouvard_vta[idx] <- a * ( (data$dbh[idx] / 100)^2 ) * data$htot[idx]
   
+  # exporting the file using function export_output ----
+  export_output(data, output)
   return(data)
 }

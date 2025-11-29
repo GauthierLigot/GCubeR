@@ -10,6 +10,10 @@
 #' @param output Optional file path (string). If provided, the resulting data frame
 #'   will be written to this file using semicolon (;) as a delimiter. NA values are
 #'   written as empty strings (""). Defaults to \code{NULL}.
+#' @param output Optional file path where the resulting data frame should be 
+#'   exported as a CSV. If NULL (default), no file is written.
+#'   Export is handled by the utility function \code{export_output()} and
+#'   failures trigger warnings without interrupting execution.
 #'
 #' @return The resulting data frame with the new column \code{vallet_vc22} 
 #'   (Commercial Volume in **m³**).
@@ -120,5 +124,7 @@ vallet_vc22 <- function(data,
     print(data)
   }
   
+  # exporting the file using function export_output ----
+  export_output(data, output)
   return(data)
 }

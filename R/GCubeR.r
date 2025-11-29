@@ -18,6 +18,10 @@
 #'   \item \code{c150}, \code{c130}, or \code{dbh}: stem circumference or diameter,
 #'   \item optionally \code{htot} (total height) and \code{hdom} (dominant height).
 #' }
+#' @param output Optional file path where the resulting data frame should be 
+#'   exported as a CSV. If NULL (default), no file is written.
+#'   Export is handled by the utility function \code{export_output()} and
+#'   failures trigger warnings without interrupting execution.
 #'
 #' @return A \code{data.frame} identical to the input but augmented with:
 #' \itemize{
@@ -57,13 +61,14 @@
 #'
 #' @export
 
-gcuber <- function(data) {
+gcuber <- function(data, output = NULL) {
   stopifnot(is.data.frame(data))
   
   if (!"species_code" %in% names(data)) {
     stop("Missing column 'species_code'.")
   }
   
+  # run all GcubeR functions ----
   data <- c150_c130(data)  
   data <- add_c130_dbh(data)
   data <- dagnelie_vc22_1(data)
@@ -77,5 +82,7 @@ gcuber <- function(data) {
   data <- bouvard_vta(data)
   data <- biomass_calc(data)
   
+  # exporting the file using function export_output ----
+  export_output(data, output)
   return(data)
 }

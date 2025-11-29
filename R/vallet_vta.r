@@ -139,5 +139,7 @@ vallet_vta <- function(data,
     print(data)
   }
   
+  # exporting the file using function export_output ----
+  export_output(data, output)
   return(data)
 }
