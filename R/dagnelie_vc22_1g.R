@@ -112,23 +112,13 @@ dagnelie_vc22_1g <- function(data,
             "\n You can find the list of available species in the helper (?dagnelie_vc22_1g)")
   }
   
-  ## Load dan2 ----
-  path_dan1g <- file.path("data-raw", "dan1g.csv")
-  dan2 <- readr::read_delim(
-    file = path_dan1g,
-    delim = ";",
-    locale = readr::locale(decimal_mark = ".", encoding = "UTF-8"),
-    trim_ws = TRUE,
-    show_col_types = FALSE
-  )
-  
   ## Merge with dan1g ----
   data <- dplyr::left_join(
     data,
     dan2 %>% dplyr::select(
       species_code,
       coeff_a, coeff_b, coeff_c, coeff_d, coeff_e, coeff_f,
-      min_c130, max_c130
+      min_c130, max_c130, min_hdom, max_hdom
     ),
     by = "species_code"
   )
@@ -143,7 +133,9 @@ dagnelie_vc22_1g <- function(data,
       coeff_e = as.numeric(coeff_e),
       coeff_f = as.numeric(coeff_f),
       min_c130 = as.numeric(min_c130),
-      max_c130 = as.numeric(max_c130)
+      max_c130 = as.numeric(max_c130),
+      max_hdom = as.numeric(max_hdom),
+      min_hdom = as.numeric(min_hdom)
     )
   
   ## Check data$c130 constraint ----
@@ -155,6 +147,33 @@ dagnelie_vc22_1g <- function(data,
     valid & (data$c130 < data$min_c130 | data$c130 > data$max_c130)
   )
   
+  ## Check data$hdom constraint ----
+  valid <- !is.na(data$hdom) & 
+    !is.na(data$min_hdom) & 
+    !is.na(data$max_hdom)
+  
+  rows_out <- which(
+    valid & (data$hdom < data$min_hdom | data$hdom > data$max_hdom)
+  )
+  
+  if (length(rows_out) > 0) {
+    
+    details <- paste0(
+      "row ", rows_out,
+      " (species ", data$species_code[rows_out],
+      ", min=", data$min_hdom[rows_out],
+      ", max=", data$max_hdom[rows_out],
+      ", found=", data$hdom[rows_out], ")"
+    )
+    
+    warning(
+      paste(
+        "hdom out of range for", length(rows_out), "tree(s):",
+        paste(details, collapse = " | ")
+      ),
+      call. = FALSE
+    )
+  }
   if (length(rows_out) > 0) {
     
     details <- paste0(

@@ -175,7 +175,7 @@ dagnelie_vc22_2 <- function(data,
     dan2 %>% dplyr::select(
       species_code,
       coeff_a, coeff_b, coeff_c, coeff_d, coeff_e, coeff_f,
-      min_c130, max_c130
+      min_c130, max_c130, min_htot, max_htot
     ),
     by = "species_code"
   )
@@ -190,7 +190,9 @@ dagnelie_vc22_2 <- function(data,
       coeff_e = as.numeric(coeff_e),
       coeff_f = as.numeric(coeff_f),
       min_c130 = as.numeric(min_c130),
-      max_c130 = as.numeric(max_c130)
+      max_c130 = as.numeric(max_c130),
+      max_htot = as.numeric(max_htot),
+      min_htot = as.numeric(min_htot)
     )
   
   ## Check data$c130 constraint ----
@@ -220,7 +222,33 @@ dagnelie_vc22_2 <- function(data,
       call. = FALSE
     )
   }
+  ## Check data$htot constraint ----
+  valid <- !is.na(data$htot) & 
+    !is.na(data$min_htot) & 
+    !is.na(data$max_htot)
   
+  rows_out <- which(
+    valid & (data$htot < data$min_htot | data$htot > data$max_htot)
+  )
+  
+  if (length(rows_out) > 0) {
+    
+    details <- paste0(
+      "row ", rows_out,
+      " (species ", data$species_code[rows_out],
+      ", min=", data$min_htot[rows_out],
+      ", max=", data$max_htot[rows_out],
+      ", found=", data$htot[rows_out], ")"
+    )
+    
+    warning(
+      paste(
+        "htot out of range for", length(rows_out), "tree(s):",
+        paste(details, collapse = " | ")
+      ),
+      call. = FALSE
+    )
+  }
   ## Initialisation des colonnes de sortie ----
   data$dagnelie_vc22_2  <- NA_real_
   nline <- nrow(data)
