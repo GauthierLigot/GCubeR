@@ -2,121 +2,87 @@
 % Please edit documentation in R/dagnelie_vc22_1g.R
 \name{dagnelie_vc22_1g}
 \alias{dagnelie_vc22_1g}
-\title{Single-entry Dagnelie volume (tarif 1g)}
+\title{Graduated single-entry Dagnelie volume (tarif 1g)}
 \usage{
 dagnelie_vc22_1g(data, na_action = c("error", "omit"), output = NULL)
 }
 \arguments{
-\item{data}{A \code{data.frame} containing at least the columns
-\code{c130} (stem circumference at 1.30 m, in cm) and
-\code{hdom} (hight of the tree)
-\code{species_code} (character code of the tree species).}
+\item{data}{A \code{data.frame} containing the columns:
+\itemize{
+\item \code{c130} (stem circumference at 1.30 m, in cm)
+\item \code{hdom} (dominant height, in m)
+\item \code{species_code} (character code of the tree species)
+}}
 
 \item{output}{Optional file path where the resulting data frame should be
-exported as a CSV. If NULL (default), no file is written.
-Export is handled by the utility function \code{export_output()} and
-failures trigger warnings without interrupting execution.}
+exported as a CSV. If \code{NULL} (default), no file is written.
+Export is handled by the utility function \code{export_output()}.}
 }
 \value{
-A \code{data.frame} identical to \code{data} but augmented with:
+A \code{data.frame} identical to \code{data}, augmented with:
 \itemize{
 \item the joined columns from \code{dan1g}
 (\code{coeff_a}, \code{coeff_b}, \code{coeff_c}, \code{coeff_d},
-\code{min_c130}, \code{max_c130}),
-\item \code{dagnelie_vc22_1g}: the Dagnelie non parametric volume \eqn{v_{c,22}}
-in m\eqn{^3} per tree.
+\code{coeff_e}, \code{coeff_f},
+\code{min_c130}, \code{max_c130}, \code{min_hdom}, \code{max_hdom})
+\item \code{dagnelie_vc22_1g}: the computed volume (m\eqn{^3} per tree)
 }
 }
 \description{
 Computes the standing volume \eqn{v_{c,22}} (in cubic metres per tree) using
-Dagnelie's non parametric equations. The volume is calculated from the
-stem circumference at 1.30 m (\code{c130}, in cm) and the tree species, using
-species-specific polynomial coefficients stored in \code{dan1g}.
+Dagnelie's \emph{tarif 1g} equations. The volume is calculated from the stem
+circumference at 1.30 m (\code{c130}, in cm), the dominant height
+(\code{hdom}, in m), and the tree species, using species-specific polynomial
+coefficients stored in \code{dan1g}.
 }
 \details{
 The function:
 \itemize{
 \item checks that the input data frame contains the required columns
-\code{c130} and \code{species_code},
-\item validates that all species are available in the \code{dan1g} table,
-\item merges the input data with \code{dan1g} to retrieve the coefficients
-\code{coeff_a}, \code{coeff_b}, \code{coeff_c}, \code{coeff_d} and
-the valid range \code{min_c130}, \code{max_c130},
-\item issues a warning for trees whose \code{c130} is outside the species-
-specific range,
-\item computes tarif 1g volume as:
-\deqn{v_{c,22} = a + b \cdot c130 + c \cdot c130^2 + d \cdot c130^3 + e \cdot hdom + f \cdot c130^2 \cdot hdom.}
+\code{c130}, \code{hdom} and \code{species_code},
+
+\item validates that all species codes are present in the \code{dan1g} table,
+
+\item merges the input data with \code{dan1g} to retrieve:
+\code{coeff_a}, \code{coeff_b}, \code{coeff_c}, \code{coeff_d},
+\code{coeff_e}, \code{coeff_f},
+as well as the species-specific valid ranges
+\code{min_c130}, \code{max_c130}, \code{min_hdom}, \code{max_hdom},
+
+\item issues a warning for trees whose \code{c130} is outside the valid
+range \code{[min_c130, max_c130]},
+
+\item issues a warning for trees whose \code{hdom} is outside the valid
+range \code{[min_hdom, max_hdom]},
+
+\item computes the tarif 1g volume using the species-specific polynomial:
+\deqn{
+           v_{c,22} =
+           coeff_a +
+           coeff_b \cdot c130 +
+           coeff_c \cdot c130^2 +
+           coeff_d \cdot c130^3 +
+           coeff_e \cdot hdom +
+           coeff_f \cdot c130^2 \cdot hdom
+        }
 }
 
-Species codes must match those available in the \code{dan1g} reference table.
-If one or more species are not found, the function issues a warning. For trees
-where \code{c130} is outside the species-specific range
-\code{[min_c130, max_c130]}, a warning is issued, but the volume is still
-computed.
-}
-\section{Supported species}{
+Species codes must match those available in the \code{dan1g} table.
+If one or more species are not found, the function issues a warning.
 
-The following species codes are currently supported by \code{dagnelie_vc22_1g}:
-\itemize{
-\item \code{"QUERCUS_SP"}
-\item \code{"QUERCUS_ROBUR"}
-\item \code{"QUERCUS_PETRAEA"}
-\item \code{"QUERCUS_PUBESCENS"}
-\item \code{"QUERCUS_RUBRA"}
-\item \code{"FAGUS_SYLVATICA"}
-\item \code{"ACER_PSEUDOPLATANUS"}
-\item \code{"FRAXINUS_EXCELSIOR"}
-\item \code{"ULMUS_SP"}
-\item \code{"PRUNUS_AVIUM"}
-\item \code{"BETULA_SP"}
-\item \code{"ALNUS_GLUTINOSA"}
-\item \code{"PICEA_ABIES"}
-\item \code{"PSEUDOTSUGA_MENZIESII"}
-\item \code{"LARIX_SP"}
-\item \code{"PINUS_SYLVESTRIS"}
-\item \code{"CRATAEGUS_SP"}
-\item \code{"PRUNUS_SP"}
-\item \code{"CARPINUS_SP"}
-\item \code{"CASTANEA_SATIVA"}
-\item \code{"CORYLUS_AVELLANA"}
-\item \code{"MALUS_SP"}
-\item \code{"PYRUS_SP"}
-\item \code{"SORBUS_ARIA"}
-\item \code{"SAMBUCUS_SP"}
-\item \code{"RHAMNUS_FRANGULA"}
-\item \code{"PRUNUS_CERASUS"}
-\item \code{"ALNUS_INCANA"}
-\item \code{"POPULUSxCANADENSIS"}
-\item \code{"POPULUS_TREMULA"}
-\item \code{"PINUS_NIGRA"}
-\item \code{"PINUS_LARICIO"}
-\item \code{"TAXUS_BACCATA"}
-\item \code{"ACER_PLATANOIDES"}
-\item \code{"ACER_CAMPESTRE"}
-\item \code{"SORBUS_AUCUPARIA"}
-\item \code{"JUNGLANS_SP"}
-\item \code{"TILLIA_SP"}
-\item \code{"PICEA_SITCHENSIS"}
-\item \code{"ABIES_ALBA"}
-\item \code{"TSUGA_CANADENSIS"}
-\item \code{"ABIES_GRANDIS"}
-\item \code{"CUPRESSUS_SP"}
-\item \code{"THUJA_PLICATA"}
-\item \code{"AESCULUS_HIPPOCASTANUM"}
-\item \code{"ROBINIA_PSEUDOACACIA"}
-\item \code{"SALIX_SP"}
+If a tree's \code{c130} or \code{hdom} falls outside the species-specific
+validity ranges \code{[min_c130, max_c130]} or \code{[min_hdom, max_hdom]},
+a warning is issued, but the volume is still computed.
 }
-}
-
 \examples{
 df <- data.frame(
   c130         = c(145, 156, 234, 233),
-  hdom            = c(25, 23, 45, 34),
+  hdom         = c(25, 23, 45, 34),
   species_code = c("PINUS_SYLVESTRIS", "QUERCUS_RUBRA",
                    "QUERCUS_SP", "FAGUS_SYLVATICA")
 )
 dagnelie_vc22_1g(data = df)
 }
 \seealso{
-\code{\link{dan2}} for the species-specific coefficients and ranges.
+\code{\link{dan1g}} for the species-specific coefficients and ranges.
 }

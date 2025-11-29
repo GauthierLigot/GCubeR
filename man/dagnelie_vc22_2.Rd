@@ -2,15 +2,15 @@
 % Please edit documentation in R/dagnelie_vc22_2.R
 \name{dagnelie_vc22_2}
 \alias{dagnelie_vc22_2}
-\title{Single-entry Dagnelie volume (tarif 2)}
+\title{Two-entry Dagnelie volume (tarif 2)}
 \usage{
 dagnelie_vc22_2(data, na_action = c("error", "omit"), output = NULL)
 }
 \arguments{
 \item{data}{A \code{data.frame} containing at least the columns
-\code{c130} (stem circumference at 1.30 m, in cm) and
-\code{htot} (hight of the tree)
-\code{species_code} (character code of the tree species).}
+\code{c130} (stem circumference at 1.30 m, in cm),
+\code{htot} (height of the tree, in m),
+and \code{species_code} (character code of the tree species).}
 
 \item{output}{Optional file path where the resulting data frame should be
 exported as a CSV. If NULL (default), no file is written.
@@ -22,37 +22,59 @@ A \code{data.frame} identical to \code{data} but augmented with:
 \itemize{
 \item the joined columns from \code{dan2}
 (\code{coeff_a}, \code{coeff_b}, \code{coeff_c}, \code{coeff_d},
-\code{min_c130}, \code{max_c130}),
-\item \code{tarif1}: the Dagnelie single-entry volume \eqn{v_{c,22}}
+\code{coeff_e}, \code{coeff_f},
+\code{min_c130}, \code{max_c130},
+\code{min_htot}, \code{max_htot}),
+\item \code{tarif2}: the Dagnelie two-entry volume \eqn{v_{c,22}}
 in m\eqn{^3} per tree.
 }
 }
 \description{
 Computes the standing volume \eqn{v_{c,22}} (in cubic metres) using
 Dagnelie's two-entry tarif 2 equations. The volume is calculated from the
-stem circumference at 1.30 m (\code{c130}, in cm) and the tree species, using
-species-specific polynomial coefficients stored in \code{dan2}.
+stem circumference at 1.30 m (\code{c130}, in cm), the total height of the tree
+(\code{htot}, in m), and the tree species, using species-specific polynomial
+coefficients stored in \code{dan2}.
 }
 \details{
 The function:
 \itemize{
 \item checks that the input data frame contains the required columns
-\code{c130} and \code{species_code},
-\item validates that all species are available in the \code{dan2} table,
-\item merges the input data with \code{dan2} to retrieve the coefficients
-\code{coeff_a}, \code{coeff_b}, \code{coeff_c}, \code{coeff_d} and
-the valid range \code{min_c130}, \code{max_c130},
-\item issues a warning for trees whose \code{c130} is outside the species-
-specific range,
-\item computes tarif 1 volume as:
-\deqn{v_{c,22} = a + b \cdot c130 + c \cdot c130^2 + d \cdot c130^3 + e \cdot htot + f \cdot c130^2 \cdot htot.}
+\code{c130}, \code{htot} and \code{species_code},
+
+\item validates that all species codes are present in the \code{dan2} table,
+
+\item merges the input data with \code{dan2} to retrieve:
+\code{coeff_a}, \code{coeff_b}, \code{coeff_c}, \code{coeff_d},
+\code{coeff_e}, \code{coeff_f},
+as well as the species-specific valid ranges:
+\code{min_c130}, \code{max_c130},
+\code{min_htot}, \code{max_htot},
+
+\item issues a warning for trees whose \code{c130} is outside the valid
+range \code{[min_c130, max_c130]},
+
+\item issues a warning for trees whose \code{htot} is outside the valid
+range \code{[min_htot, max_htot]},
+
+\item computes the tarif 2 volume using the species-specific polynomial:
+\deqn{
+           v_{c,22} =
+           coeff_a +
+           coeff_b \cdot c130 +
+           coeff_c \cdot c130^2 +
+           coeff_d \cdot c130^3 +
+           coeff_e \cdot htot +
+           coeff_f \cdot c130^2 \cdot htot
+        }
 }
 
 Species codes must match those available in the \code{dan2} reference table.
-If one or more species are not found, the function issues a warning. For trees
-where \code{c130} is outside the species-specific range
-\code{[min_c130, max_c130]}, a warning is issued, but the volume is still
-computed.
+If one or more species are not found, the function issues a warning.
+
+For trees where \code{c130} or \code{htot} is outside the species-specific
+validity ranges \code{[min_c130, max_c130]} and \code{[min_htot, max_htot]},
+warnings are issued, but the volume is still computed.
 }
 \section{Supported species}{
 
@@ -111,7 +133,7 @@ The following species codes are currently supported by \code{dagnelie_vc22_2}:
 \examples{
 df <- data.frame(
   c130         = c(145, 156, 234, 233),
-  htot            = c(25, 23, 45, 34),
+  htot         = c(25, 23, 45, 34),
   species_code = c("PINUS_SYLVESTRIS", "QUERCUS_RUBRA",
                    "QUERCUS_SP", "FAGUS_SYLVATICA")
 )
