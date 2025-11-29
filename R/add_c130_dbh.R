@@ -30,7 +30,7 @@
 #' @export
 #' 
 # FUNCTION ----
-add_c130_dbh <- function(data) {
+add_c130_dbh <- function(data, output = NULL) {
   # Vérifier que c'est bien un data.frame
   stopifnot(is.data.frame(data))
   
