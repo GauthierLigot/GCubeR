@@ -263,7 +263,7 @@ dagnelie_vc22_2 <- function(data,
   data <- dplyr::select(
     data,
     -dplyr::any_of(c("coeff_a", "coeff_b", "coeff_c", "coeff_d","coeff_e", "coeff_f",
-                     "min_c130", "max_c130"))
+                     "min_c130", "max_c130", "min_htot", "max_htot"))
   )
   # exporting the file using function export_output ----
   export_output(data, output)
