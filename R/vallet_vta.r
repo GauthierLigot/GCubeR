@@ -122,13 +122,12 @@ vallet_vta <- function(data,
       # Step 2: Calculate VTA
       vallet_vta = form * (1 /(pi *40000)) * (c130^2) * htot
     ) %>%
-    # Remove temporary columns, coefficients, keeping 'form' and 'vallet_vta'
-    select(-starts_with("coeff_"), -a, -b, -c, -d, -starts_with("term"))
+    # Remove temporary columns, coefficients, keeping 'vallet_vta'
+    select(-starts_with("coeff_"), -a, -b, -c, -d, -starts_with("term"),-form)
   
   # Final step: Set vta and form factor to NA for all identified invalid rows
   if (length(rows_to_invalidate) > 0) {
     data$vallet_vta[rows_to_invalidate] <- NA
-    data$form[rows_to_invalidate] <- NA
   }
   
   # OUTPUT ----
