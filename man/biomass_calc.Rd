@@ -33,7 +33,10 @@ All volume columns must be numeric and expressed in cubic meters (m³).}
 \item{na_action}{How to handle missing values. \code{"error"} (default) stops if any required
 value is missing. \code{"omit"} removes rows with missing values.}
 
-\item{output}{Optional file path to export the results as a CSV. If \code{NULL}, results are printed.}
+\item{output}{Optional file path where the resulting data frame should be
+exported as a CSV. If NULL (default), no file is written.
+Export is handled by the utility function \code{export_output()} and
+failures trigger warnings without interrupting execution.}
 }
 \value{
 A data frame with one row per tree, including:

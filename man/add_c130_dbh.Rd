@@ -4,7 +4,7 @@
 \alias{add_c130_dbh}
 \title{Add or compute c130 and dbh columns}
 \usage{
-add_c130_dbh(data)
+add_c130_dbh(data, output = NULL)
 }
 \arguments{
 \item{data}{A data frame containing tree measurements.

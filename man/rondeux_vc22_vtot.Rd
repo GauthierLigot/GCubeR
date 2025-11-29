@@ -15,6 +15,11 @@ rondeux_vc22_vtot(data, na_action = c("error", "omit"), output = NULL)
 \item{na_action}{How to handle missing essential values (\code{c130}, \code{htot}).
 \code{"error"} (default) stops if missing values are detected.
 \code{"omit"} removes rows with missing essential fields.}
+
+\item{output}{Optional file path where the resulting data frame should be
+exported as a CSV. If NULL (default), no file is written.
+Export is handled by the utility function \code{export_output()} and
+failures trigger warnings without interrupting execution.}
 }
 \value{
 A data frame identical to \code{data}, with two added columns:

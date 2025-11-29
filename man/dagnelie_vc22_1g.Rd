@@ -12,9 +12,10 @@ dagnelie_vc22_1g(data, na_action = c("error", "omit"), output = NULL)
 \code{hdom} (hight of the tree)
 \code{species_code} (character code of the tree species).}
 
-\item{output}{Optional character string controlling the format of the output.
-Currently ignored; the function always returns the input data frame with
-additional columns.}
+\item{output}{Optional file path where the resulting data frame should be
+exported as a CSV. If NULL (default), no file is written.
+Export is handled by the utility function \code{export_output()} and
+failures trigger warnings without interrupting execution.}
 }
 \value{
 A \code{data.frame} identical to \code{data} but augmented with:

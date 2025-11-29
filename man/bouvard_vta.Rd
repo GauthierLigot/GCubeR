@@ -13,6 +13,11 @@ bouvard_vta(data, na_action = c("error", "omit"), output = NULL)
 \item \code{dbh}: diameter at breast height (cm).
 \item \code{htot}: total tree height (m).
 }}
+
+\item{output}{Optional file path where the resulting data frame should be
+exported as a CSV. If NULL (default), no file is written.
+Export is handled by the utility function \code{export_output()} and
+failures trigger warnings without interrupting execution.}
 }
 \value{
 A data frame with the original input columns plus one new output:

@@ -12,9 +12,10 @@ dagnelie_vc22_2(data, na_action = c("error", "omit"), output = NULL)
 \code{htot} (hight of the tree)
 \code{species_code} (character code of the tree species).}
 
-\item{output}{Optional character string controlling the format of the output.
-Currently ignored; the function always returns the input data frame with
-additional columns.}
+\item{output}{Optional file path where the resulting data frame should be
+exported as a CSV. If NULL (default), no file is written.
+Export is handled by the utility function \code{export_output()} and
+failures trigger warnings without interrupting execution.}
 }
 \value{
 A \code{data.frame} identical to \code{data} but augmented with:
@@ -27,7 +28,7 @@ in m\eqn{^3} per tree.
 }
 }
 \description{
-Computes the standing volume \eqn{v_{c,22}} (in cubic metres per tree) using
+Computes the standing volume \eqn{v_{c,22}} (in cubic metres) using
 Dagnelie's two-entry tarif 2 equations. The volume is calculated from the
 stem circumference at 1.30 m (\code{c130}, in cm) and the tree species, using
 species-specific polynomial coefficients stored in \code{dan2}.

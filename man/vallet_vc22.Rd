@@ -13,9 +13,10 @@ vallet_vc22(data, na_action = c("error", "omit"), output = NULL)
 \item{na_action}{How to handle missing input values. \code{"error"} (default) stops if
 core required values are explicitly \code{NA}. \code{"omit"} removes rows with missing core data.}
 
-\item{output}{Optional file path (string). If provided, the resulting data frame
-will be written to this file using semicolon (;) as a delimiter. NA values are
-written as empty strings (""). Defaults to \code{NULL}.}
+\item{output}{Optional file path where the resulting data frame should be
+exported as a CSV. If NULL (default), no file is written.
+Export is handled by the utility function \code{export_output()} and
+failures trigger warnings without interrupting execution.}
 }
 \value{
 The resulting data frame with the new column \code{vallet_vc22}

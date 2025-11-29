@@ -4,7 +4,7 @@
 \alias{algan_vta_vc22}
 \title{Volume Estimation Using the Algan Method}
 \usage{
-algan_vta_vc22(data, na_action = c("error", "omit"), output = NULL)
+algan_vta_vc22(data, output = NULL)
 }
 \arguments{
 \item{data}{A data frame containing tree measurements. Must include:
@@ -13,6 +13,11 @@ algan_vta_vc22(data, na_action = c("error", "omit"), output = NULL)
 \item \code{dbh}: diameter at breast height (cm).
 \item \code{htot}: total tree height (m).
 }}
+
+\item{output}{Optional file path where the resulting data frame should be
+exported as a CSV. If NULL (default), no file is written.
+Export is handled by the utility function \code{export_output()} and
+failures trigger warnings without interrupting execution.}
 }
 \value{
 A data frame with the original input columns plus two new outputs:

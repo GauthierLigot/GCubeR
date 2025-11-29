@@ -13,6 +13,11 @@ c150_c130(data, na_action = c("error", "omit"), output = NULL)
 \item \code{c150}: stem circumference at 1.50 m (cm), or
 \item \code{c130}: stem circumference at 1.30 m (cm).
 }}
+
+\item{output}{Optional file path where the resulting data frame should be
+exported as a CSV. If NULL (default), no file is written.
+Export is handled by the utility function \code{export_output()} and
+failures trigger warnings without interrupting execution.}
 }
 \value{
 A \code{data.frame} identical to the input but augmented with:
