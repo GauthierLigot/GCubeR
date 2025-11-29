@@ -8,7 +8,7 @@
 #'
 #' The tarif-1 volume is calculated as:
 #' \deqn{
-#'   v_{c,22} = a + b\,c130 + c\,c130^2 + d\,c130^3
+#'   v_{c,22} = coeff\_a + coeff\_b \cdot c130 + coeff\_c \cdot c130^2 + coeff\_d \cdot c130^3
 #' }
 #' where \eqn{a}, \eqn{b}, \eqn{c}, and \eqn{d} are species-specific coefficients.
 #'
