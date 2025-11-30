@@ -26,5 +26,5 @@ Depends:
     R (>= 3.5)
 LazyData: true
 Suggests: 
-    knitr, rmarkdown
+    knitr, rmarkdown, GCubeR
 VignetteBuilder: knitr
