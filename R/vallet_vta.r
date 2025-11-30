@@ -29,6 +29,19 @@
 #'
 #' Coefficients a, b, c, d are loaded from the \code{vallet_vta.csv} file.
 #' 
+#' @section Supported species:
+#' The Vallet VTA method is currently implemented for the following species
+#' (via their \code{species_code}):
+#' \itemize{
+#'   \item \code{"PICEA_ABIES"}
+#'   \item \code{"QUERCUS_ROBUR"}
+#'   \item \code{"FAGUS_SYLVATICA"}
+#'   \item \code{"PINUS_SYLVESTRIS"}
+#'   \item \code{"PINUS_PINASTER"}
+#'   \item \code{"ABIES_ALBA"}
+#'   \item \code{"PSEUDOTSUGA_MENZIESII"}
+#' }
+#' 
 #' @import dplyr readr
 #'
 #' @examples
@@ -130,14 +143,6 @@ vallet_vta <- function(data,
   # Final step: Set vta and form factor to NA for all identified invalid rows
   if (length(rows_to_invalidate) > 0) {
     data$vallet_vta[rows_to_invalidate] <- NA
-  }
-  
-  # OUTPUT ----
-  if (!is.null(output)) { 
-    write_delim(data, file = output, delim = ";", na = "", col_names = TRUE)
-    message("File written: ", normalizePath(output, winslash = "/"))
-  } else {
-    print(data)
   }
   
   # exporting the file using function export_output ----

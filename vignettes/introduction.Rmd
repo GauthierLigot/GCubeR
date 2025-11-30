@@ -19,7 +19,7 @@ knitr::opts_chunk$set(
 )
 
 ```
-Welcome to GcubeR!
+# Welcome to GcubeR
 
 Forest quantification has become increasingly important in recent years.
 Whether your goal is to anticipate financial flows, estimate standing timber value,
@@ -37,3 +37,105 @@ biomass, carbon content, and CO₂ equivalent.
 
 This vignette walks you through the workflow of applying GcubeR to your dataset
 and shows how to extract the most useful information from your forest inventory.
+
+---
+
+# Global structure of GcubeR
+
+## User input
+
+To use **GcubeR**, the user must provide a data frame with at least:
+
+- `c130`: stem circumference at 1.30 m height (cm)  
+- `species_code`: full Latin species name in uppercase, e.g. `"QUERCUS_ROBUR"`
+
+To be able to use **all** functions in the package, your data frame should contain:
+
+- `c130`: stem circumference at 1.30 m height (cm)  
+- `species_code`: species Latin name in uppercase (e.g. `"FAGUS_SYLVATICA"`)  
+- `hdom`: dominant height (m)  
+- `htot`: total tree height (m)  
+- `dbh`: diameter at breast height (cm)
+
+---
+
+# Converting module
+
+GcubeR provides tools to transform basic measurements so they fit the requirements
+of the different volume and biomass equations:
+
+- **`c150_c130`** : converts stem circumference measured at 1.50 m (`c150`)
+  to circumference at 1.30 m (`c130`)
+- **`add_c130_dbh`** : converts circumference at 1.30 m (`c130`) to
+  diameter at breast height (`dbh`), and can also back-calculate `c130`
+  from `dbh` when needed
+
+---
+
+# VTA module
+
+The **VTA module** computes total aboveground volume (trunk + branches) using
+three different methods.
+
+### Bouvard method — `bouvard_vta`
+
+Available for **QUERCUS** species.
+
+Formula:
+
+\[
+v_{\mathrm{vta}} = 0.5 \times \left(\frac{dbh}{100}\right)^2 \times h_{tot}
+\]
+
+`dbh` is in cm, `htot` in m, result in m³ per tree.
+
+---
+
+### Algan method — `algan_vta_vc22`
+
+Available for:
+
+- `ABIES_ALBA`
+
+Formula:
+
+\[
+v_{\mathrm{vta}} = 0.4 \times \left(\frac{dbh}{100}\right)^2 \times h_{tot}
+\]
+
+---
+
+### Vallet form-factor method — `vallet_vta`
+
+Available for the following species:
+
+- `PICEA_ABIES`  
+- `QUERCUS_ROBUR`  
+- `FAGUS_SYLVATICA`  
+- `PINUS_SYLVESTRIS`  
+- `PINUS_PINASTER`  
+- `ABIES_ALBA`  
+- `PSEUDOTSUGA_MENZIESII`  
+
+Formula:
+
+\[
+v_{\mathrm{vta}} =
+\mathrm{form} \times \frac{1}{\pi \cdot 40000} \times c_{130}^2 \times h_{tot}
+\]
+
+where the *form factor* is species-specific and computed internally from
+Vallet’s coefficients.
+
+---
+
+# Function overview diagram
+
+```{r function-diagram, echo=FALSE, fig.align='center', out.width='80%'}
+knitr::include_graphics("img/function_diagram.png")
+
+
+```{r fig.align='center', out.width='120%', out.height='120%'}
+knitr::include_graphics("img/function_diagram.png")
+
+
