@@ -79,7 +79,7 @@
 #'
 #' # Example: compute Dagnelie tarif 2 volume, then summarise and plot
 #' df <- dagnelie_vc22_2(df)
-#' res <- volume_by_c130_class(df, volume_col = "dagnelie_vc22_2")
+#' res <- volume_by_class(df, volume_col = "dagnelie_vc22_2")
 #'
 #' # Inspect the table
 #' res$table
@@ -224,13 +224,13 @@ volume_by_class <- function(
       ) +
       ggplot2::labs(
         x        = "c130 (cm)",
-        y        = paste("Total volume (m³) -", vol_col),
+        y        = paste("Total volume (m3) -", vol_col),
         fill     = "Species",
         title    = "Standing volume by c130 class and species",
         subtitle = paste0(
           "Small wood: <", small_limit, " cm  |  ",
           "Medium wood: [", small_limit, ", ", medium_limit, "[ cm  |  ",
-          "Large wood: ≥ ", medium_limit, " cm"
+          "Large wood: >= ", medium_limit, " cm"
         )
       ) +
       ggplot2::theme_minimal() +

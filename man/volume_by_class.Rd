@@ -98,7 +98,7 @@ df <- data.frame(
 
 # Example: compute Dagnelie tarif 2 volume, then summarise and plot
 df <- dagnelie_vc22_2(df)
-res <- volume_by_c130_class(df, volume_col = "dagnelie_vc22_2")
+res <- volume_by_class(df, volume_col = "dagnelie_vc22_2")
 
 # Inspect the table
 res$table

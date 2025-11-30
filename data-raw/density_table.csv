@@ -1,53 +1,53 @@
-species_fr;species_code;con_broad;density
-Chêne indigène;QUERCUS_SP;broadleaf;0.56
-Chene sessile;QUERCUS_PETRAEA;broadleaf;0.58
-Chene pedonculé;QUERCUS_ROBUR;broadleaf;0.54
-Chene pubescent;QUERCUS_PUBESCENS;broadleaf;0.65
-Chene rouge;QUERCUS_RUBRA;broadleaf;0.56
-Hetre;FAGUS_SYLVATICA;broadleaf;0.55
-Erable sycomore;ACER_PSEUDOPLATANUS;broadleaf;0.51
-Frene;FRAXINUS_EXCELSIOR;broadleaf;0.56
-Orme;ULMUS_SP;broadleaf;0.52
-Orme champêtre;ULMUS_MINOR;broadleaf;0.52
-Merisier;PRUNUS_AVIUM;broadleaf;0.5
-Aubépine;CRATAEGUS_MONOGYNA;broadleaf;0.6
-Prunellier;PRUNUS_SPINOSA;broadleaf;0.58
-Bouleau;BETULA_SP;broadleaf;0.52
-Bouleau verruqeux;BETULA_PENDULA;broadleaf;0.52
-Aulne blanc;ALNUS_INCANA;broadleaf;0.42
-Aulne glutineux;ALNUS_GLUTINOSA;broadleaf;0.42
-Charme;CARPINUS_BETULUS;broadleaf;0.61
-Chataignier;CASTANEA_SATIVA;broadleaf;0.47
-Erable champetre;ACER_CAMPESTRE;broadleaf;0.56
-Sorbier;SORBUS_AUCUPARIA;broadleaf;0.62
-Marronnier;AESCULUS_HIPPOCASTANUM;broadleaf;0.5
-Noisetier;CORYLUS_AVELLANA;broadleaf;0.52
-Noyer;JUGLANS_REGIA;broadleaf;0.52
-Peuplier hybride;POPULUS_X_CANADENSIS;broadleaf;0.35
-Peuplier tremble;POPULUS_TREMULA;broadleaf;0.38
-Robinier;ROBINIA_PSEUDOACACIA;broadleaf;0.58
-Saule marsault;SALIX_CAPREA ;broadleaf;0.37
-Autre saule;SALIX_SP;broadleaf;0.37
-Tilleuls;TILIA_CORDATA;broadleaf;0.43
-Pommier;MALUS_DOMESTICA;broadleaf;0.55
-Poirier;PYRUS_COMMUNIS;broadleaf;0.56
-Alisier;SORBUS_TERMINALIS;broadleaf;0.62
-Sureaux;SAMBUCUS_NIGRA;broadleaf;0.45
-Bourdaine;FRANGULA_ALNUS;broadleaf;0.48
-Cerisier;PRUNUS_CERASUS;broadleaf;0.56
-Epicea commun;PICEA_ABIES;conifer;0.37
-Epicea de sitka;PICEA_SITCHENSIS;conifer;0.36
-Spain de douglas;PSEUDOTSUGA_MENZIESII;conifer;0.43
-Meleze;LARIX_SP;conifer;0.48
-Meleze d'Europe;LARIX_DECIDUA;conifer;0.48
-Pin sylvestre;PINUS_SYLVESTRIS;conifer;0.44
-Pin maritime;PINUS_PINASTER;conifer;0.46
-Pin noir d’Autriche;PINUS_NIGRA;conifer;0.46
-Pin noir de corse;PINUS_NIGRA_SUBSP_CORSICANA;conifer;0.46
-Pin weymouth;PINUS_STROBUS;conifer;0.34
-Sapin pectiné;ABIES_ALBA;conifer;0.38
-Sapin de vancouver;ABIES_GRANDIS;conifer;0.36
-Cypres;CUPRESSUS_SEMPERVIRENS;conifer;0.4
-Tsuga;TSUGA_CANADENSIS;conifer;0.42
-Thuya;THUJA_PLICATA;conifer;0.4
-If;TAXUS_BACCATA;conifer;0.58
+species_code;con_broad;density
+QUERCUS_SP;broadleaf;0.56
+QUERCUS_PETRAEA;broadleaf;0.58
+QUERCUS_ROBUR;broadleaf;0.54
+QUERCUS_PUBESCENS;broadleaf;0.65
+QUERCUS_RUBRA;broadleaf;0.56
+FAGUS_SYLVATICA;broadleaf;0.55
+ACER_PSEUDOPLATANUS;broadleaf;0.51
+FRAXINUS_EXCELSIOR;broadleaf;0.56
+ULMUS_SP;broadleaf;0.52
+ULMUS_MINOR;broadleaf;0.52
+PRUNUS_AVIUM;broadleaf;0.5
+CRATAEGUS_MONOGYNA;broadleaf;0.6
+PRUNUS_SPINOSA;broadleaf;0.58
+BETULA_SP;broadleaf;0.52
+BETULA_PENDULA;broadleaf;0.52
+ALNUS_INCANA;broadleaf;0.42
+ALNUS_GLUTINOSA;broadleaf;0.42
+CARPINUS_BETULUS;broadleaf;0.61
+CASTANEA_SATIVA;broadleaf;0.47
+ACER_CAMPESTRE;broadleaf;0.56
+SORBUS_AUCUPARIA;broadleaf;0.62
+AESCULUS_HIPPOCASTANUM;broadleaf;0.5
+CORYLUS_AVELLANA;broadleaf;0.52
+JUGLANS_REGIA;broadleaf;0.52
+POPULUS_X_CANADENSIS;broadleaf;0.35
+POPULUS_TREMULA;broadleaf;0.38
+ROBINIA_PSEUDOACACIA;broadleaf;0.58
+SALIX_CAPREA ;broadleaf;0.37
+SALIX_SP;broadleaf;0.37
+TILIA_CORDATA;broadleaf;0.43
+MALUS_DOMESTICA;broadleaf;0.55
+PYRUS_COMMUNIS;broadleaf;0.56
+SORBUS_TERMINALIS;broadleaf;0.62
+SAMBUCUS_NIGRA;broadleaf;0.45
+FRANGULA_ALNUS;broadleaf;0.48
+PRUNUS_CERASUS;broadleaf;0.56
+PICEA_ABIES;conifer;0.37
+PICEA_SITCHENSIS;conifer;0.36
+PSEUDOTSUGA_MENZIESII;conifer;0.43
+LARIX_SP;conifer;0.48
+LARIX_DECIDUA;conifer;0.48
+PINUS_SYLVESTRIS;conifer;0.44
+PINUS_PINASTER;conifer;0.46
+PINUS_NIGRA;conifer;0.46
+PINUS_NIGRA_SUBSP_CORSICANA;conifer;0.46
+PINUS_STROBUS;conifer;0.34
+ABIES_ALBA;conifer;0.38
+ABIES_GRANDIS;conifer;0.36
+CUPRESSUS_SEMPERVIRENS;conifer;0.4
+TSUGA_CANADENSIS;conifer;0.42
+THUJA_PLICATA;conifer;0.4
+TAXUS_BACCATA;conifer;0.58
