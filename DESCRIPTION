@@ -20,6 +20,7 @@ Imports:
     dplyr,
     magrittr,
     tidyr,
+     ggplot2,
     readr
 Depends: 
     R (>= 3.5)
