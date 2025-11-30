@@ -40,6 +40,21 @@ The Total Aboveground Volume (\code{VTA}) is then:
 
 Coefficients a, b, c, d are loaded from the \code{vallet_vta.csv} file.
 }
+\section{Supported species}{
+
+The Vallet VTA method is currently implemented for the following species
+(via their \code{species_code}):
+\itemize{
+\item \code{"PICEA_ABIES"}
+\item \code{"QUERCUS_ROBUR"}
+\item \code{"FAGUS_SYLVATICA"}
+\item \code{"PINUS_SYLVESTRIS"}
+\item \code{"PINUS_PINASTER"}
+\item \code{"ABIES_ALBA"}
+\item \code{"PSEUDOTSUGA_MENZIESII"}
+}
+}
+
 \examples{
 data_test <- data.frame(
   species_code = c("PICEA_ABIES", "FAGUS_SYLVATICA", "UNKNOWN_SPECIES", "QUERCUS_ROBUR"),
