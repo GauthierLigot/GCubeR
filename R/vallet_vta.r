@@ -15,7 +15,7 @@
 #'   will be written to this file using semicolon (;) as a delimiter. NA values are
 #'   written as empty strings (""). Defaults to \code{NULL}.
 #'
-#' @return The resulting data frame (same as the printed data) with the new columns \code{form} (Form Factor) and \code{vallet_vta} (Total Aboveground Volume in **m3**)..
+#' @return The resulting data frame (same as the printed data) with the new columns and \code{vallet_vta} (Total Aboveground Volume in **m3**)..
 #'
 #' @details
 #' The model is only valid for trees with a circumference at 1.30m (\code{c130}) of at least 45 cm.

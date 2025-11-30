@@ -21,7 +21,7 @@ will be written to this file using semicolon (;) as a delimiter. NA values are
 written as empty strings (""). Defaults to \code{NULL}.}
 }
 \value{
-The resulting data frame (same as the printed data) with the new columns \code{form} (Form Factor) and \code{vallet_vta} (Total Aboveground Volume in \strong{m3})..
+The resulting data frame (same as the printed data) with the new columns and \code{vallet_vta} (Total Aboveground Volume in \strong{m3})..
 }
 \description{
 Computes the total aboveground volume (VTA) for trees based on
