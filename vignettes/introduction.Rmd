@@ -105,7 +105,7 @@ v_{\mathrm{vta}} = 0.4 \times \left(\frac{dbh}{100}\right)^2 \times h_{tot}
 
 ---
 
-### Vallet form-factor method — `vallet_vta`
+### Vallet method — `vallet_vta`
 
 Available for the following species:
 
@@ -131,11 +131,9 @@ Vallet’s coefficients.
 
 # Function overview diagram
 
-```{r function-diagram, echo=FALSE, fig.align='center', out.width='80%'}
+```{r function-diagram, echo=FALSE, fig.align='center', out.width='100%'}
 knitr::include_graphics("img/function_diagram.png")
 
 
-```{r fig.align='center', out.width='120%', out.height='120%'}
-knitr::include_graphics("img/function_diagram.png")
 
 
