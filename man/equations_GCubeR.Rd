@@ -11,11 +11,23 @@ A data frame with columns:
 \item{method}{Method family (Vallet, Dagnelie, Algan, Rondeux, CNIEFEB…)}
 \item{predicted_variable}{Predicted variable (volume, biomass, carbon…)}
 \item{output_unit}{Unit of the output (m3, kg, tdm…)}
+\item{species_id}{Numeric species identifier (integer)}
+\item{species_name_fr}{Species name in French (character)}
 \item{species_code}{Species code (uppercase Latin name)}
-\item{coeff_a, coeff_b, coeff_c, coeff_d, coeff_e, coeff_f}{Equation coefficients (numeric, may be NA)}
+\item{validity_region}{Region of validity (text)}
 \item{validity_range}{Range of validity (text)}
-\item{reference_source}{Bibliographic source}
+\item{input_variable}{Input variables required (e.g. c130, htot, dbh)}
+\item{input_unit}{Units of input variables (e.g. cm, m)}
+\item{formula_type}{Equation type (e.g. polynomial, exponential)}
+\item{explicit_formula}{Explicit formula as text}
+\item{coeff_a}{Equation coefficient a (numeric)}
+\item{coeff_b}{Equation coefficient b (numeric)}
+\item{coeff_c}{Equation coefficient c (numeric)}
+\item{coeff_d}{Equation coefficient d (numeric)}
+\item{coeff_e}{Equation coefficient e (numeric)}
+\item{coeff_f}{Equation coefficient f (numeric)}
 \item{remarks}{Additional notes}
+\item{reference_source}{Bibliographic source}
 }
 }
 \source{
