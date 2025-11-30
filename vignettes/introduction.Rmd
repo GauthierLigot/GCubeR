@@ -1,0 +1,39 @@
+---
+title: "Introduction to GcubeR"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction to GcubeR}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+# Charge le package en développement local
+if (requireNamespace("GcubeR", quietly = TRUE)) {
+  library(GcubeR)
+}
+
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+
+```
+Welcome to GcubeR!
+
+Forest quantification has become increasingly important in recent years.
+Whether your goal is to anticipate financial flows, estimate standing timber value,
+or quantify the carbon stored in your forest, working with tree volume equations
+is rarely straightforward. Formulas are often difficult to find, coefficients vary
+between species, and implementations can be tedious or error-prone.
+
+GcubeR provides a unified and user-friendly toolbox that brings together the
+most commonly used allometric equations in forestry. With only a few input
+variables, the package handles all calculations for you.
+
+GcubeR includes implementations of Algan, Rondeux, Dagnelie, and Vallet
+volume equations, as well as CNIEFEB and Vallet's methods for estimating
+biomass, carbon content, and CO₂ equivalent.
+
+This vignette walks you through the workflow of applying GcubeR to your dataset
+and shows how to extract the most useful information from your forest inventory.
