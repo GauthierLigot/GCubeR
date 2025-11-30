@@ -22,8 +22,8 @@ failures trigger warnings without interrupting execution.}
 \value{
 A data frame with the original input columns plus two new outputs:
 \itemize{
-\item \code{algan_vta}: aerial total volume (m³). Computed only for \code{"ABIES_ALBA"}, \code{NA} otherwise.
-\item \code{algan_vc22}: merchantable volume (m³). Computed only for compatible species
+\item \code{algan_vta}: aerial total volume (m3). Computed only for \code{"ABIES_ALBA"}, \code{NA} otherwise.
+\item \code{algan_vc22}: merchantable volume (m3). Computed only for compatible species
 (\code{ABIES_ALBA}, \code{PICEA_ABIES}, \code{ALNUS_GLUTINOSA}, \code{PRUNUS_AVIUM}, \code{BETULA_SP}),
 \code{NA} otherwise.
 }
@@ -46,7 +46,7 @@ required columns are present and applies formulas only to compatible species.
 \item For \code{"ABIES_ALBA"} and \code{"PICEA_ABIES"}, the Algan method is valid only if \verb{dbh > 15 cm}.
 \item For other compatible species (\code{ALNUS_GLUTINOSA}, \code{PRUNUS_AVIUM}, \code{BETULA_SP}), no minimum dbh threshold is applied.
 }
-\item Resulting volumes are expressed in cubic meters (m³).
+\item Resulting volumes are expressed in cubic meters (m3).
 \item If required columns are missing or non-numeric, the function stops with an error.
 \item Both output columns are always created to ensure consistency for downstream functions.
 }

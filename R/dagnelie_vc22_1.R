@@ -104,7 +104,6 @@
 #' @seealso \code{\link{dan1}} for species-specific coefficients.
 #'
 #' @import dplyr
-#' @export
 #'
 #' @examples
 #' df <- data.frame(
@@ -113,10 +112,9 @@
 #'                    "QUERCUS_SP", "FAGUS_SYLVATICA")
 #' )
 #' dagnelie_vc22_1(df)
+#' @export
 
-dagnelie_vc22_1 <- function(data,
-                            na_action = c("error", "omit"),
-                            output = NULL) {
+dagnelie_vc22_1 <- function(data, output = NULL) {
   
   ## Validation of the Dataframe ----
   stopifnot(is.data.frame(data))

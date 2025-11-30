@@ -20,7 +20,7 @@ failures trigger warnings without interrupting execution.}
 }
 \value{
 The resulting data frame with the new column \code{vallet_vc22}
-(Commercial Volume in \strong{m³}).
+(Commercial Volume in \strong{m3}).
 }
 \description{
 Computes the commercial wood volume (vc22, over bark, up to a 7 cm top-diameter)
@@ -28,10 +28,12 @@ using the Vallet polynomial model, based on dbh (cm) and htot (m).
 }
 \details{
 The model is valid only for trees with a diameter at 1.30m (\code{dbh})
-\strong{greater than or equal to 7 cm}.
+greater than or equal to 7 cm.
 
 The polynomial formula used is:
-$$\text{VC22}\emph{{\text{dm³}} = a \cdot \frac{h}{tot}}{\text{dbh}} + (b + c \cdot \text{dbh}) \cdot \left(\frac{\pi \cdot \text{dbh}^2 \cdot h_{tot}}{40}\right)$$
+\deqn{VC22_{dm^3} = a \cdot \frac{h_{tot}}{dbh} + (b + c \cdot dbh) \cdot \frac{\pi \cdot dbh^2 \cdot h_{tot}}{40}}
+
+Coefficients a, b, c are species-specific and loaded from the \code{vallet_vc22.csv} file.
 }
 \examples{
 data_test_vc22 <- data.frame(

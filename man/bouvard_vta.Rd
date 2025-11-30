@@ -4,7 +4,7 @@
 \alias{bouvard_vta}
 \title{Volume Estimation Using the Bouvard Method}
 \usage{
-bouvard_vta(data, na_action = c("error", "omit"), output = NULL)
+bouvard_vta(data, output = NULL)
 }
 \arguments{
 \item{data}{A data frame containing tree measurements. Must include:
@@ -22,7 +22,7 @@ failures trigger warnings without interrupting execution.}
 \value{
 A data frame with the original input columns plus one new output:
 \itemize{
-\item \code{bouvard_vta}: aerial total volume (m³). Computed only for \code{"QUERCUS_SP"},
+\item \code{bouvard_vta}: aerial total volume (m3). Computed only for \code{"QUERCUS_SP"},
 otherwise not created.
 }
 }
@@ -37,7 +37,7 @@ and applies the formula only to species \code{"QUERCUS_SP"}.
 \item Input \code{htot} must be in meters (m).
 \item Formula for aerial total volume (only \code{"QUERCUS_SP"}):
 \deqn{bouvard_vta = 0.5 * (dbh/100)^2 * htot}
-\item Resulting volumes are expressed in cubic meters (m³).
+\item Resulting volumes are expressed in cubic meters (m3).
 \item If required columns are missing or non-numeric, the function stops with an error.
 \item The output column is created only if at least one \code{"QUERCUS_SP"} row is present,
 otherwise a warning message is displayed and no column is added.

@@ -4,7 +4,7 @@
 \alias{dagnelie_br}
 \title{Single-entry Dagnelie branch volume (tarif "br")}
 \usage{
-dagnelie_br(data, na_action = c("error", "omit"), output = NULL)
+dagnelie_br(data, output = NULL)
 }
 \arguments{
 \item{data}{A \code{data.frame} containing at least:

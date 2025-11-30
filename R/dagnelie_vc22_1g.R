@@ -77,9 +77,8 @@
 #'                    "QUERCUS_SP", "FAGUS_SYLVATICA")
 #' )
 #' dagnelie_vc22_1g(data = df)
-dagnelie_vc22_1g <- function(data,
-                             na_action = c("error", "omit"),
-                             output = NULL) {
+#' @export
+dagnelie_vc22_1g <- function(data, output = NULL) {
   
   # Validation of the Dataframe  ----
   ##  Field needed ----

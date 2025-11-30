@@ -7,6 +7,8 @@
 #'   Must include at least one of the following columns:
 #'   - `c130`: circumference at 1.30 m (cm)
 #'   - `dbh`: diameter at 1.30 m (cm)
+#' @param output Optional file path where the resulting data frame should be
+#'   exported as a CSV. If NULL (default), no file is written.
 #'
 #' @return The same data frame with both `c130` and `dbh` columns.
 #'   Note: the function does not modify the input data frame in place.
@@ -31,40 +33,40 @@
 #' 
 # FUNCTION ----
 add_c130_dbh <- function(data, output = NULL) {
-  # Vérifier que c'est bien un data.frame
+  # Check that input is a data.frame
   stopifnot(is.data.frame(data))
   
-  # Cas 1 : aucune des deux colonnes
+  # Case 1: neither column exists
   if (!("c130" %in% names(data)) && !("dbh" %in% names(data))) {
     stop("Data must contain either a 'c130' or a 'dbh' column.")
   }
   
-  # Cas 2 : c130 existe mais pas dbh
+  # Case 2: c130 exists but not dbh
   if ("c130" %in% names(data) && !"dbh" %in% names(data)) {
     data$dbh <- data$c130 / pi
-    message("✅ 'dbh' column added from 'c130'.")
+    message("dbh' column added from 'c130'.")
   }
   
-  # Cas 3 : dbh existe mais pas c130
+  # Case 3: dbh exists but not c130
   if ("dbh" %in% names(data) && !"c130" %in% names(data)) {
     data$c130 <- data$dbh * pi
-    message("✅ 'c130' column added from 'dbh'.")
+    message("c130' column added from 'dbh'.")
   }
   
-  # Cas 4 : les deux colonnes existent
+  # Case 4: both columns exist
   if ("dbh" %in% names(data) && "c130" %in% names(data)) {
-    # Compléter les NA de c130 à partir de dbh
+    # Fill missing c130 values from dbh
     idx_c130_na <- which(is.na(data$c130) & !is.na(data$dbh))
     if (length(idx_c130_na) > 0) {
       data$c130[idx_c130_na] <- data$dbh[idx_c130_na] * pi
-      message("⚠️ ", length(idx_c130_na), " valeurs de 'c130' complétées à partir de 'dbh'.")
+      message(length(idx_c130_na), "'c130' values filled from 'dbh'")
     }
     
-    # Compléter les NA de dbh à partir de c130
+    # Fill missing dbh values from c130
     idx_dbh_na <- which(is.na(data$dbh) & !is.na(data$c130))
     if (length(idx_dbh_na) > 0) {
       data$dbh[idx_dbh_na] <- data$c130[idx_dbh_na] / pi
-      message("⚠️ ", length(idx_dbh_na), " valeurs de 'dbh' complétées à partir de 'c130'.")
+      message(length(idx_dbh_na), "'dbh' values filled from 'c130'")
     }
   }
   

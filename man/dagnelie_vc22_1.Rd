@@ -4,7 +4,7 @@
 \alias{dagnelie_vc22_1}
 \title{Single-entry Dagnelie volume (tarif 1)}
 \usage{
-dagnelie_vc22_1(data, na_action = c("error", "omit"), output = NULL)
+dagnelie_vc22_1(data, output = NULL)
 }
 \arguments{
 \item{data}{A \code{data.frame} containing at least:

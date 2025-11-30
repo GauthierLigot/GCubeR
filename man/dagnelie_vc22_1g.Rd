@@ -4,7 +4,7 @@
 \alias{dagnelie_vc22_1g}
 \title{Graduated single-entry Dagnelie volume (tarif 1g)}
 \usage{
-dagnelie_vc22_1g(data, na_action = c("error", "omit"), output = NULL)
+dagnelie_vc22_1g(data, output = NULL)
 }
 \arguments{
 \item{data}{A \code{data.frame} containing the columns:

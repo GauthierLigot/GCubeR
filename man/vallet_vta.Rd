@@ -21,7 +21,7 @@ will be written to this file using semicolon (;) as a delimiter. NA values are
 written as empty strings (""). Defaults to \code{NULL}.}
 }
 \value{
-The resulting data frame (same as the printed data) with the new columns \code{form} (Form Factor) and \code{vallet_vta} (Total Aboveground Volume in \strong{m³})..
+The resulting data frame (same as the printed data) with the new columns \code{form} (Form Factor) and \code{vallet_vta} (Total Aboveground Volume in \strong{m3})..
 }
 \description{
 Computes the total aboveground volume (VTA) for trees based on
@@ -29,13 +29,15 @@ the circumference at 1.30m (c130) and total height (htot) using the
 Vallet form factor method.
 }
 \details{
-The model is only valid for trees with a circumference at 1.30m (\code{c130}) of at least \strong{45 cm}.
+The model is only valid for trees with a circumference at 1.30m (\code{c130}) of at least 45 cm.
 For non-compliant trees or unknown species, results are set to \code{NA}.
 
 The Form Factor (\code{form}) is calculated as:
-$$\text{form} = (a + b \cdot c_{130} + c \cdot \frac{\sqrt{c_{130}}}{h_{tot}}) \cdot (1 + \frac{d}{c_{130}^2})$$
+\deqn{form = (a + b \cdot c_{130} + c \cdot \frac{\sqrt{c_{130}}}{h_{tot}}) \cdot \left(1 + \frac{d}{c_{130}^2}\right)}
+
 The Total Aboveground Volume (\code{VTA}) is then:
-$$\text{VTA} = \text{form} \cdot \frac{1}{\pi \cdot 40000} \cdot c_{130}^2 \cdot h_{tot}$$
+\deqn{VTA = form \cdot \frac{1}{\pi \cdot 40000} \cdot c_{130}^2 \cdot h_{tot}}
+
 Coefficients a, b, c, d are loaded from the \code{vallet_vta.csv} file.
 }
 \examples{

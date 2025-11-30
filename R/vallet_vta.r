@@ -15,18 +15,20 @@
 #'   will be written to this file using semicolon (;) as a delimiter. NA values are
 #'   written as empty strings (""). Defaults to \code{NULL}.
 #'
-#' @return The resulting data frame (same as the printed data) with the new columns \code{form} (Form Factor) and \code{vallet_vta} (Total Aboveground Volume in **m³**)..
+#' @return The resulting data frame (same as the printed data) with the new columns \code{form} (Form Factor) and \code{vallet_vta} (Total Aboveground Volume in **m3**)..
 #'
 #' @details
-#' The model is only valid for trees with a circumference at 1.30m (\code{c130}) of at least **45 cm**.
+#' The model is only valid for trees with a circumference at 1.30m (\code{c130}) of at least 45 cm.
 #' For non-compliant trees or unknown species, results are set to \code{NA}.
-#' 
-#' The Form Factor (\code{form}) is calculated as:
-#' $$\text{form} = (a + b \cdot c_{130} + c \cdot \frac{\sqrt{c_{130}}}{h_{tot}}) \cdot (1 + \frac{d}{c_{130}^2})$$
-#' The Total Aboveground Volume (\code{VTA}) is then:
-#' $$\text{VTA} = \text{form} \cdot \frac{1}{\pi \cdot 40000} \cdot c_{130}^2 \cdot h_{tot}$$
-#' Coefficients a, b, c, d are loaded from the \code{vallet_vta.csv} file.
 #'
+#' The Form Factor (\code{form}) is calculated as:
+#' \deqn{form = (a + b \cdot c_{130} + c \cdot \frac{\sqrt{c_{130}}}{h_{tot}}) \cdot \left(1 + \frac{d}{c_{130}^2}\right)}
+#'
+#' The Total Aboveground Volume (\code{VTA}) is then:
+#' \deqn{VTA = form \cdot \frac{1}{\pi \cdot 40000} \cdot c_{130}^2 \cdot h_{tot}}
+#'
+#' Coefficients a, b, c, d are loaded from the \code{vallet_vta.csv} file.
+#' 
 #' @import dplyr readr
 #'
 #' @examples
@@ -100,7 +102,7 @@ vallet_vta <- function(data,
   ## If no compatible rows, skip calculation ----
   compatible_idx <- which(!is.na(data$coeff_a) & data$c130 >= min_c130)
   if (length(compatible_idx) == 0) {
-    message("⚠️ No compatible species found for Vallet VTA method. No column created.")
+    message("No compatible species found for Vallet VTA method. No column created.")
     return(data %>% select(-starts_with("coeff_")))
   }
   

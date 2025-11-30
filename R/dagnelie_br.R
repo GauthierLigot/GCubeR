@@ -96,7 +96,6 @@
 #' @seealso \code{\link{danbr}} for species-specific coefficients.
 #'
 #' @import dplyr
-#' @export
 #'
 #' @examples
 #' df <- data.frame(
@@ -105,12 +104,9 @@
 #'                    "QUERCUS_SP", "FAGUS_SYLVATICA")
 #' )
 #' dagnelie_br(df)
+#' @export
 
-
-
-dagnelie_br <- function(data,
-                        na_action = c("error", "omit"),
-                        output = NULL) {
+dagnelie_br <- function(data, output = NULL) {
   
   ## Validation of the Dataframe ----
   stopifnot(is.data.frame(data))

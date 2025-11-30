@@ -1,6 +1,6 @@
-#' Total Biomass, Carbon and CO₂ Estimation for Tree Species
+#' Total Biomass, Carbon and CO2 Estimation for Tree Species
 #'
-#' Computes total biomass (aboveground + root), carbon content and CO₂ equivalent
+#' Computes total biomass (aboveground + root), carbon content and CO2 equivalent
 #' for tree species using CNIEFEB (with multiple trunk volume sources) and Vallet methods.
 #'
 #' @param data A data frame containing volume and species information for each tree.
@@ -18,7 +18,7 @@
 #'
 #'   If multiple trunk volumes are provided, CNIEFEB is computed separately for each source.
 #'   If only one is available, the corresponding method is applied.
-#'   All volume columns must be numeric and expressed in cubic meters (m³).
+#'   All volume columns must be numeric and expressed in cubic meters (m3).
 #'
 #' @param na_action How to handle missing values. `"error"` (default) stops if any required
 #'   value is missing. `"omit"` removes rows with missing values.
@@ -30,8 +30,8 @@
 #' @return A data frame with one row per tree, including:
 #' - `species_code`: species name in uppercase Latin format.
 #' - `dagnelie_vc22_1`, `dagnelie_vc22_1g`, `dagnelie_vc22_2`, `vallet_vc22`, `rondeux_vc22`,`algan_vc22`:
-#'   optional trunk volume inputs (in m³).
-#' - `vallet_vta`: optional total aboveground volume (in m³) for Vallet method.
+#'   optional trunk volume inputs (in m3).
+#' - `vallet_vta`: optional total aboveground volume (in m3) for Vallet method.
 #' - `vc22_dagnelie`: selected trunk volume used for CNIEFEB (Dagnelie), based on priority.
 #' - `vc22_source`: name of the Dagnelie column used to populate `vc22`.
 #'
@@ -55,7 +55,7 @@
 #'
 #' @details
 #' - The density table provides:
-#'   - `density`: wood density in tonnes of dry matter per cubic meter (t/m³).
+#'   - `density`: wood density in tonnes of dry matter per cubic meter (t/m3).
 #'   - `con_broad`: species group, either `"conifer"` or `"broadleaf"`.
 #' - The expansion factor `feb` is  derived from `con_broad`:
 #'   - `feb = 1.3` for conifers
@@ -67,7 +67,7 @@
 #' - If required columns are missing, the corresponding method is skipped with a warning.
 #' - Warnings are also displayed if trunk volume columns exist but contain missing values (`NA`).
 #' - All biomass values are expressed in tonnes of dry matter (t),
-#'   carbon in tonnes of carbon (t C), and CO₂ in tonnes of CO₂ equivalent (t CO₂).
+#'   carbon in tonnes of carbon (t C), and CO2 in tonnes of CO2 equivalent (t CO2).
 #'
 #' @import dplyr
 #' @import readr
@@ -89,9 +89,9 @@
 #' output_path <- tempfile(fileext = ".csv")
 #' results <- biomass_calc(data, output = output_path)
 #' if (file.exists(output_path)) {
-#'   message("✅ CSV file successfully created.")
+#'   message("CSV file successfully created.")
 #' } else {
-#'   warning("⚠️ CSV file was not created.")
+#'   warning("CSV file was not created.")
 #' }
 #'
 #' @export
@@ -116,7 +116,7 @@ biomass_calc <- function(data,
   if (length(vc22_available) > 0) {
     data <- data %>% mutate(vc22_dagnelie= coalesce(!!!syms(vc22_available)))
   } else {
-    message("⚠️ No vc22 column found (dagnelie_vc22_2, dagnelie_vc22_1g, dagnelie_vc22_1). CNIEFEB method (Dagnelie) will be skipped.")
+    message("No vc22 column found (dagnelie_vc22_2, dagnelie_vc22_1g, dagnelie_vc22_1). CNIEFEB method (Dagnelie) will be skipped.")
   }
   
   #### Create vc22_source column safely (only for Dagnelie) ----
@@ -133,7 +133,7 @@ biomass_calc <- function(data,
   if (length(vc22_available) > 0) {
     rows_missing_vc22 <- which(rowSums(!is.na(data[vc22_available])) == 0)
     if (length(rows_missing_vc22) > 0) {
-      message("⚠️ The following rows have no trunk volume values in any of the Dagnelie columns (dagnelie_vc22_2, dagnelie_vc22_1g, dagnelie_vc22_1). CNIEFEB (Dagnelie) will be skipped for these rows: ",
+      message("The following rows have no trunk volume values in any of the Dagnelie columns (dagnelie_vc22_2, dagnelie_vc22_1g, dagnelie_vc22_1). CNIEFEB (Dagnelie) will be skipped for these rows: ",
               paste(rows_missing_vc22, collapse = ", "))
     }
   }
@@ -141,7 +141,7 @@ biomass_calc <- function(data,
   if ("vallet_vc22" %in% names(data)) {
     rows_missing_vallet <- which(is.na(data$vallet_vc22))
     if (length(rows_missing_vallet) > 0) {
-      message("⚠️ The following rows have no trunk volume values in column 'vallet_vc22'. CNIEFEB (Vallet) will be skipped for these rows: ",
+      message("The following rows have no trunk volume values in column 'vallet_vc22'. CNIEFEB (Vallet) will be skipped for these rows: ",
               paste(rows_missing_vallet, collapse = ", "))
     }
   }
@@ -149,7 +149,7 @@ biomass_calc <- function(data,
   if ("rondeux_vc22" %in% names(data)) {
     rows_missing_rondeux <- which(is.na(data$rondeux_vc22))
     if (length(rows_missing_rondeux) > 0) {
-      message("⚠️ The following rows have no trunk volume values in column 'rondeux_vc22'. CNIEFEB (Rondeux) will be skipped for these rows: ",
+      message("The following rows have no trunk volume values in column 'rondeux_vc22'. CNIEFEB (Rondeux) will be skipped for these rows: ",
               paste(rows_missing_rondeux, collapse = ", "))
     }
   }
@@ -157,7 +157,7 @@ biomass_calc <- function(data,
   if ("algan_vc22" %in% names(data)) {
     rows_missing_algan <- which(is.na(data$algan_vc22))
     if (length(rows_missing_algan) > 0) {
-      message("⚠️ The following rows have no trunk volume values in column 'algan_vc22'. CNIEFEB (Algan) will be skipped for these rows: ",
+      message("The following rows have no trunk volume values in column 'algan_vc22'. CNIEFEB (Algan) will be skipped for these rows: ",
               paste(rows_missing_algan, collapse = ", "))
     }
   }
@@ -210,19 +210,19 @@ biomass_calc <- function(data,
   
   ## Ensure data exists to avoid errors  ----
   if (!"vallet_vta" %in% names(data)) {
-    message("⚠️ Column 'vallet_vta' not found. Vallet method will be skipped.")
+    message("Column 'vallet_vta' not found. Vallet method will be skipped.")
   }
   
   if (!"vallet_vc22" %in% names(data)) {
-    message("⚠️ Column 'vallet_vc22' not found. CNIEFEB (Vallet) will be skipped.")
+    message("Column 'vallet_vc22' not found. CNIEFEB (Vallet) will be skipped.")
   }
   
   if (!"rondeux_vc22" %in% names(data)) {
-    message("⚠️ Column 'rondeux_vc22' not found. CNIEFEB (Rondeux) will be skipped.")
+    message("Column 'rondeux_vc22' not found. CNIEFEB (Rondeux) will be skipped.")
   }
   
   if (!"algan_vc22" %in% names(data)) {
-    message("⚠️ Column 'algan_vc22' not found. CNIEFEB (Algan) will be skipped.")
+    message("Column 'algan_vc22' not found. CNIEFEB (Algan) will be skipped.")
   }
   
   # CONSTANTS ----

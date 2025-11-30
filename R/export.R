@@ -21,6 +21,7 @@
 #' # Export to CSV :
 #' export_output(df, "results/volumes.csv")
 #'}
+#'@export
 
 export_output <- function(data, output) {
   

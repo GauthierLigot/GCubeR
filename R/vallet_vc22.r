@@ -16,15 +16,17 @@
 #'   failures trigger warnings without interrupting execution.
 #'
 #' @return The resulting data frame with the new column \code{vallet_vc22} 
-#'   (Commercial Volume in **m³**).
+#'   (Commercial Volume in **m3**).
 #'
 #' @details
-#' The model is valid only for trees with a diameter at 1.30m (\code{dbh}) 
-#' **greater than or equal to 7 cm**.
-#' 
-#' The polynomial formula used is:
-#' $$\text{VC22}_{\text{dm³}} = a \cdot \frac{h_{tot}}{\text{dbh}} + (b + c \cdot \text{dbh}) \cdot \left(\frac{\pi \cdot \text{dbh}^2 \cdot h_{tot}}{40}\right)$$
+#' The model is valid only for trees with a diameter at 1.30m (\code{dbh})
+#' greater than or equal to 7 cm.
 #'
+#' The polynomial formula used is:
+#' \deqn{VC22_{dm^3} = a \cdot \frac{h_{tot}}{dbh} + (b + c \cdot dbh) \cdot \frac{\pi \cdot dbh^2 \cdot h_{tot}}{40}}
+#'
+#' Coefficients a, b, c are species-specific and loaded from the \code{vallet_vc22.csv} file.
+#' 
 #' @import dplyr readr
 #'
 #' @examples
@@ -87,7 +89,7 @@ vallet_vc22 <- function(data,
   ## If no compatible rows, skip calculation ----
   compatible_idx <- which(!is.na(data$coeff_b) & data$dbh >= min_dbh)
   if (length(compatible_idx) == 0) {
-    message("⚠️ No compatible species found for Vallet merchantable volume (vc22). No column created.")
+    message("No compatible species found for Vallet merchantable volume (vc22). No column created.")
     return(data %>% select(-starts_with("coeff_")))
   }
   
@@ -105,8 +107,8 @@ vallet_vc22 <- function(data,
       
       vc22_dm3 = term1_a + (term2_bc * term3_geom),
       
-      # Convert to m³ (Final Unit)
-      vallet_vc22 = vc22_dm3 / 1000 # dm³ -> m³
+      # Convert to m3 (Final Unit)
+      vallet_vc22 = vc22_dm3 / 1000 # dm3 -> m3
     ) %>%
     # Remove temporary columns
     select(-starts_with("coeff_"), -vc22_dm3, -starts_with("term"))

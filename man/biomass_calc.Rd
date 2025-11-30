@@ -2,7 +2,7 @@
 % Please edit documentation in R/biomass.R
 \name{biomass_calc}
 \alias{biomass_calc}
-\title{Total Biomass, Carbon and CO₂ Estimation for Tree Species}
+\title{Total Biomass, Carbon and CO2 Estimation for Tree Species}
 \usage{
 biomass_calc(data, na_action = c("error", "omit"), output = NULL)
 }
@@ -28,7 +28,7 @@ matched against a density table.
 
 If multiple trunk volumes are provided, CNIEFEB is computed separately for each source.
 If only one is available, the corresponding method is applied.
-All volume columns must be numeric and expressed in cubic meters (m³).}
+All volume columns must be numeric and expressed in cubic meters (m3).}
 
 \item{na_action}{How to handle missing values. \code{"error"} (default) stops if any required
 value is missing. \code{"omit"} removes rows with missing values.}
@@ -43,8 +43,8 @@ A data frame with one row per tree, including:
 \itemize{
 \item \code{species_code}: species name in uppercase Latin format.
 \item \code{dagnelie_vc22_1}, \code{dagnelie_vc22_1g}, \code{dagnelie_vc22_2}, \code{vallet_vc22}, \code{rondeux_vc22},\code{algan_vc22}:
-optional trunk volume inputs (in m³).
-\item \code{vallet_vta}: optional total aboveground volume (in m³) for Vallet method.
+optional trunk volume inputs (in m3).
+\item \code{vallet_vta}: optional total aboveground volume (in m3) for Vallet method.
 \item \code{vc22_dagnelie}: selected trunk volume used for CNIEFEB (Dagnelie), based on priority.
 \item \code{vc22_source}: name of the Dagnelie column used to populate \code{vc22}.
 }
@@ -80,14 +80,14 @@ optional trunk volume inputs (in m³).
 }
 }
 \description{
-Computes total biomass (aboveground + root), carbon content and CO₂ equivalent
+Computes total biomass (aboveground + root), carbon content and CO2 equivalent
 for tree species using CNIEFEB (with multiple trunk volume sources) and Vallet methods.
 }
 \details{
 \itemize{
 \item The density table provides:
 \itemize{
-\item \code{density}: wood density in tonnes of dry matter per cubic meter (t/m³).
+\item \code{density}: wood density in tonnes of dry matter per cubic meter (t/m3).
 \item \code{con_broad}: species group, either \code{"conifer"} or \code{"broadleaf"}.
 }
 \item The expansion factor \code{feb} is  derived from \code{con_broad}:
@@ -102,7 +102,7 @@ in the following priority: \code{dagnelie_vc22_2} > \code{dagnelie_vc22_1g} > \c
 \item If required columns are missing, the corresponding method is skipped with a warning.
 \item Warnings are also displayed if trunk volume columns exist but contain missing values (\code{NA}).
 \item All biomass values are expressed in tonnes of dry matter (t),
-carbon in tonnes of carbon (t C), and CO₂ in tonnes of CO₂ equivalent (t CO₂).
+carbon in tonnes of carbon (t C), and CO2 in tonnes of CO2 equivalent (t CO2).
 }
 }
 \examples{
@@ -122,9 +122,9 @@ data <- data.frame(
 output_path <- tempfile(fileext = ".csv")
 results <- biomass_calc(data, output = output_path)
 if (file.exists(output_path)) {
-  message("✅ CSV file successfully created.")
+  message("CSV file successfully created.")
 } else {
-  warning("⚠️ CSV file was not created.")
+  warning("CSV file was not created.")
 }
 
 }

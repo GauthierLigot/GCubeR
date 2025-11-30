@@ -4,7 +4,7 @@
 \alias{c150_c130}
 \title{Convert circumference between 1.50 m and 1.30 m}
 \usage{
-c150_c130(data, na_action = c("error", "omit"), output = NULL)
+c150_c130(data, output = NULL)
 }
 \arguments{
 \item{data}{A \code{data.frame} containing at least:

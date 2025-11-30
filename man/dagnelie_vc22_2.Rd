@@ -4,7 +4,7 @@
 \alias{dagnelie_vc22_2}
 \title{Two-entry Dagnelie volume (tarif 2)}
 \usage{
-dagnelie_vc22_2(data, na_action = c("error", "omit"), output = NULL)
+dagnelie_vc22_2(data, output = NULL)
 }
 \arguments{
 \item{data}{A \code{data.frame} containing at least the columns

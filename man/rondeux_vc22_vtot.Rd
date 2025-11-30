@@ -24,8 +24,8 @@ failures trigger warnings without interrupting execution.}
 \value{
 A data frame identical to \code{data}, with two added columns:
 \itemize{
-\item \code{rondeux_vtot}: total stem volume (m³)
-\item \code{rondeux_vc22}: commercial stem volume at 22 cm (m³)
+\item \code{rondeux_vtot}: total stem volume (m3)
+\item \code{rondeux_vc22}: commercial stem volume at 22 cm (m3)
 }
 }
 \description{
@@ -48,7 +48,7 @@ Expected units:
 \itemize{
 \item \code{c130}: cm
 \item \code{htot}: m
-\item output volumes: m³
+\item output volumes: m3
 }
 
 These equations are valid \strong{only for larch}. Rows with other species are
@@ -61,6 +61,6 @@ df <- data.frame(
   htot = c(15, 18, 20)
 )
 
-v_rondeux_larch(df)
+rondeux_vc22_vtot(df)
 
 }

@@ -68,21 +68,31 @@ gcuber <- function(data, output = NULL) {
     stop("Missing column 'species_code'.")
   }
   
-  # run all GcubeR functions ----
-  data <- c150_c130(data)  
+  # Always applied ----
+  data <- c150_c130(data)
   data <- add_c130_dbh(data)
   data <- dagnelie_vc22_1(data)
-  data <- dagnelie_vc22_1g(data)
-  data <- dagnelie_vc22_2(data)
   data <- dagnelie_br(data)
-  data <- vallet_vta(data)
-  data <- vallet_vc22(data)
-  data <- algan_vta_vc22(data)
-  data <- rondeux_vc22_vtot(data)
-  data <- bouvard_vta(data)
+  
+  # Conditional on hdom ----
+  if ("hdom" %in% names(data)) {
+    data <- dagnelie_vc22_1g(data)
+  }
+  
+  # Conditional on htot ----
+  if ("htot" %in% names(data)) {
+    data <- dagnelie_vc22_2(data)
+    data <- vallet_vta(data)
+    data <- vallet_vc22(data)
+    data <- algan_vta_vc22(data)
+    data <- rondeux_vc22_vtot(data)
+    data <- bouvard_vta(data)
+  }
+  
+  # Always applied at the end ----
   data <- biomass_calc(data)
   
-  # exporting the file using function export_output ----
+  # Export if requested ----
   export_output(data, output)
   return(data)
 }

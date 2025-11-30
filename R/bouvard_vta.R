@@ -14,7 +14,7 @@
 #'   failures trigger warnings without interrupting execution.
 #'   
 #' @return A data frame with the original input columns plus one new output:
-#' - `bouvard_vta`: aerial total volume (m³). Computed only for `"QUERCUS_SP"`,
+#' - `bouvard_vta`: aerial total volume (m3). Computed only for `"QUERCUS_SP"`,
 #'   otherwise not created.
 #'
 #' @details
@@ -22,7 +22,7 @@
 #' - Input `htot` must be in meters (m).
 #' - Formula for aerial total volume (only `"QUERCUS_SP"`):
 #'   \deqn{bouvard_vta = 0.5 * (dbh/100)^2 * htot}
-#' - Resulting volumes are expressed in cubic meters (m³).
+#' - Resulting volumes are expressed in cubic meters (m3).
 #' - If required columns are missing or non-numeric, the function stops with an error.
 #' - The output column is created only if at least one `"QUERCUS_SP"` row is present,
 #'   otherwise a warning message is displayed and no column is added.
@@ -38,9 +38,7 @@
 #' bouvard_vta(df)
 #'
 #' @export
-bouvard_vta <- function(data,
-                        na_action = c("error", "omit"),
-                        output = NULL) {
+bouvard_vta <- function(data, output = NULL) {
   
   # INPUT CHECKS ----
   required_cols <- c("species_code", "dbh", "htot")
@@ -61,9 +59,9 @@ bouvard_vta <- function(data,
   # Identify compatible rows ----
   idx <- which(data$species_code %in% compatible_species)
   
-  # If no compatible species → message only ----
+  # If no compatible species -> message only ----
   if (length(idx) == 0) {
-    message("⚠️ No compatible species found for Bouvard method (only QUERCUS_SP is supported). No volume column created.")
+    message("No compatible species found for Bouvard method (only QUERCUS_SP is supported). No volume column created.")
     return(data)
   }
   

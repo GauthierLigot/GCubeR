@@ -78,9 +78,7 @@
 #' @import dplyr
 #' @export
 
-c150_c130 <- function(data,
-                         na_action = c("error", "omit"),
-                         output = NULL) {
+c150_c130 <- function(data, output = NULL) {
   
   stopifnot(is.data.frame(data))
   if (!"species_code" %in% names(data)) {

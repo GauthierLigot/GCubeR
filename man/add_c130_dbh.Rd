@@ -13,6 +13,9 @@ Must include at least one of the following columns:
 \item \code{c130}: circumference at 1.30 m (cm)
 \item \code{dbh}: diameter at 1.30 m (cm)
 }}
+
+\item{output}{Optional file path where the resulting data frame should be
+exported as a CSV. If NULL (default), no file is written.}
 }
 \value{
 The same data frame with both \code{c130} and \code{dbh} columns.

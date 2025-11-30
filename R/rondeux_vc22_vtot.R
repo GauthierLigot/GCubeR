@@ -20,7 +20,7 @@
 #' \itemize{
 #'   \item \code{c130}: cm
 #'   \item \code{htot}: m
-#'   \item output volumes: m³
+#'   \item output volumes: m3
 #' }
 #'
 #' These equations are valid **only for larch**. Rows with other species are
@@ -43,8 +43,8 @@
 #' @return
 #' A data frame identical to \code{data}, with two added columns:
 #' \itemize{
-#'   \item \code{rondeux_vtot}: total stem volume (m³)
-#'   \item \code{rondeux_vc22}: commercial stem volume at 22 cm (m³)
+#'   \item \code{rondeux_vtot}: total stem volume (m3)
+#'   \item \code{rondeux_vc22}: commercial stem volume at 22 cm (m3)
 #' }
 #'
 #' @examples
@@ -54,7 +54,7 @@
 #'   htot = c(15, 18, 20)
 #' )
 #'
-#' v_rondeux_larch(df)
+#' rondeux_vc22_vtot(df)
 #'
 #' @export
 rondeux_vc22_vtot <- function(data,
@@ -76,7 +76,7 @@ rondeux_vc22_vtot <- function(data,
          paste(missing_cols, collapse = ", "))
   }
   
-  # --- C130 RANGE CHECK (10–70 cm) ----
+  # --- C130 RANGE CHECK (10 - 70 cm) ----
   min_c130 <- 10
   max_c130 <- 70
   
@@ -117,7 +117,7 @@ rondeux_vc22_vtot <- function(data,
   
   # --- RETURN EARLY IF NO LARCH ----
   if (length(idx) == 0) {
-    message("⚠️ No compatible species (LARIX_DECIDUA or LARIX_SP) found. No Rondeux volume columns created.")
+    message("No compatible species (LARIX_DECIDUA or LARIX_SP) found. No Rondeux volume columns created.")
     return(data)
   }
   
@@ -145,7 +145,7 @@ rondeux_vc22_vtot <- function(data,
   }
   # If all results are NA, drop columns ----
   if (all(is.na(data$rondeux_vtot)) & all(is.na(data$rondeux_vc22))) {
-    message("⚠️ No valid Rondeux volumes computed. Columns not created.")
+    message("No valid Rondeux volumes computed. Columns not created.")
     data <- data %>% dplyr::select(-dplyr::matches("rondeux_"))
   }
   
