@@ -91,7 +91,7 @@ c150_c130 <- function(data, output = NULL) {
   # Merge coefficients
   data <- dplyr::left_join(
     data,
-    c150_c130_coeff %>%
+    GCubeR::c150_c130_coeff %>%
       dplyr::select(species_code, coeff_a, coeff_b, min_c150, max_c150),
     by = "species_code"
   )
