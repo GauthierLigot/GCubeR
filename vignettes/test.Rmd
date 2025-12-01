@@ -8,11 +8,6 @@ vignette: >
 ---
 
 ```{r setup, include = FALSE}
-# Charge le package en développement local
-if (requireNamespace("GcubeR", quietly = TRUE)) {
-  library(GcubeR)
-}
-
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
@@ -273,4 +268,27 @@ You can load them with:
 `data("dan1g", package = "GCubeR")`
 
 
+```{r c150_c130-example}
+GCubeR::c150_c130(data.frame(
+  c130 = 130,
+  species_code = "QUERCUS_ROBUR",
+  htot = 25
+))
+```
+ 
+```{r add_c130_dbh-example}
+GCubeR::add_c130_dbh(data.frame(
+  c130 = 130,
+  species_code = "QUERCUS_ROBUR",
+  htot = 25
+))
+```
 
+```{r vallet_vc22-example}
+GCubeR::vallet_vc22(data.frame(
+  dbh = 45,
+  species_code = "QUERCUS_ROBUR",
+  htot = 25
+))
+```
+ 
