@@ -1,16 +1,16 @@
 ---
-title: "Introduction to GcubeR"
+title: "Introduction to GCubeR"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Introduction to GcubeR}
+  %\VignetteIndexEntry{Introduction to GCubeR}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include = FALSE}
 # Charge le package en développement local
-if (requireNamespace("GcubeR", quietly = TRUE)) {
-  library(GcubeR)
+if (requireNamespace("GCubeR", quietly = TRUE)) {
+  library(GCubeR)
 }
 
 knitr::opts_chunk$set(
@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
 
 ```
 
-# Welcome to GcubeR
+# Welcome to GCubeR
 
 Forest quantification has become increasingly important in recent years.
 Whether your goal is to anticipate financial flows, estimate standing timber value,
@@ -28,24 +28,24 @@ or quantify the carbon stored in your forest, working with tree volume equations
 is rarely straightforward. Formulas are often difficult to find, coefficients vary
 between species, and implementations can be tedious or error-prone.
 
-GcubeR provides a unified and user-friendly toolbox that brings together the
+GCubeR provides a unified and user-friendly toolbox that brings together the
 most commonly used allometric equations in forestry. With only a few input
 variables, the package handles all calculations for you.
 
-GcubeR includes implementations of Algan, Rondeux, Dagnelie, and Vallet
+GCubeR includes implementations of Algan, Rondeux, Dagnelie, and Vallet
 volume equations, as well as CNIEFEB and Vallet's methods for estimating
 biomass, carbon content, and CO₂ equivalent.
 
-This vignette walks you through the workflow of applying GcubeR to your dataset
+This vignette walks you through the workflow of applying GCubeR to your dataset
 and shows how to extract the most useful information from your forest inventory.
 
 ---
 
-# Global structure of GcubeR
+# Global structure of GCubeR
 
 ## User input
 
-To use **GcubeR**, the user must provide a data frame with at least:
+To use **GCubeR**, the user must provide a data frame with at least:
 
 - `c130`: stem circumference at 1.30 m height (cm)  
 - `species_code`: full Latin species name in uppercase, e.g. \"QUERCUS_ROBUR\"
@@ -62,7 +62,7 @@ To be able to use **all** functions in the package, your data frame should conta
 
 # Converting module
 
-GcubeR provides tools to transform basic measurements so they fit the requirements
+GCubeR provides tools to transform basic measurements so they fit the requirements
 of the different volume and biomass equations:
 
 - **`c150_c130`** : converts stem circumference measured at 1.50 m (c150)
@@ -78,7 +78,40 @@ of the different volume and biomass equations:
 The **VTA module** computes total aboveground volume (trunk + branches) using
 three different methods.
 
-### Bouvard method — `bouvard_vta()`
+## Rondeux 2 entry method (parametric) - `rondeux_vc22_vtot()`
+
+This function compute VTA **AND** VC22
+
+Available for the folowing `species_code`:
+
+- `LARIX_SP`
+
+Required column:
+
+- `htot`
+- `species_code`
+- `c130`
+
+Formula:
+
+\[
+v_{\mathrm{c22}} =
+a_{\mathrm{vc22}}
+\;+\;
+b_{\mathrm{vc22}} \, c_{130}^{2} \, h_{\mathrm{tot}}
+\]
+
+\[
+v_{\mathrm{vta}} =
+a_{\mathrm{vtot}} \, c_{130}^{2} \, h_{\mathrm{tot}}
+\]
+
+All coefficients used in this model are provided in the dataset `rondeux_vc22_vtot()`.  
+You can load them with:
+
+data("rondeux_vc22_vtot", package = "GCubeR")
+
+### Bouvard method (parametric) — `bouvard_vta()`
 
 Required columns:
 
@@ -100,7 +133,7 @@ v_{\mathrm{vta}} = 0.5 \times \left(\frac{dbh}{100}\right)^2 \times h_{tot}
 
 ---
 
-### Algan method — `algan_vta_vc22()`
+### Algan method (parametric) — `algan_vta_vc22()`
 
 Required columns:
 
@@ -141,12 +174,35 @@ Available for the following species:
 Formula:
 
 \[
+\text{term}_{1,c}
+= 
+c \left( \frac{\sqrt{c_{130}}}{h_{\mathrm{tot}}} \right)
+\]
+
+\[
+\text{term}_{2,d}
+=
+1 + \frac{d}{c_{130}^{2}}
+\]
+
+\[
+\mathrm{form}
+=
+\left( a + b\,c_{130} + \text{term}_{1,c} \right)
+\;\times\;
+\text{term}_{2,d}
+\]
+
+
+\[
 v_{\mathrm{vta}} =
 \mathrm{form} \times \frac{1}{\pi \cdot 40000} \times c_{130}^2 \times h_{tot}
 \]
 
-where the *form factor* is species-specific and computed internally from
-Vallet's coefficients.
+All coefficients used in this model are provided in the dataset `vallet_vta()`.  
+You can load them with:
+
+data("vallet_vta", package = "GCubeR")
 
 ---
 
@@ -155,7 +211,7 @@ Vallet's coefficients.
 The **VC22 module** computes the trunk volume until 22 cm circumference using different
 methods.
 
-### Non parametric equations
+## Non parametric equations
 
 The non parametric equations are based on empirical volume tables which give them 
 a better fitness for trees evaluated in the same environment as those used for model construction.
@@ -243,7 +299,7 @@ You can load them with:
 
 `data("dan1", package = "GCubeR")`
 
-### Graduated single-entry Dagnelie volume — `dagnelie_vc22_1g()`
+### Graduated single-entry Dagnelie method — `dagnelie_vc22_1g()`
 
 Required columns:
 
@@ -252,6 +308,8 @@ Required columns:
 - `hdom`
 
 Available for the following `species_code`:
+
+see at Dagnelie single entry method
 
 Formula:
 
@@ -268,8 +326,140 @@ f\,h_{\mathrm{dom}}\,c_{130}^{2}
 All coefficients used in this model are provided in the dataset `dan1g`.  
 You can load them with:
 
-```r
-data("dan1g", package = "GcubeR")
+data("dan1g", package = "GCubeR")
 
+### Dagnelie two entry model - `dagnelie_vc22_2()`
+
+Required column:
+
+- `c130`
+- `species_code`
+- `htot`
+
+Available for the folowing `species_code`:
+
+See at Dagnelie single entry method
+
+Formula :
+
+\[
+v =
+a \;+\;
+b\,c_{130}
+\;+\;
+c\,c_{130}^{2}
+\;+\;
+d\,c_{130}^{3}
+\;+\;
+e\,h_{\mathrm{tot}}
+\;+\;
+f\,h_{\mathrm{tot}}\,c_{130}^{2}
+\]
+
+
+All coefficients used in this model are provided in the dataset `dan2`.  
+You can load them with:
+
+data("dan2", package = "GCubeR")
+
+## Parametric equations
+
+Parametric models provide stable and interpretable equations that remain valid 
+across a wide range of tree dimensions.
+
+### Vallet 2 entry method - `vallet_vc22()`
+
+Required columns:
+
+- `dbh`
+- `species_code`
+- `htot`
+
+Available for the folowing `species_code`:
+<div style="display: flex; gap: 40px;">
+
+<div style="flex: 1;">
+
+
+- `QUERCUS_ROBUR`
+- `QUERCUS_PETRAEA`
+- `QUERCUS_PUBESCENS`
+- `FAGUS_SYLVATICA`
+- `PINUS_PINASTER`
+- `PINUS_SYLVESTRIS`
+
+</div>
+
+<div style="flex: 1;">
+
+- `PINUS_LARICIO`
+- `PINUS_NIGRA`
+- `PINUS_HALEPENSIS`
+- `PICEA_ABIES`
+- `ABIES_ALBA`
+- `PSEUDOTSUGA_MENZIESII`
+
+</div>
+
+</div>
+
+Formula:
+
+\[
+\text{term}_{1,a} = a \times \left( \frac{h_{\mathrm{tot}}}{dbh} \right)
+\]
+
+\[
+\text{term}_{2,bc} = b \;+\; c \, dbh
+\]
+
+\[
+\text{term}_{3,\mathrm{geom}} =
+\frac{\pi \, dbh^{2} \, h_{\mathrm{tot}}}{40}
+\]
+
+\[
+v_{\mathrm{c22,dm3}} =
+\text{term}_{1,a}
+\;+\;
+\text{term}_{2,bc} \times \text{term}_{3,\mathrm{geom}}
+\]
+
+All coefficients used in this model are provided in the dataset `vallet_vc22()`.  
+You can load them with:
+
+data("vallet_vc22", package = "GCubeR")
+
+### Rondeux 2 entry method - `rondeux_vc22_vtot()`
+
+This function compute VTA **AND** VC22
+
+Available for the folowing `species_code`:
+
+- `LARIX_SP`
+
+Required column:
+
+- `htot`
+- `species_code`
+- `c130`
+
+Formula:
+
+\[
+v_{\mathrm{c22}} =
+a_{\mathrm{vc22}}
+\;+\;
+b_{\mathrm{vc22}} \, c_{130}^{2} \, h_{\mathrm{tot}}
+\]
+
+\[
+v_{\mathrm{vta}} =
+a_{\mathrm{vtot}} \, c_{130}^{2} \, h_{\mathrm{tot}}
+\]
+
+# Merchendising volume
+
+Regroup all soldable part of the trunc and branches 
 
 
