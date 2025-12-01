@@ -19,6 +19,7 @@ knitr::opts_chunk$set(
 )
 
 ```
+
 # Welcome to GcubeR
 
 Forest quantification has become increasingly important in recent years.
@@ -47,12 +48,12 @@ and shows how to extract the most useful information from your forest inventory.
 To use **GcubeR**, the user must provide a data frame with at least:
 
 - `c130`: stem circumference at 1.30 m height (cm)  
-- `species_code`: full Latin species name in uppercase, e.g. `"QUERCUS_ROBUR"`
+- `species_code`: full Latin species name in uppercase, e.g. \"QUERCUS_ROBUR\"
 
 To be able to use **all** functions in the package, your data frame should contain:
 
 - `c130`: stem circumference at 1.30 m height (cm)  
-- `species_code`: species Latin name in uppercase (e.g. `"FAGUS_SYLVATICA"`)  
+- `species_code`: species Latin name in uppercase (e.g. \"FAGUS_SYLVATICA\")  
 - `hdom`: dominant height (m)  
 - `htot`: total tree height (m)  
 - `dbh`: diameter at breast height (cm)
@@ -64,11 +65,11 @@ To be able to use **all** functions in the package, your data frame should conta
 GcubeR provides tools to transform basic measurements so they fit the requirements
 of the different volume and biomass equations:
 
-- **`c150_c130`** : converts stem circumference measured at 1.50 m (`c150`)
-  to circumference at 1.30 m (`c130`)
-- **`add_c130_dbh`** : converts circumference at 1.30 m (`c130`) to
-  diameter at breast height (`dbh`), and can also back-calculate `c130`
-  from `dbh` when needed
+- **`c150_c130`** : converts stem circumference measured at 1.50 m (c150)
+  to circumference at 1.30 m (c130)
+- **`add_c130_dbh`** : converts circumference at 1.30 m (c130) to
+  diameter at breast height (dbh), and can also back-calculate c130
+  from dbh when needed
 
 ---
 
@@ -77,9 +78,17 @@ of the different volume and biomass equations:
 The **VTA module** computes total aboveground volume (trunk + branches) using
 three different methods.
 
-### Bouvard method — `bouvard_vta`
+### Bouvard method — `bouvard_vta()`
 
-Available for **QUERCUS** species.
+Required columns:
+
+- `dbh`
+- `species_code`
+- `htot`
+
+Available for the folowing `species_code` :
+
+- `QUERCUS_SP`
 
 Formula:
 
@@ -91,9 +100,15 @@ v_{\mathrm{vta}} = 0.5 \times \left(\frac{dbh}{100}\right)^2 \times h_{tot}
 
 ---
 
-### Algan method — `algan_vta_vc22`
+### Algan method — `algan_vta_vc22()`
 
-Available for:
+Required columns:
+
+- `dbh`
+- `species_code`
+- `htot`
+
+Available for the following `species_code`:
 
 - `ABIES_ALBA`
 
@@ -105,7 +120,13 @@ v_{\mathrm{vta}} = 0.4 \times \left(\frac{dbh}{100}\right)^2 \times h_{tot}
 
 ---
 
-### Vallet method — `vallet_vta`
+### Vallet method — `vallet_vta()`
+
+Required columns:
+
+- `c130`
+- `species_code`
+- `htot`
 
 Available for the following species:
 
@@ -125,15 +146,130 @@ v_{\mathrm{vta}} =
 \]
 
 where the *form factor* is species-specific and computed internally from
-Vallet’s coefficients.
+Vallet's coefficients.
 
 ---
 
-# Function overview diagram
+# VC22 module
 
-```{r function-diagram, echo=FALSE, fig.align='center', out.width='100%'}
-knitr::include_graphics("img/function_diagram.png")
+The **VC22 module** computes the trunk volume until 22 cm circumference using different
+methods.
 
+### Non parametric equations
+
+The non parametric equations are based on empirical volume tables which give them 
+a better fitness for trees evaluated in the same environment as those used for model construction.
+
+---
+
+### Dagnelie single-entry method — `dagnelie_vc22_1()`
+
+Required columns:
+
+- `c130`
+- `species_code`
+
+Available for the following `species_code`:
+<div style="display: flex; gap: 40px;">
+
+<div style="flex: 1;">
+
+- `ABIES_ALBA`
+- `ACER_CAMPESTRE`
+- `ACER_PLATANOIDES`
+- `ACER_PSEUDOPLATANUS`
+- `AESCULUS_HIPPOCASTANUM`
+- `ALNUS_GLUTINOSA`
+- `ALNUS_INCANA`
+- `BETULA_SP`
+- `CARPINUS_SP`
+- `CASTANEA_SATIVA`
+- `CORLYUS_AVELLANA`
+- `CRATAEGUS_SP`
+- `CUPRESSUS_SP`
+- `FAGUS_SYLVATICA`
+- `FRAXINUS_EXCELSIOR`
+- `JUNGLANS_SP`
+- `LARIX_SP`
+- `MALUS_SP`
+- `PICEA_ABIES`
+- `PICEA_SITCHENSIS`
+- `PINUS_LARICIO`
+- `PINUS_NIGRA`
+- `PINUS_SYLVESTRIS`
+
+</div>
+
+<div style="flex: 1;">
+
+
+- `POPULUS_TREMULA`
+- `POPULUSxCANADENSIS`
+- `PRUNUS_AVIUM`
+- `PRUNUS_CERASUS`
+- `PRUNUS_SP`
+- `PSEUDOTSUGA_MENZIESII`
+- `PYRUS_SP`
+- `QUERCUS_PETRAEA`
+- `QUERCUS_PUBESCENS`
+- `QUERCUS_ROBUR`
+- `QUERCUS_RUBRA`
+- `QUERCUS_SP`
+- `RHAMNUS_FRANGULA`
+- `ROBINIA_PSEUDOACACIA`
+- `SALIX_SP`
+- `SAMBUCUS_SP`
+- `SORBUS_ARIA`
+- `SORBUS_AUCUPARIA`
+- `TAXUS_BACCATA`
+- `THUJA_PLICATA`
+- `TILIA_SP`
+- `ULMUS_SP`
+
+</div>
+
+</div>
+
+Formula:
+
+\[
+v_{\mathrm{c22}} = 
+a \;+\; b\,c_{130} \;+\; c\,c_{130}^2 \;+\; d\,c_{130}^3
+\]
+
+
+All coefficients used in this model are provided in the dataset `dan1`.  
+You can load them with:
+
+`data("dan1", package = "GCubeR")`
+
+### Graduated single-entry Dagnelie volume — `dagnelie_vc22_1g()`
+
+Required columns:
+
+- `c130`
+- `species_code`
+- `hdom`
+
+Available for the following `species_code`:
+
+Formula:
+
+\[
+v_{\mathrm{c22}} =
+a \;+\;
+b\,c_{130} \;+\;
+c\,c_{130}^{2} \;+\;
+d\,c_{130}^{3} \;+\;
+e\,h_{\mathrm{dom}} \;+\;
+f\,h_{\mathrm{dom}}\,c_{130}^{2}
+\]
+
+All coefficients used in this model are provided in the dataset `dan1g`.  
+You can load them with:
+
+```r
+data("dan1g", package = "GcubeR")
 
 
 
