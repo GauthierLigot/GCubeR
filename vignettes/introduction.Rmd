@@ -8,16 +8,10 @@ vignette: >
 ---
 
 ```{r setup, include = FALSE}
-# Charge le package en développement local
-if (requireNamespace("GCubeR", quietly = TRUE)) {
-  library(GCubeR)
-}
-
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
-
 ```
 
 # Welcome to GCubeR
@@ -462,4 +456,27 @@ a_{\mathrm{vtot}} \, c_{130}^{2} \, h_{\mathrm{tot}}
 
 Regroup all soldable part of the trunc and branches 
 
+```{r c150_c130-example}
+GCubeR::c150_c130(data.frame(
+  c130 = 130,
+  species_code = "QUERCUS_ROBUR",
+  htot = 25
+))
+```
+ 
+```{r add_c130_dbh-example}
+GCubeR::add_c130_dbh(data.frame(
+  c130 = 130,
+  species_code = "QUERCUS_ROBUR",
+  htot = 25
+))
+```
 
+```{r vallet_vc22-example}
+GCubeR::vallet_vc22(data.frame(
+  dbh = 45,
+  species_code = "QUERCUS_ROBUR",
+  htot = 25
+))
+```
+ 
