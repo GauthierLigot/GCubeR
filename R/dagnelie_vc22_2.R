@@ -171,7 +171,7 @@ dagnelie_vc22_2 <- function(data, output = NULL) {
   ## Merge with dan2 ----
   data <- dplyr::left_join(
     data,
-    dan2 %>% dplyr::select(
+    GCubeR::dan2 %>% dplyr::select(
       species_code,
       coeff_a, coeff_b, coeff_c, coeff_d, coeff_e, coeff_f,
       min_c130, max_c130, min_htot, max_htot

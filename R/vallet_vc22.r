@@ -71,7 +71,7 @@ vallet_vc22 <- function(data,
   ## Clean species names and join ----
   data <- data %>%
     mutate(species_code = toupper(trimws(species_code))) %>%
-    left_join(val_vc22, by = "species_code")
+    left_join(GCubeR::val_vc22, by = "species_code")
   
   ## Check for unknown species (missing coefficients) ----
   rows_unknown_species <- which(is.na(data$coeff_b))

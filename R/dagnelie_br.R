@@ -138,7 +138,7 @@ dagnelie_br <- function(data, output = NULL) {
   ## Merge with coefficients ----
   data <- dplyr::left_join(
     data,
-    dan1 %>% dplyr::select(
+    GCubeR::danbr %>% dplyr::select(
       species_code,
       coeff_a, coeff_b, coeff_c, coeff_d,
       min_c130, max_c130

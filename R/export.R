@@ -10,7 +10,7 @@
 #'
 #' @return Invisibly returns \code{TRUE} if the export succeeded, \code{FALSE}
 #'   otherwise.
-#'
+#' @importFrom utils write.csv2
 #' @examples
 #' \dontrun{
 #' df <- data.frame(

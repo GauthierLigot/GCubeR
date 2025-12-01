@@ -164,7 +164,7 @@ biomass_calc <- function(data,
   
   ## Clean species names ----
   data <- data %>% mutate(species_code = toupper(trimws(species_code)))
-  density_table <- density_table %>% mutate(
+  density_ref <- GCubeR::density_table %>% mutate(
     species_code = toupper(trimws(species_code)),
     con_broad = tolower(trimws(con_broad)),
     density = as.numeric(gsub(",", ".", as.character(density)))
@@ -173,7 +173,7 @@ biomass_calc <- function(data,
   ## Merge with density table ----
   data <- left_join(
     data,
-    density_table %>% select(species_code, density, con_broad),
+    density_ref %>% select(species_code, density, con_broad),
     by = "species_code"
   )
   
@@ -203,7 +203,7 @@ biomass_calc <- function(data,
   data <- data[idx_keep, ]
   
   ## Check species validity ----
-  wrong <- setdiff(unique(data$species_code), density_table$species_code)
+  wrong <- setdiff(unique(data$species_code), density_ref$species_code)
   if (length(wrong) > 0) {
     message("Unknown species : ", paste(wrong, collapse = ", "))
   }

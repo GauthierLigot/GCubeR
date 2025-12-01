@@ -7,17 +7,19 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+```{r setup, include = FALSE}
+# Charge le package en développement local
+if (requireNamespace("GcubeR", quietly = TRUE)) {
+  library(GcubeR)
+}
 
-```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+
 ```
 
-```{r setup}
-library(GCubeR)
-```
 # Welcome to GcubeR
 
 Forest quantification has become increasingly important in recent years.
@@ -46,12 +48,12 @@ and shows how to extract the most useful information from your forest inventory.
 To use **GcubeR**, the user must provide a data frame with at least:
 
 - `c130`: stem circumference at 1.30 m height (cm)  
-- `species_code`: full Latin species name in uppercase, e.g. `"QUERCUS_ROBUR"`
+- `species_code`: full Latin species name in uppercase, e.g. \"QUERCUS_ROBUR\"
 
 To be able to use **all** functions in the package, your data frame should contain:
 
 - `c130`: stem circumference at 1.30 m height (cm)  
-- `species_code`: species Latin name in uppercase (e.g. `"FAGUS_SYLVATICA"`)  
+- `species_code`: species Latin name in uppercase (e.g. \"FAGUS_SYLVATICA\")  
 - `hdom`: dominant height (m)  
 - `htot`: total tree height (m)  
 - `dbh`: diameter at breast height (cm)
@@ -63,11 +65,11 @@ To be able to use **all** functions in the package, your data frame should conta
 GcubeR provides tools to transform basic measurements so they fit the requirements
 of the different volume and biomass equations:
 
-- **`c150_c130`** : converts stem circumference measured at 1.50 m (`c150`)
-  to circumference at 1.30 m (`c130`)
-- **`add_c130_dbh`** : converts circumference at 1.30 m (`c130`) to
-  diameter at breast height (`dbh`), and can also back-calculate `c130`
-  from `dbh` when needed
+- **`c150_c130`** : converts stem circumference measured at 1.50 m (c150)
+  to circumference at 1.30 m (c130)
+- **`add_c130_dbh`** : converts circumference at 1.30 m (c130) to
+  diameter at breast height (dbh), and can also back-calculate c130
+  from dbh when needed
 
 ---
 
@@ -76,9 +78,17 @@ of the different volume and biomass equations:
 The **VTA module** computes total aboveground volume (trunk + branches) using
 three different methods.
 
-### Bouvard method — `bouvard_vta`
+### Bouvard method — `bouvard_vta()`
 
-Available for **QUERCUS** species.
+Required columns:
+
+- `dbh`
+- `species_code`
+- `htot`
+
+Available for the folowing `species_code` :
+
+- `QUERCUS_SP`
 
 Formula:
 
@@ -90,9 +100,15 @@ v_{\mathrm{vta}} = 0.5 \times \left(\frac{dbh}{100}\right)^2 \times h_{tot}
 
 ---
 
-### Algan method — `algan_vta_vc22`
+### Algan method — `algan_vta_vc22()`
 
-Available for:
+Required columns:
+
+- `dbh`
+- `species_code`
+- `htot`
+
+Available for the following `species_code`:
 
 - `ABIES_ALBA`
 
@@ -104,7 +120,13 @@ v_{\mathrm{vta}} = 0.4 \times \left(\frac{dbh}{100}\right)^2 \times h_{tot}
 
 ---
 
-### Vallet method — `vallet_vta`
+### Vallet method — `vallet_vta()`
+
+Required columns:
+
+- `c130`
+- `species_code`
+- `htot`
 
 Available for the following species:
 
@@ -124,209 +146,33 @@ v_{\mathrm{vta}} =
 \]
 
 where the *form factor* is species-specific and computed internally from
-Vallet’s coefficients.
-
----
-# VC22 module
-
-The **VS22 module** computes the trunc volume until 22cm circumference using different
-method
-
-### non parametric équation
-
-The non parametric equation are related on empirical volume table which gives them 
-a better fitness for trees to evaluate trees from the same environement than the
-one used for the model construction
----
-
-### Dagnelie 1entry method — `dagnelie_vc22_1`
-
-Available for the following species:
----
-
-
-- `ABIES_ALBA`
-- `ACER_CAMPESTRE`
-- `ACER_PLATANOIDES`
-- `ACER_PSEUDOPLATANUS`
-- `AESCULUS_HIPPOCASTANUM`
-- `ALNUS_GLUTINOSA`
-- `ALNUS_INCANA`
-- `BETULA_SP`
-- `CARPINUS_SP`
-- `CASTANEA_SATIVA`
-- `CORLYUS_AVELLANA`
-- `CRATAEGUS_SP`
-- `CUPRESSUS_SP`
-- `FAGUS_SYLVATICA`
-- `FRAXINUS_EXCELSIOR`
-- `JUNGLANS_SP`
-- `LARIX_SP`
-- `MALUS_SP`
-- `PICEA_ABIES`
-- `PICEA_SITCHENSIS`
-- `PINUS_LARICIO`
-- `PINUS_NIGRA`
-- `PINUS_SYLVESTRIS`
-- `POPULUS_TREMULA`
-- `POPULUSxCANADENSIS`
-- `PRUNUS_AVIUM`
-- `PRUNUS_CERASUS`
-- `PRUNUS_SP`
-- `PSEUDOTSUGA_MENZIESII`
-- `PYRUS_SP`
-- `QUERCUS_PETRAEA`
-- `QUERCUS_PUBESCENS`
-- `QUERCUS_ROBUR`
-- `QUERCUS_RUBRA`
-- `QUERCUS_SP`
-- `RHAMNUS_FRANGULA`
-- `ROBINIA_PSEUDOACACIA`
-- `SALIX_SP`
-- `SAMBUCUS_SP`
-- `SORBUS_ARIA`
-- `SORBUS_AUCUPARIA`
-- `TAXUS_BACCATA`
-- `THUJA_PLICATA`
-- `TILIA_SP`
-- `ULMUS_SP`
-
-# Function overview diagram
-cat("
-# Welcome to GcubeR
-
-Forest quantification has become increasingly important in recent years.
-Whether your goal is to anticipate financial flows, estimate standing timber value,
-or quantify the carbon stored in your forest, working with tree volume equations
-is rarely straightforward. Formulas are often difficult to find, coefficients vary
-between species, and implementations can be tedious or error-prone.
-
-**GcubeR** provides a unified and user-friendly toolbox that brings together
-commonly used allometric equations in forestry. With only a few input variables,
-the package handles all computations for you.
-
-GcubeR includes implementations of Algan, Rondeux, Dagnelie, and Vallet
-volume equations, as well as CNIEFEB and Vallet methods for estimating
-biomass, carbon content, and CO\\(_2\\) equivalent.
-
-This vignette walks you through the workflow of applying GcubeR to your dataset
-and explains how to extract the most useful information from your forest inventory.
-
----
-
-# Overall structure of GcubeR
-
-## User input requirements
-
-To use **GcubeR**, the user must provide a data frame containing at least:
-
-- `c130`: stem circumference at 1.30 m height (cm)  
-- `species_code`: full Latin species name in uppercase, e.g. \"QUERCUS_ROBUR\"
-
-To access **all** functions in the package, the dataset should include:
-
-- `c130` — circumference at 1.30 m  
-- `species_code` — species Latin name  
-- `hdom` — dominant height (m)  
-- `htot` — total height (m)  
-- `dbh` — diameter at breast height (cm)
-
----
-
-# Conversion module
-
-GcubeR provides tools to convert basic forest measurements as required by
-different volume and biomass models:
-
-- **`c150_c130`** — converts circumference measured at 1.50 m (c150)
-  to circumference at 1.30 m (c130)
-- **`add_c130_dbh`** — converts c130 to dbh, or dbh back to c130 when needed
-
----
-
-# VTA module (Total Aboveground Volume)
-
-The **VTA module** computes total aboveground volume (stem + branches)
-using several classical forestry models.
-
-### Bouvard method — `bouvard_vta`
-
-Available for **QUERCUS** species.
-
-The total aboveground volume is computed as:
-
-\\[
-v_{\\mathrm{VTA}} =
-0.5 \\,\\times\\, \\left( \\frac{dbh}{100} \\right)^2 \\times h_{\\mathrm{tot}}
-\\]
-
-where:
-- \(dbh\) is in centimeters,  
-- \(h_{\\mathrm{tot}}\) is in meters.
-
----
-
-### Algan method — `algan_vta_vc22`
-
-Available for:
-
-- `ABIES_ALBA`
-
-The formula is:
-
-\\[
-v_{\\mathrm{VTA}} =
-0.4 \\,\\times\\, \\left( \\frac{dbh}{100} \\right)^2 \\times h_{\\mathrm{tot}}
-\\]
-
----
-
-### Vallet method — `vallet_vta`
-
-Available for the following species:
-
-- `PICEA_ABIES`  
-- `QUERCUS_ROBUR`  
-- `FAGUS_SYLVATICA`  
-- `PINUS_SYLVESTRIS`  
-- `PINUS_PINASTER`  
-- `ABIES_ALBA`  
-- `PSEUDOTSUGA_MENZIESII`
-
-Vallet's model computes total aboveground volume as:
-
-\\[
-v_{\\mathrm{VTA}} =
-\\mathrm{form} \\,\\times\\,
-\\frac{1}{\\pi \\cdot 40\\,000} \\,\\times\\,
-c_{130}^2 \\,\\times\\, h_{\\mathrm{tot}}
-\\]
-
-where:
-- \(c_{130}\) is circumference at 1.30 m (cm),  
-- \(h_{\\mathrm{tot}}\) is total tree height (m),  
-- \\(\\mathrm{form}\\) is a species-specific form factor estimated internally.
+Vallet's coefficients.
 
 ---
 
 # VC22 module
 
-The **VC22 module** computes stem volume down to a top circumference of 22 cm.
+The **VC22 module** computes the trunk volume until 22 cm circumference using different
+methods.
 
-## Non-parametric equations
+### Non parametric equations
 
-These equations rely on empirical volume tables, often providing better accuracy
-for trees growing in conditions similar to those used to build the reference tables.
+The non parametric equations are based on empirical volume tables which give them 
+a better fitness for trees evaluated in the same environment as those used for model construction.
 
 ---
 
-### Dagnelie 1-entry method — `dagnelie_vc22_1`
+### Dagnelie single-entry method — `dagnelie_vc22_1()`
 
-Available for the following species:
+Required columns:
 
-<div style=\"display:flex; gap:40px;\">
+- `c130`
+- `species_code`
 
-<div style=\"flex:1;\">
+Available for the following `species_code`:
+<div style="display: flex; gap: 40px;">
+
+<div style="flex: 1;">
 
 - `ABIES_ALBA`
 - `ACER_CAMPESTRE`
@@ -354,7 +200,8 @@ Available for the following species:
 
 </div>
 
-<div style=\"flex:1;\">
+<div style="flex: 1;">
+
 
 - `POPULUS_TREMULA`
 - `POPULUSxCANADENSIS`
@@ -383,5 +230,47 @@ Available for the following species:
 
 </div>
 
----
-")
+Formula:
+
+\[
+v_{\mathrm{c22}} = 
+a \;+\; b\,c_{130} \;+\; c\,c_{130}^2 \;+\; d\,c_{130}^3
+\]
+
+
+All coefficients used in this model are provided in the dataset `dan1`.  
+You can load them with:
+
+`data("dan1", package = "GCubeR")`
+
+### Graduated single-entry Dagnelie volume — `dagnelie_vc22_1g()`
+
+Required columns:
+
+- `c130`
+- `species_code`
+- `hdom`
+
+Available for the following `species_code`:
+
+identical as Dagnelie single entry above
+
+Formula:
+
+\[
+v_{\mathrm{c22}} =
+a \;+\;
+b\,c_{130} \;+\;
+c\,c_{130}^{2} \;+\;
+d\,c_{130}^{3} \;+\;
+e\,h_{\mathrm{dom}} \;+\;
+f\,h_{\mathrm{dom}}\,c_{130}^{2}
+\]
+
+All coefficients used in this model are provided in the dataset `dan1g`.  
+You can load them with:
+
+`data("dan1g", package = "GCubeR")`
+
+
+

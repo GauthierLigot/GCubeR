@@ -89,7 +89,7 @@ vallet_vta <- function(data,
   ## Clean species names and join ----
   data <- data %>%
     mutate(species_code = toupper(trimws(species_code))) %>%
-    left_join(val_vta, by = "species_code") %>%
+    left_join(GCubeR::val_vta, by = "species_code") %>%
     mutate(
       coeff_a = suppressWarnings(as.numeric(coeff_a)),
       coeff_b = suppressWarnings(as.numeric(coeff_b)),
