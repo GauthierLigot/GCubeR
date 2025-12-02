@@ -1,7 +1,7 @@
 ##############################################################
-# Application Shiny - Tarifs Dagnelie / GCubeR
+# Application Shiny - GCubeR
 # Auteur : Timon LUIZI
-# DATE last modif : 20-10-2025 
+# DATE last modif : 02-12-2025 
 ##############################################################
 
 ##############################################################
@@ -63,8 +63,18 @@ species_codes <- data.frame(
 aggregate_codes <- c("110","120","150","210","220")
 
 # Chargement de la liste des essences depuis le CSV
+csv_path <- system.file(
+  "Shiny",
+  "species_list_gcuber.csv",
+  package = "GCubeR"
+)
+
+if (!nzchar(csv_path) || !file.exists(csv_path)) {
+  stop("Fichier 'species_list_gcuber.csv' introuvable dans le package GCubeR.")
+}
+
 species_db <- read.csv(
-  "inst/Shiny/species_list_gcuber.csv",
+  csv_path,
   sep = ";",
   stringsAsFactors = FALSE,
   encoding = "UTF-8"
