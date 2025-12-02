@@ -1,14 +1,13 @@
 ##############################################################
 # Application Shiny - Tarifs GCubeR
 # Auteur : Timon LUIZI
-# DATE last modif : 20-10-2025 
+# DATE last modif : 03-12-2025 
 ##############################################################
 
 ##############################################################
 # 0) - EN-TÊTE ET INSTALLATION DES PACKAGES ----
 ##############################################################
 
-## Installation de GCubeR si nécessaire ----
 if (!requireNamespace("GCubeR", quietly = TRUE)) {
   if (!requireNamespace("remotes", quietly = TRUE)) {
     install.packages("remotes")
@@ -19,7 +18,6 @@ if (!requireNamespace("GCubeR", quietly = TRUE)) {
   )
 }
 
-## Chargement des packages ----
 library(shiny)
 library(shinythemes)
 library(GCubeR)
@@ -32,82 +30,132 @@ library(stringr)
 # 1) - DONNÉES DE RÉFÉRENCE ----
 ##############################################################
 
-## 1.1 - Tableau des essences depuis un data.frame du package ----
-# EXTRAPOLATION :
-# Je suppose qu'il existe un data.frame 'species_list_gcuber'
-# dans le package GCubeR, avec les colonnes au moins :
-#   - species_code
-#   - nom_fr
-#   - nom_latin
-# Si le nom réel est différent, il suffit d'adapter ce bloc.
+## 1.1 - Chargement des métadonnées d'équations ----
+# On considère equations_GCubeR comme la référence unique
+# pour :
+#  - la liste d’essences
+#  - la documentation des modèles
 
-if ("species_list_gcuber" %in% data(package = "GCubeR")$results[, "Item"]) {
-  # Chargement explicite de l'objet de données du package
-  data("species_list_gcuber", package = "GCubeR", envir = environment())
-  species_db <- species_list_gcuber
+if ("equations_GCubeR" %in% data(package = "GCubeR")$results[, "Item"]) {
+  data("equations_GCubeR", package = "GCubeR", envir = environment())
+  models_doc <- equations_GCubeR
 } else {
-  # Si l'objet n'existe pas, on stoppe avec un message explicite.
   stop(
-    "Le data.frame 'species_list_gcuber' n'a pas été trouvé dans le package GCubeR.\n",
-    "Adapte ce bloc avec le nom réel de ta table d'essences."
+    "Le dataset 'equations_GCubeR' n'a pas été trouvé dans le package GCubeR.\n",
+    "Vérifie que le package est bien installé et à jour."
   )
 }
 
-# Création d'un label lisible pour l'utilisateur
-species_db$label <- ifelse(
-  is.na(species_db$nom_latin) | species_db$nom_latin == "",
-  species_db$nom_fr,
-  paste0(species_db$nom_fr, " (", species_db$nom_latin, ")")
+## 1.2 - Construction de la liste d’essences à partir d'equations_GCubeR ----
+# On extrait les couples (species_code, species_name_fr),
+# en gardant une seule ligne par species_code.
+
+species_ref <- unique(models_doc[, c("species_code", "species_name_fr")])
+
+# Gestion des NA éventuels sur species_name_fr :
+species_ref$species_name_fr[is.na(species_ref$species_name_fr)] <- ""
+
+species_ref$label <- ifelse(
+  nzchar(species_ref$species_name_fr),
+  paste0(species_ref$species_name_fr, " (", species_ref$species_code, ")"),
+  species_ref$species_code
 )
 
-# Liste nommée pour selectInput :
-# - Nom affiché = label
-# - Valeur envoyée = species_code
+# Option : trier par nom français puis code
+species_ref <- species_ref[order(species_ref$species_name_fr,
+                                 species_ref$species_code), ]
+
+# Vecteur nommé pour les selectInput :
+#  - ce que voit l’utilisateur = label
+#  - ce qui est passé à l’app = species_code
 species_choices_gcuber <- setNames(
-  species_db$species_code,
-  species_db$label
+  species_ref$species_code,
+  species_ref$label
 )
 
-## 1.2 - (Optionnel) Tableau de documentation des modèles ----
-# EXTRAPOLATION :
-# Pour l'onglet "Documentation", l'idée est d'avoir une table
-# résumant les modèles disponibles. Pour l'instant, je crée un
-# squelette minimal à compléter plus tard.
+## 1.3 - Table de codes numériques (Dagnelie) + fusion avec GCubeR ----
+## Cette table permet de reconnaître les essences encodées en :
+##  - code numérique (1, 2, 3, ...)
+##  - nom français
+##  - species_code
 
-models_doc <- data.frame(
-  modele       = c("dagnelie_vc22_1", "vallet_vc22", "vallet_vta"),
-  type_volume  = c("vc22", "vc22", "vta"),
-  description  = c(
-    "Dagnelie : volume marchand jusqu’à c22",
-    "Vallet : volume marchand jusqu’à c22",
-    "Vallet : volume total aérien"
-  ),
-  variables    = c(
-    "c130 (+ éventuelle hauteur)",
-    "c130 (+ éventuelle hauteur)",
-    "c130 (+ éventuelle hauteur)"
-  ),
-  commentaire  = c(
-    "Exemple : compléter avec domaine de validité réel.",
-    "Exemple : compléter avec domaine de validité réel.",
-    "Exemple : compléter avec domaine de validité réel."
+species_codes_num <- data.frame(
+  code = as.character(c(
+    1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,
+    24,25,26,27,28,29,30,31,32,33,34,35,
+    41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,
+    110,120,150,210,220
+  )),
+  nom = c(
+    "Chênes indigènes","Chêne rouge","Hêtre","Érable sycomore","Frêne","Ormes","Merisier","Aubépines",
+    "Prunellier","Feuillus divers","Bouleau","Aulne blanc","Aulne glutineux","Charme","Châtaignier",
+    "Érable plane","Érable champêtre","Sorbier","Marronnier","Noisetier","Noyers",
+    "Peuplier hybride","Peuplier tremble","Robinier","Saule marsault","Autres saules",
+    "Tilleuls","Pommier","Poirier","Alisiers","Sureaux","Bourdaine","Cerisiers",
+    "Épicéa commun","Épicéa de Sitka","Sapin de Douglas","Mélèze","Pin sylvestre",
+    "Pin noir Autriche","Pin noir de Corse","Pin weymouth","Sapin pectiné",
+    "Sapin de Vancouver","Autres sapins","Cyprès","Tsuga","Thuya","Autres résineux","If",
+    "Toutes essences feuillues","Toutes essences résineuses","Feuillus nobles","Autres feuillus","Autres résineux"
   ),
   stringsAsFactors = FALSE
 )
-# À adapter avec les informations précises de ton rapport.
+
+## Fusion par nom français : on suppose que nom == species_name_fr
+species_lookup <- merge(
+  species_ref,
+  species_codes_num,
+  by.x = "species_name_fr",
+  by.y = "nom",
+  all = TRUE
+)
+
+## 1.4 - Fonction de normalisation des essences (batch) ----
+## Entrée : vecteur brut (code numérique, nom FR ou species_code)
+## Sortie : species_code (format GCubeR) ou NA
+
+normalize_species <- function(x) {
+  x_chr <- as.character(x)
+  out <- rep(NA_character_, length(x_chr))
+  unknown <- character()
+  
+  for (i in seq_along(x_chr)) {
+    val <- trimws(x_chr[i])
+    if (is.na(val) || !nzchar(val)) next
+    
+    # Cas 1 : code numérique (ex. "3")
+    if (grepl("^[0-9]+$", val)) {
+      hit <- species_lookup$species_code[species_lookup$code == val]
+    } else {
+      # Cas 2 : species_code ou nom français
+      up <- toupper(val)
+      hit <- species_lookup$species_code[
+        toupper(species_lookup$species_code) == up |
+          toupper(species_lookup$species_name_fr) == up
+      ]
+    }
+    
+    hit <- unique(hit[!is.na(hit)])
+    if (length(hit) >= 1) {
+      out[i] <- hit[1]
+    } else {
+      unknown <- c(unknown, val)
+    }
+  }
+  
+  if (length(unique(unknown)) > 0) {
+    warning(
+      "Certaines essences n'ont pas pu être reconnues et sont mises à NA : ",
+      paste(unique(unknown), collapse = ", ")
+    )
+  }
+  
+  out
+}
 
 ##############################################################
 # 2) - FONCTIONS UTILITAIRES ----
 ##############################################################
 
-## 2.1 - Aides générales pour plus tard (server) ----
-
-# Test simple sur les noms d'arguments (reprise de dagnelie)
-has_name <- function(x) {
-  is.character(x) && length(x) == 1 && !is.na(x) && nzchar(x)
-}
-
-# Parse un texte "100, 110, 125" -> c(100,110,125)
 parse_vector <- function(txt) {
   if (is.null(txt) || !nzchar(trimws(txt))) return(NULL)
   t <- trimws(txt)
@@ -122,7 +170,6 @@ parse_vector <- function(txt) {
   t
 }
 
-# Recyclage d'un vecteur à une longueur n
 recycle_to <- function(x, n) {
   if (is.null(x)) return(rep(NA, n))
   if (length(x) == n) return(x)
@@ -130,7 +177,7 @@ recycle_to <- function(x, n) {
   stop("Longueurs incompatibles : ", length(x), " vs ", n)
 }
 
-## 2.2 - Lecture robuste de CSV / XLSX (comme dagnelie) ----
+## Lecture CSV/XLSX ----
 
 guess_sep <- function(path, nlines = 5) {
   con <- file(path, "r"); on.exit(close(con))
@@ -172,19 +219,254 @@ read_table_any <- function(path, ext = "csv",
   )
 }
 
+## 2.3 - Normalisation des mesures (c130 / dbh13 / c150 / hauteurs) ----
+# Convention :
+#  - d130 = D à 1.30 m  -> dbh (1.30 m, utilisé par GCubeR)
+#  - d150 = D à 1.50 m  -> conversion géométrique vers c150, puis c150_c130 + add_c130_dbh
+
+build_base_uni <- function(species_code,
+                           meas_type, meas_vals,
+                           h_type, h_vals) {
+  n <- length(meas_vals)
+  if (!is.null(h_vals)) {
+    h_vals <- recycle_to(h_vals, n)
+  } else {
+    h_vals <- rep(NA_real_, n)
+  }
+  
+  df <- data.frame(
+    species_code = rep(species_code, n),
+    c130 = NA_real_,
+    dbh  = NA_real_,   # dbh à 1.30 m (convention GCubeR)
+    c150 = NA_real_,
+    htot = NA_real_,
+    hdom = NA_real_,
+    stringsAsFactors = FALSE
+  )
+  
+  if (meas_type == "c130") {
+    df$c130 <- meas_vals
+  } else if (meas_type == "c150") {
+    df$c150 <- meas_vals
+  } else if (meas_type == "d130") {
+    df$dbh <- meas_vals             # dbh à 1.30 m (DBH)
+  } else if (meas_type == "d150") { # DBH à 1.50 m
+    df$c150 <- meas_vals * pi       # EXTRAPOLATION : c150 = π * d150
+  }
+  
+  if (any(!is.na(df$c150))) {
+    tmp <- tryCatch(
+      GCubeR::c150_c130(df),
+      error = function(e) {
+        warning("Erreur dans c150_c130() : ", conditionMessage(e))
+        df
+      }
+    )
+    df$c130 <- tmp$c130
+    df$c150 <- tmp$c150
+  }
+  
+  if (any(!is.na(df$c130)) || any(!is.na(df$dbh))) {
+    tmp <- tryCatch(
+      GCubeR::add_c130_dbh(df),
+      error = function(e) {
+        warning("Erreur dans add_c130_dbh() : ", conditionMessage(e))
+        df
+      }
+    )
+    df$c130 <- tmp$c130
+    df$dbh  <- tmp$dbh   # dbh standardisé à 1.30 m
+  }
+  
+  if (h_type == "htot") {
+    df$htot <- h_vals
+  } else if (h_type == "hdom") {
+    df$hdom <- h_vals
+  }
+  
+  df
+}
+
+## 2.4 - Version batch de la normalisation (simplifiée) ----
+## Hypothèses :
+##  - une seule colonne de mesure (cm) pour tout le fichier
+##  - un seul type de mesure global (c130 / c150 / d130 / d150)
+##  - hauteur : soit aucune, soit htot par colonne, soit Hdom commune
+
+build_base_batch <- function(df_in,
+                             col_species,
+                             col_meas_value,
+                             meas_type_batch,
+                             h_mode_batch,
+                             col_htot,
+                             hdom_value) {
+  n <- nrow(df_in)
+  
+  # Normalisation des essences
+  species_raw  <- df_in[[col_species]]
+  species_code <- normalize_species(species_raw)
+  
+  # Colonne de mesure (cm)
+  meas_vals <- suppressWarnings(as.numeric(df_in[[col_meas_value]]))
+  
+  base <- data.frame(
+    species_code = species_code,
+    c130 = NA_real_,
+    dbh  = NA_real_,
+    c150 = NA_real_,
+    htot = NA_real_,
+    hdom = NA_real_,
+    stringsAsFactors = FALSE
+  )
+  
+  # Type de mesure global
+  if (meas_type_batch == "c130") {
+    base$c130 <- meas_vals
+  } else if (meas_type_batch == "c150") {
+    base$c150 <- meas_vals
+  } else if (meas_type_batch == "d130") {
+    base$dbh <- meas_vals              # dbh (1.30 m)
+  } else if (meas_type_batch == "d150") {
+    base$c150 <- meas_vals * pi        # EXTRAPOLATION vers c150
+  }
+  
+  # Conversion c150 -> c130
+  if (any(!is.na(base$c150))) {
+    tmp <- tryCatch(
+      GCubeR::c150_c130(base),
+      error = function(e) {
+        warning("Erreur dans c150_c130() (batch) : ", conditionMessage(e))
+        base
+      }
+    )
+    base$c130 <- tmp$c130
+    base$c150 <- tmp$c150
+  }
+  
+  # Complétude c130 / dbh
+  if (any(!is.na(base$c130)) || any(!is.na(base$dbh))) {
+    tmp <- tryCatch(
+      GCubeR::add_c130_dbh(base),
+      error = function(e) {
+        warning("Erreur dans add_c130_dbh() (batch) : ", conditionMessage(e))
+        base
+      }
+    )
+    base$c130 <- tmp$c130
+    base$dbh  <- tmp$dbh
+  }
+  
+  # Hauteurs
+  if (identical(h_mode_batch, "htot") && nzchar(col_htot)) {
+    base$htot <- suppressWarnings(as.numeric(df_in[[col_htot]]))
+  } else if (identical(h_mode_batch, "hdom")) {
+    base$hdom <- rep(hdom_value, n)
+  }
+  
+  base
+}
+
+## 2.5 - Labels avec unités ----
+
+label_with_units <- function(cols) {
+  # mapping minimal et explicite pour les colonnes principales
+  unit_labels <- c(
+    species_code = "species_code",
+    c130 = "c130 (cm)",
+    c150 = "c150 (cm)",
+    dbh  = "dbh (cm)",
+    htot = "htot (m)",
+    hdom = "hdom (m)",
+    dagnelie_vc22_1  = "dagnelie_vc22_1 (m³/arbre)",
+    dagnelie_vc22_1g = "dagnelie_vc22_1g (m³/arbre)",
+    dagnelie_vc22_2  = "dagnelie_vc22_2 (m³/arbre)",
+    dagnelie_br      = "dagnelie_br (m³ branches/arbre)",
+    vallet_vc22      = "vallet_vc22 (m³/arbre)",
+    vallet_vta       = "vallet_vta (m³/arbre)",
+    algan_vta        = "algan_vta (m³/arbre)",
+    algan_vc22       = "algan_vc22 (m³/arbre)",
+    rondeux_vtot     = "rondeux_vtot (m³/arbre)",
+    rondeux_vc22     = "rondeux_vc22 (m³/arbre)",
+    bouvard_vta      = "bouvard_vta (m³/arbre)"
+  )
+  
+  # Labels pour quelques sorties de biomass_calc (CNIEFEB, Vallet)
+  biomass_map <- c(
+    cniefeb_dagnelie_bag  = "cniefeb_dagnelie_bag (t biomasse aérienne)",
+    cniefeb_dagnelie_bbg  = "cniefeb_dagnelie_bbg (t biomasse racinaire)",
+    cniefeb_dagnelie_btot = "cniefeb_dagnelie_btot (t biomasse totale)",
+    cniefeb_dagnelie_c    = "cniefeb_dagnelie_c (t C)",
+    cniefeb_dagnelie_co2  = "cniefeb_dagnelie_co2 (t CO₂)"
+  )
+  unit_labels <- c(unit_labels, biomass_map)
+  
+  sapply(cols, function(x) if (!is.null(unit_labels[[x]])) unit_labels[[x]] else x,
+         USE.NAMES = FALSE)
+}
+
 ##############################################################
-# 3) - INTERFACE UTILISATEUR (UI) ----
+# 3) - UI ----
 ##############################################################
 
 ui <- fluidPage(
   theme = shinytheme("flatly"),
+  
+  # Couleurs Gembloux Agro-Bio Tech (vert clair en couleur principale)
+  tags$head(
+    tags$style(HTML("
+      /* ----- BARRE DE NAVIGATION ----- */
+      .navbar-default {
+        background-color: #00707F;  /* turquoise principal */
+        border-color: #B9CD76;      /* rappel du vert clair des tableaux */
+      }
+      
+      /* Texte de la navbar (titre, onglets) */
+      .navbar-default .navbar-brand,
+      .navbar-default .navbar-nav > li > a {
+        color: #FFFFFF !important;  /* texte en blanc pour contraste */
+      }
+      
+      /* Onglet actif : léger rappel du vert clair dans le bas */
+      .navbar-default .navbar-nav > .active > a,
+      .navbar-default .navbar-nav > .active > a:focus,
+      .navbar-default .navbar-nav > .active > a:hover {
+        background-color: #00707F;  /* on garde le fond turquoise */
+        border-bottom: 3px solid #B9CD76;  /* soulignement vert clair */
+        color: #FFFFFF !important;
+      }
+      
+      /* ----- BOUTONS PRIMAIRES (Calculer, etc.) ----- */
+      .btn-primary {
+        background-color: #00707F;  /* turquoise principal */
+        border-color: #00707F;
+      }
+      
+      .btn-primary:hover,
+      .btn-primary:focus {
+        background-color: #5FA4B0;  /* turquoise plus clair au survol */
+        border-color: #5FA4B0;
+      }
+      
+      /* ----- TITRES ----- */
+      h3, h4 {
+        color: #00707F;  /* titres en turquoise */
+      }
+      
+      /* ----- EN-TÊTES DE TABLEAUX ----- */
+      table.table th {
+        background-color: #B9CD76;  /* vert clair des tableaux */
+      }
+    "))
+  ),
+  
+  
   titlePanel("Tarifs de cubage (package GCubeR)"),
   
   navbarPage(
     title = "GCubeR – Outils de cubage",
     
     ##########################################################
-    # 3.1 Onglet 1 : Arbre unique / comparaison de modèles ----
+    # 3.1 Arbre unique ----
     ##########################################################
     tabPanel(
       "Arbre unique",
@@ -195,17 +477,16 @@ ui <- fluidPage(
             "Pour plusieurs arbres, utilise des virgules : ex. 100,110,125."
           ),
           
-          # Types de volumes demandés (vc22, vtot, biomasse)
           selectInput(
             "vol_type_uni",
             label = HTML(
-              "Choisir le(s) type(s) de volume <span style='color:red;'>*</span> :"
+              "Choisir le(s) type(s) de volume / biomasse <span style='color:red;'>*</span> :"
             ),
             choices = c(
-              "Volume marchand (jusqu'à c22)" = "vc22",
-              "Volume total tige"             = "vtot",
-              "Volume total aérien (vta)"     = "vta",
-              "Biomasse / Carbone"           = "biomass"
+              "Volume marchand vc22 (m³)"      = "vc22",
+              "Volume total tige vtot (m³)"    = "vtot",
+              "Volume total aérien vta (m³)"   = "vta",
+              "Biomasse / C / CO₂ (t)"         = "biomass"
             ),
             selected = "vc22",
             multiple = TRUE
@@ -213,107 +494,78 @@ ui <- fluidPage(
           
           helpText(
             tags$em(
-              "* Plusieurs types de volumes peuvent être calculés simultanément pour un même arbre. ",
-              "Tous les types de volumes ne sont pas disponibles pour toutes les essences."
+              "* Plusieurs types de volumes peuvent être calculés simultanément.",
+              " Tous les types ne sont pas disponibles pour toutes les essences."
             )
           ),
           
-          # Essence (liste GCubeR)
           selectInput(
             "species_uni",
-            label   = "Essence :",
+            label   = "Essence (species_code) :",
             choices = species_choices_gcuber,
             selected = NULL,
             multiple = FALSE
           ),
           
-          # Type de mesure (C130, C150, D130, D150, DBH, ...)
           selectInput(
             "meas_type_uni",
-            label = "Type de mesure de la tige :",
+            label = "Type de mesure de la tige (cm) :",
             choices = c(
-              "Circonférence à 1.30 m (C130)" = "c130",
-              "Circonférence à 1.50 m (C150)" = "c150",
-              "Diamètre à 1.30 m (D130)"      = "d130",
-              "Diamètre à 1.50 m (D150)"      = "d150",
-              "Diamètre à 1.30 m (DBH)"       = "dbh"
+              "Circonférence à 1.30 m (C130, cm)"        = "c130",
+              "Circonférence à 1.50 m (C150, cm)"        = "c150",
+              "Diamètre à 1.30 m (D130 / DBH, cm)"       = "d130",
+              "Diamètre à 1.50 m (D150, cm)"             = "d150"
             ),
             selected = "c130"
           ),
           
-          # Valeur(s) de la mesure (cm)
           textInput(
             "meas_value_uni",
-            label = "Valeur(s) de circonférence / diamètre (cm) :",
+            label = "Valeur(s) de mesure (cm) :",
             value = "100",
             placeholder = "Ex. 100, 110, 125"
           ),
           
           helpText("Tu peux encoder plusieurs valeurs séparées par des virgules."),
           
-          # Type de hauteur
           selectInput(
             "h_type_uni",
             label = "Type de hauteur :",
             choices = c(
-              "Hauteur totale"           = "htot",
-              "Hauteur dominante (Hdom)" = "hdom",
-              "Sans mesure de hauteur"   = "none"
+              "Hauteur totale (htot, m)"           = "htot",
+              "Hauteur dominante (Hdom, m)"        = "hdom",
+              "Sans mesure de hauteur"             = "none"
             ),
             selected = "none"
           ),
           
-          # Champ de hauteur dynamique (affiché seulement si nécessaire)
           uiOutput("h_value_ui"),
           
           hr(),
-          
-          # Choix de l'ensemble de modèles à utiliser (extrapolation)
-          checkboxInput(
-            "use_all_models_uni",
-            "Utiliser tous les modèles compatibles (Dagnelie, Vallet, ...)",
-            value = TRUE
-          ),
-          
-          # Plus tard : possibilité de limiter à un sous-ensemble
-          # (liste déroulante à partir de models_doc$modele)
-          conditionalPanel(
-            condition = "!input.use_all_models_uni",
-            selectInput(
-              "models_subset_uni",
-              "Limiter aux modèles suivants :",
-              choices  = models_doc$modele,
-              selected = models_doc$modele,
-              multiple = TRUE
-            )
-          ),
-          
-          hr(),
           actionButton("calc_uni", "Calculer (arbre unique)", class = "btn btn-primary"),
-          checkboxInput("show_call_uni", "Afficher l'appel R", TRUE)
+          checkboxInput("show_call_uni", "Afficher remarques et avertissements", TRUE)
         ),
         
         mainPanel(
           h3("Résultats – Arbre(s) unique(s)"),
-          
           verbatimTextOutput("result_msg_uni"),
           tableOutput("result_table_uni"),
           
           conditionalPanel(
             condition = "input.show_call_uni == true",
-            h4("Appels R sous-jacents (résumé)"),
+            h4("Remarques et avertissements (équations GCubeR)"),
             verbatimTextOutput("appel_uni")
           ),
           
           hr(),
-          h4("Modèles utilisés et domaines de validité"),
+          h4("Équations disponibles pour l’essence sélectionnée"),
           uiOutput("models_expl_uni")
         )
       )
     ),
     
     ##########################################################
-    # 3.2 Onglet 2 : Jeu de données (lot d'arbres) ----
+    # 3.2 Jeu de données ----
     ##########################################################
     tabPanel(
       "Jeu de données",
@@ -340,40 +592,20 @@ ui <- fluidPage(
           
           hr(),
           
-          # Types de volumes à calculer pour le lot
           checkboxGroupInput(
             "vol_type_batch",
             "Types de volumes / résultats à calculer :",
             choices = c(
-              "vc22 (volume marchand jusqu'à c22)" = "vc22",
-              "vtot (volume total tige)"           = "vtot",
-              "vta (volume total aérien)"          = "vta",
-              "Biomasse / Carbone"                = "biomass"
+              "vc22 (volume marchand, m³)"      = "vc22",
+              "vtot (volume total tige, m³)"    = "vtot",
+              "vta (volume total aérien, m³)"   = "vta",
+              "Biomasse / C / CO₂ (t)"          = "biomass"
             ),
-            selected = c("vc22")
+            selected = "vc22"
           ),
           
           hr(),
-          
-          # Mapping manuel des colonnes (comme demandé)
           uiOutput("mapping_ui"),
-          
-          hr(),
-          checkboxInput(
-            "use_all_models_batch",
-            "Utiliser tous les modèles compatibles",
-            value = TRUE
-          ),
-          conditionalPanel(
-            condition = "!input.use_all_models_batch",
-            selectInput(
-              "models_subset_batch",
-              "Limiter aux modèles suivants :",
-              choices  = models_doc$modele,
-              selected = models_doc$modele,
-              multiple = TRUE
-            )
-          ),
           
           hr(),
           actionButton("calc_batch", "Calculer (lot d’arbres)", class = "btn btn-primary"),
@@ -388,32 +620,27 @@ ui <- fluidPage(
           hr(),
           h3("Résultats – Lot d’arbres"),
           tableOutput("result_table_batch"),
-          verbatimTextOutput("result_msg_batch")
+          verbatimTextOutput("result_msg_batch"),
+          h4("Remarques et avertissements (lot d’arbres)"),
+          verbatimTextOutput("appel_batch")
         )
       )
     ),
     
     ##########################################################
-    # 3.3 Onglet 3 : Documentation des modèles ----
+    # 3.3 Documentation des équations ----
     ##########################################################
     tabPanel(
-      "Documentation des tarifs",
+      "Documentation des équations",
       fluidRow(
         column(
           12,
-          h3("Tarifs / modèles de volume et de biomasse disponibles"),
+          h3("Équations et modèles disponibles dans GCubeR"),
           p(
-            "Ce tableau résume les principaux modèles de volume et de biomasse ",
-            "utilisés par le package GCubeR. Il est à compléter avec les données ",
-            "issues du rapport et des publications originales."
+            "Ce tableau reprend les métadonnées des équations (famille, variable prédite,",
+            " espèces, domaine de validité, variables d’entrée, source bibliographique)."
           ),
-          tableOutput("models_table"),
-          hr(),
-          p(
-            em("Remarque : "),
-            "la Shiny utilise, pour chaque arbre, uniquement les modèles dont les ",
-            "conditions d'application et le domaine de validité sont respectés."
-          )
+          tableOutput("models_table")
         )
       )
     )
@@ -426,20 +653,76 @@ ui <- fluidPage(
 
 server <- function(input, output, session) {
   
-  ##########################################################
-  # 4.1 Arbre unique ----
-  ##########################################################
+  ## stockage des warnings pour l’onglet “Arbre unique”
+  uni_warnings   <- reactiveVal(character())
+  ## stockage des warnings pour l’onglet “Jeu de données”
+  batch_warnings <- reactiveVal(character())
   
-  # Champ de hauteur dynamique en fonction du type choisi
-  output$h_value_ui <- renderUI({
-    if (identical(input$h_type_uni, "none")) {
-      return(NULL)
+  ## wrapper de capture des warnings pour arbre unique
+  safe_run_gcuber_uni <- function(df, fun, fun_label, ...) {
+    w_local <- character()
+    res <- tryCatch(
+      withCallingHandlers(
+        fun(data = df, ...),
+        warning = function(w) {
+          w_local <<- c(w_local, conditionMessage(w))
+          invokeRestart("muffleWarning")
+        }
+      ),
+      error = function(e) {
+        w_local <<- c(
+          w_local,
+          paste0("Erreur dans ", fun_label, " : ", conditionMessage(e))
+        )
+        df
+      }
+    )
+    if (length(w_local) > 0) {
+      old <- uni_warnings()
+      uni_warnings(unique(c(old, paste0("[", fun_label, "] ", w_local))))
     }
+    res
+  }
+  
+  safe_run_biomass_uni <- function(df) {
+    safe_run_gcuber_uni(df, GCubeR::biomass_calc, "biomass_calc", na_action = "omit")
+  }
+  
+  ## wrapper de capture des warnings pour le lot d’arbres
+  safe_run_gcuber_batch <- function(df, fun, fun_label, ...) {
+    w_local <- character()
+    res <- tryCatch(
+      withCallingHandlers(
+        fun(data = df, ...),
+        warning = function(w) {
+          w_local <<- c(w_local, conditionMessage(w))
+          invokeRestart("muffleWarning")
+        }
+      ),
+      error = function(e) {
+        w_local <<- c(
+          w_local,
+          paste0("Erreur dans ", fun_label, " : ", conditionMessage(e))
+        )
+        df
+      }
+    )
+    if (length(w_local) > 0) {
+      old <- batch_warnings()
+      batch_warnings(unique(c(old, paste0("[", fun_label, "] ", w_local))))
+    }
+    res
+  }
+  
+  ## 4.1 Arbre unique ----
+  
+  output$h_value_ui <- renderUI({
+    if (identical(input$h_type_uni, "none")) return(NULL)
     
     label_txt <- if (identical(input$h_type_uni, "hdom")) {
       "Hauteur dominante Hdom (m) :"
     } else {
-      "Hauteur totale (m) :"
+      "Hauteur totale htot (m) :"
     }
     
     textInput(
@@ -450,30 +733,71 @@ server <- function(input, output, session) {
     )
   })
   
-  # SQUELETTE CALCUL ARBRE UNIQUE (sans logique GCubeR pour l'instant)
   calc_res_uni <- eventReactive(input$calc_uni, {
-    # Ici, on ne fait encore aucun appel aux fonctions GCubeR.
-    # On construit seulement une table d'entrée propre, qui
-    # servira ensuite de base pour brancher les modèles.
+    uni_warnings(character())  # reset des warnings
     
     meas_vals <- parse_vector(input$meas_value_uni)
-    h_vals    <- parse_vector(input$h_value_uni)
+    validate(need(!is.null(meas_vals), "Valeur(s) de mesure manquante(s)."))
     
-    n <- length(meas_vals)
+    h_vals <- if (!is.null(input$h_value_uni) && nzchar(input$h_value_uni)) {
+      parse_vector(input$h_value_uni)
+    } else {
+      NULL
+    }
     
-    data.frame(
-      species_code = rep(input$species_uni, n),
-      meas_type    = rep(input$meas_type_uni, n),
-      meas_value   = meas_vals,
-      h_type       = rep(input$h_type_uni, n),
-      h_value      = if (!is.null(h_vals)) recycle_to(h_vals, n) else rep(NA, n),
-      # Colonnes résultats factices pour l'instant
-      vc22_dagnelie = NA_real_,
-      vc22_vallet   = NA_real_,
-      vta_vallet    = NA_real_,
-      biomass_dummy = NA_real_,
-      stringsAsFactors = FALSE
+    base_df <- build_base_uni(
+      species_code = input$species_uni,
+      meas_type    = input$meas_type_uni,
+      meas_vals    = meas_vals,
+      h_type       = input$h_type_uni,
+      h_vals       = h_vals
     )
+    
+    df <- base_df
+    vol_types <- input$vol_type_uni
+    
+    if ("vc22" %in% vol_types) {
+      df <- safe_run_gcuber_uni(df, GCubeR::dagnelie_vc22_1,  "dagnelie_vc22_1")
+      df <- safe_run_gcuber_uni(df, GCubeR::dagnelie_vc22_1g, "dagnelie_vc22_1g")
+      df <- safe_run_gcuber_uni(df, GCubeR::dagnelie_vc22_2,  "dagnelie_vc22_2")
+      df <- safe_run_gcuber_uni(df, GCubeR::vallet_vc22,      "vallet_vc22")
+      df <- safe_run_gcuber_uni(df, GCubeR::algan_vta_vc22,   "algan_vta_vc22")
+      df <- safe_run_gcuber_uni(df, GCubeR::rondeux_vc22_vtot,"rondeux_vc22_vtot")
+    }
+    
+    if ("vta" %in% vol_types) {
+      df <- safe_run_gcuber_uni(df, GCubeR::vallet_vta,     "vallet_vta")
+      df <- safe_run_gcuber_uni(df, GCubeR::bouvard_vta,    "bouvard_vta")
+      df <- safe_run_gcuber_uni(df, GCubeR::algan_vta_vc22, "algan_vta_vc22")
+    }
+    
+    if ("vtot" %in% vol_types) {
+      df <- safe_run_gcuber_uni(df, GCubeR::rondeux_vc22_vtot, "rondeux_vc22_vtot")
+    }
+    
+    if ("biomass" %in% vol_types) {
+      df <- safe_run_biomass_uni(df)
+    }
+    
+    base_cols <- c("species_code", "c130", "dbh", "c150", "htot", "hdom")
+    vol_cols <- intersect(
+      c("dagnelie_vc22_1", "dagnelie_vc22_1g", "dagnelie_vc22_2",
+        "dagnelie_br",
+        "vallet_vc22", "vallet_vta",
+        "algan_vta", "algan_vc22",
+        "rondeux_vtot", "rondeux_vc22",
+        "bouvard_vta"),
+      names(df)
+    )
+    biomass_cols <- names(df)[grepl("^cniefeb_|^vallet_b", names(df))]
+    
+    cols_show <- unique(c(base_cols, vol_cols, biomass_cols))
+    cols_show <- intersect(cols_show, names(df))
+    
+    df_out <- df[, cols_show, drop = FALSE]
+    names(df_out) <- label_with_units(names(df_out))
+    
+    df_out
   }, ignoreInit = TRUE)
   
   output$result_table_uni <- renderTable({
@@ -484,44 +808,73 @@ server <- function(input, output, session) {
   output$result_msg_uni <- renderPrint({
     req(calc_res_uni())
     df <- calc_res_uni()
-    cat("Nombre d'arbres encodés :", nrow(df), "\n")
-    cat("Les valeurs de volume et de biomasse seront calculées une fois la logique GCubeR implémentée.")
+    cat("Nombre d’arbres traités :", nrow(df), "\n")
+    cat("Les volumes et biomasses affichés proviennent directement des fonctions de GCubeR.\n")
+    cat("Les avertissements de domaine de validité (plages de c130, dbh, hauteurs, espèces...) ",
+        "sont capturés et affichés ci-dessous.\n", sep = "")
   })
   
   output$appel_uni <- renderPrint({
     req(calc_res_uni())
-    df <- calc_res_uni()
-    cat("Les appels R exacts (GCubeR::...) seront construits ici, ",
-        "en fonction des modèles sélectionnés et du type de volume.\n",
-        "Exemple (à adapter plus tard) :\n",
-        "GCubeR::dagnelie_vc22_1(c130 = ..., htot = ...)")
+    cat(
+      "Fonctions appelées (selon les types choisis) :\n",
+      "- Dagnelie : dagnelie_vc22_1(), dagnelie_vc22_1g(), dagnelie_vc22_2(), dagnelie_br()\n",
+      "- Vallet  : vallet_vc22(), vallet_vta()\n",
+      "- Algan   : algan_vta_vc22()\n",
+      "- Rondeux : rondeux_vc22_vtot()\n",
+      "- Bouvard : bouvard_vta()\n",
+      "- Biomasse / carbone : biomass_calc()\n\n",
+      "Chaque fonction applique ses propres contrôles de validité (espèces supportées, plages de c130/dbh/hauteur).\n",
+      "Les résultats sont néanmoins renvoyés même hors domaine de validité ; GCubeR émet des warnings.\n\n"
+    )
+    w <- uni_warnings()
+    if (length(w) == 0) {
+      cat("Aucun warning n’a été remonté par les fonctions GCubeR pour ce calcul.\n")
+    } else {
+      cat("Avertissements remontés par GCubeR :\n")
+      for (msg in w) {
+        cat(" - ", msg, "\n", sep = "")
+      }
+    }
   })
   
-  # Bloc explicatif des modèles utilisés (ici encore statique / à enrichir)
   output$models_expl_uni <- renderUI({
-    # Plus tard, filtrer 'models_doc' sur les modèles effectivement utilisés.
-    # Pour l'instant, on affiche tout.
+    req(input$species_uni)
+    sp <- input$species_uni
+    
+    md <- subset(models_doc, species_code == sp)
+    if (nrow(md) == 0) {
+      return(tags$p(
+        "Aucune métadonnée d’équation trouvée pour cette essence dans equations_GCubeR."
+      ))
+    }
+    
     tagList(
-      lapply(seq_len(nrow(models_doc)), function(i) {
-        m <- models_doc[i, ]
+      lapply(split(md, md$eq_id), function(m) {
+        m1 <- m[1, ]
         tags$details(
-          tags$summary(m$modele),
+          tags$summary(
+            paste0(m1$eq_id, " (", m1$method, " – ", m1$predicted_variable, ")")
+          ),
           tags$p(
-            strong("Type de volume : "), m$type_volume, br(),
-            strong("Description : "), m$description, br(),
-            strong("Variables nécessaires : "), m$variables, br(),
-            strong("Commentaire : "), m$commentaire
+            strong("Méthode : "), m1$method, br(),
+            strong("Variable prédite : "), m1$predicted_variable,
+            " [", m1$output_unit, "]", br(),
+            strong("Espèce : "), m1$species_name_fr, " (", m1$species_code, ")", br(),
+            strong("Région de validité : "), m1$validity_region, br(),
+            strong("Plage de validité (texte) : "), m1$validity_range, br(),
+            strong("Variables d’entrée : "), m1$input_variable,
+            " [", m1$input_unit, "]", br(),
+            strong("Type de formule : "), m1$formula_type, br(),
+            strong("Référence : "), m1$reference_source
           )
         )
       })
     )
   })
   
-  ##########################################################
-  # 4.2 Jeu de données (lot d'arbres) ----
-  ##########################################################
+  ## 4.2 Jeu de données ----
   
-  # Import brut du fichier
   dat_raw <- reactive({
     req(input$file_up)
     ext <- tools::file_ext(input$file_up$name)
@@ -532,13 +885,12 @@ server <- function(input, output, session) {
     )
   })
   
-  # Aperçu des 10 premières lignes
   output$preview <- renderTable({
     req(dat_raw())
     head(dat_raw(), 10)
   })
   
-  # UI de mapping manuel des colonnes
+  ## UI de mapping simplifiée pour le lot ----
   output$mapping_ui <- renderUI({
     req(dat_raw())
     cols <- names(dat_raw())
@@ -546,133 +898,121 @@ server <- function(input, output, session) {
     tagList(
       h4("Mapping des colonnes"),
       helpText(
-        "Sélectionne manuellement les colonnes correspondant aux champs nécessaires. ",
-        "Aucune détection automatique n'est faite."
+        "Sélectionne la colonne d’essence, la mesure unique de diamètre/circonférence,",
+        " et la hauteur si disponible. L’essence peut être encodée en code numérique,",
+        " nom français ou species_code."
       ),
-      
-      # Colonne essence
       selectInput(
-        "col_species", "Colonne essence (species_code) :",
-        choices = cols
+        "col_species", "Colonne essence :", choices = cols
       ),
-      
-      # Type de mesure : colonne ou fixe
       selectInput(
-        "col_meas_type", "Colonne type de mesure (ou fixe) :",
-        choices = c("<fixe>", cols),
-        selected = "<fixe>"
+        "col_meas_value", "Colonne diamètre / circonférence (cm) :", choices = cols
       ),
-      conditionalPanel(
-        condition = "input.col_meas_type == '<fixe>'",
-        selectInput(
-          "meas_type_fix", "Type de mesure fixe :",
-          choices = c(
-            "C130" = "c130",
-            "C150" = "c150",
-            "D130" = "d130",
-            "D150" = "d150",
-            "DBH"  = "dbh"
-          ),
-          selected = "c130"
-        )
-      ),
-      
-      # Colonne valeur mesure
       selectInput(
-        "col_meas_value", "Colonne valeur de mesure (cm) :",
-        choices = cols
-      ),
-      
-      # Type de hauteur : sans / fixe / colonne
-      selectInput(
-        "h_type_mode",
-        "Mode pour la hauteur :",
+        "meas_type_batch",
+        "Type de mesure (cm) :",
         choices = c(
-          "Sans hauteur"          = "none",
-          "Hauteur fixe (m)"      = "fixed",
-          "Colonne hauteur (m)"   = "column"
+          "Circonférence à 1.30 m (C130)"        = "c130",
+          "Circonférence à 1.50 m (C150)"        = "c150",
+          "Diamètre à 1.30 m (D130 / DBH)"       = "d130",
+          "Diamètre à 1.50 m (D150)"             = "d150"
+        ),
+        selected = "c130"
+      ),
+      radioButtons(
+        "h_mode_batch",
+        "Hauteur :",
+        choices = c(
+          "Sans hauteur"                              = "none",
+          "Hauteur totale individuelle (htot, colonne)" = "htot",
+          "Hauteur dominante commune (Hdom, valeur unique)" = "hdom"
         ),
         selected = "none"
       ),
       conditionalPanel(
-        condition = "input.h_type_mode == 'fixed'",
+        condition = "input.h_mode_batch == 'htot'",
         selectInput(
-          "h_type_fix", "Type de hauteur fixe :",
-          choices = c("Hauteur totale (htot)" = "htot",
-                      "Hauteur dominante (hdom)" = "hdom"),
-          selected = "htot"
-        ),
-        numericInput(
-          "h_value_fix", "Valeur de hauteur fixe (m) :",
-          value = 20,
-          min = 0
+          "col_htot",
+          "Colonne hauteur totale htot (m) :",
+          choices = cols
         )
       ),
       conditionalPanel(
-        condition = "input.h_type_mode == 'column'",
-        selectInput(
-          "col_h_type", "Colonne type de hauteur (optionnelle) :",
-          choices = c("", cols),
-          selected = ""
-        ),
-        selectInput(
-          "col_h_value", "Colonne hauteur (m) :",
-          choices = cols
+        condition = "input.h_mode_batch == 'hdom'",
+        numericInput(
+          "hdom_value",
+          "Hauteur dominante Hdom (m) :",
+          value = 20,
+          min = 0
         )
       )
     )
   })
   
-  # SQUELETTE CALCUL LOT (sans logique GCubeR pour l'instant)
   calc_res_batch <- eventReactive(input$calc_batch, {
-    df <- dat_raw()
+    batch_warnings(character())  # reset warnings lot
     
-    # Récupération des colonnes mappées (sans vérification avancée pour l'instant)
-    species_col <- df[[input$col_species]]
+    df_in <- dat_raw()
+    validate(need(!is.null(input$col_species), "Sélectionne la colonne d’essence."))
+    validate(need(!is.null(input$col_meas_value), "Sélectionne la colonne de mesure."))
+    validate(need(!is.null(input$meas_type_batch), "Sélectionne le type de mesure."))
     
-    meas_type_vec <- if (input$col_meas_type == "<fixe>") {
-      rep(input$meas_type_fix, nrow(df))
-    } else {
-      as.character(df[[input$col_meas_type]])
-    }
-    
-    meas_value_vec <- df[[input$col_meas_value]]
-    
-    # Gestion des hauteurs (mode simplifié)
-    if (identical(input$h_type_mode, "none")) {
-      h_type_vec  <- rep("none", nrow(df))
-      h_value_vec <- rep(NA_real_, nrow(df))
-    } else if (identical(input$h_type_mode, "fixed")) {
-      h_type_vec  <- rep(input$h_type_fix, nrow(df))
-      h_value_vec <- rep(input$h_value_fix, nrow(df))
-    } else {
-      # mode "column"
-      h_type_vec <- if (nzchar(input$col_h_type)) {
-        as.character(df[[input$col_h_type]])
-      } else {
-        # si pas de colonne type, on suppose htot
-        rep("htot", nrow(df))
-      }
-      h_value_vec <- df[[input$col_h_value]]
-    }
-    
-    # Résultats factices pour l'instant
-    out <- data.frame(
-      species_code = species_col,
-      meas_type    = meas_type_vec,
-      meas_value   = meas_value_vec,
-      h_type       = h_type_vec,
-      h_value      = h_value_vec,
-      # Colonnes résultats placeholder : à remplacer par les
-      # sorties réelles des fonctions GCubeR (vc22, vtot, vta, biomasse...)
-      vc22_dagnelie = NA_real_,
-      vc22_vallet   = NA_real_,
-      vta_vallet    = NA_real_,
-      biomass_dummy = NA_real_,
-      stringsAsFactors = FALSE
+    # Construction du data.frame de base (c130, dbh, h, species_code)
+    base_df <- build_base_batch(
+      df_in         = df_in,
+      col_species   = input$col_species,
+      col_meas_value = input$col_meas_value,
+      meas_type_batch = input$meas_type_batch,
+      h_mode_batch  = input$h_mode_batch,
+      col_htot      = if (!is.null(input$col_htot)) input$col_htot else "",
+      hdom_value    = if (!is.null(input$hdom_value)) input$hdom_value else NA_real_
     )
     
-    out
+    df <- base_df
+    vol_types <- input$vol_type_batch
+    
+    if ("vc22" %in% vol_types) {
+      df <- safe_run_gcuber_batch(df, GCubeR::dagnelie_vc22_1,   "dagnelie_vc22_1")
+      df <- safe_run_gcuber_batch(df, GCubeR::dagnelie_vc22_1g,  "dagnelie_vc22_1g")
+      df <- safe_run_gcuber_batch(df, GCubeR::dagnelie_vc22_2,   "dagnelie_vc22_2")
+      df <- safe_run_gcuber_batch(df, GCubeR::vallet_vc22,       "vallet_vc22")
+      df <- safe_run_gcuber_batch(df, GCubeR::algan_vta_vc22,    "algan_vta_vc22")
+      df <- safe_run_gcuber_batch(df, GCubeR::rondeux_vc22_vtot, "rondeux_vc22_vtot")
+    }
+    
+    if ("vta" %in% vol_types) {
+      df <- safe_run_gcuber_batch(df, GCubeR::vallet_vta,        "vallet_vta")
+      df <- safe_run_gcuber_batch(df, GCubeR::bouvard_vta,       "bouvard_vta")
+      df <- safe_run_gcuber_batch(df, GCubeR::algan_vta_vc22,    "algan_vta_vc22")
+    }
+    
+    if ("vtot" %in% vol_types) {
+      df <- safe_run_gcuber_batch(df, GCubeR::rondeux_vc22_vtot, "rondeux_vc22_vtot")
+    }
+    
+    if ("biomass" %in% vol_types) {
+      df <- safe_run_gcuber_batch(df, GCubeR::biomass_calc,      "biomass_calc", na_action = "omit")
+    }
+    
+    base_cols <- c("species_code", "c130", "dbh", "c150", "htot", "hdom")
+    vol_cols <- intersect(
+      c("dagnelie_vc22_1", "dagnelie_vc22_1g", "dagnelie_vc22_2",
+        "dagnelie_br",
+        "vallet_vc22", "vallet_vta",
+        "algan_vta", "algan_vc22",
+        "rondeux_vtot", "rondeux_vc22",
+        "bouvard_vta"),
+      names(df)
+    )
+    biomass_cols <- names(df)[grepl("^cniefeb_|^vallet_b", names(df))]
+    
+    cols_show <- unique(c(base_cols, vol_cols, biomass_cols))
+    cols_show <- intersect(cols_show, names(df))
+    
+    df_out <- df[, cols_show, drop = FALSE]
+    names(df_out) <- label_with_units(names(df_out))
+    
+    df_out
   }, ignoreInit = TRUE)
   
   output$result_table_batch <- renderTable({
@@ -683,28 +1023,54 @@ server <- function(input, output, session) {
   output$result_msg_batch <- renderPrint({
     req(calc_res_batch())
     df <- calc_res_batch()
-    cat("Nombre de lignes dans le fichier :", nrow(dat_raw()), "\n")
-    cat("Nombre de lignes dans le tableau résultats :", nrow(df), "\n")
-    cat("Les colonnes de volume et biomasse seront remplies après implémentation de la logique GCubeR.")
+    cat("Nombre de lignes dans le fichier importé :", nrow(dat_raw()), "\n")
+    cat("Nombre de lignes dans le tableau de résultats :", nrow(df), "\n")
+    cat("Les fonctions GCubeR appliquent leurs propres contrôles de validité ",
+        "(plages de c130, dbh, hauteurs, espèces...). ",
+        "Les avertissements sont capturés et repris ci-dessous.\n", sep = "")
   })
   
-  # Modèle Excel de base
+  output$appel_batch <- renderPrint({
+    req(calc_res_batch())
+    cat(
+      "Fonctions appelées sur le lot (selon les types choisis) :\n",
+      "- Dagnelie : dagnelie_vc22_1(), dagnelie_vc22_1g(), dagnelie_vc22_2(), dagnelie_br()\n",
+      "- Vallet  : vallet_vc22(), vallet_vta()\n",
+      "- Algan   : algan_vta_vc22()\n",
+      "- Rondeux : rondeux_vc22_vtot()\n",
+      "- Bouvard : bouvard_vta()\n",
+      "- Biomasse / carbone : biomass_calc()\n\n",
+      "Chaque fonction applique ses propres contrôles de validité.",
+      " Les résultats sont renvoyés même hors domaine de validité ; GCubeR émet des warnings.\n\n"
+    )
+    w <- batch_warnings()
+    if (length(w) == 0) {
+      cat("Aucun warning n’a été remonté par les fonctions GCubeR pour ce lot.\n")
+    } else {
+      cat("Avertissements remontés par GCubeR (lot) :\n")
+      for (msg in w) {
+        cat(" - ", msg, "\n", sep = "")
+      }
+    }
+  })
+  
   output$dl_template_xlsx <- downloadHandler(
     filename = function() "template_gcuber.xlsx",
     content  = function(file) {
+      ## Modèle simple, cohérent avec le nouveau mapping :
+      ##  - species : nom FR, species_code ou code numérique
+      ##  - meas_value : diamètre/circonférence (cm)
+      ##  - htot : hauteur totale (optionnelle)
       tpl <- data.frame(
-        species_code = c("PICEA_ABIES", "FAGUS_SYLVATICA"),
-        meas_type    = c("c130", "c130"),
-        meas_value   = c(100, 120),
-        h_type       = c("htot", "hdom"),
-        h_value      = c(25, 22),
+        species    = c("PICEA_ABIES", "Hêtre", "3"),
+        meas_value = c(100, 120, 140),  # cm
+        htot       = c(25, 22, NA),     # m (optionnel)
         stringsAsFactors = FALSE
       )
       writexl::write_xlsx(tpl, path = file)
     }
   )
   
-  # Export des résultats (CSV)
   output$dl_results <- downloadHandler(
     filename = function() "resultats_gcuber.csv",
     content  = function(file) {
@@ -713,12 +1079,20 @@ server <- function(input, output, session) {
     }
   )
   
-  ##########################################################
-  # 4.3 Documentation des modèles ----
-  ##########################################################
+  ## 4.3 Documentation ----
   
   output$models_table <- renderTable({
-    models_doc
+    if (!is.null(models_doc) && nrow(models_doc) > 0) {
+      cols <- c("eq_id", "method", "predicted_variable", "output_unit",
+                "species_name_fr", "species_code",
+                "validity_region", "validity_range",
+                "input_variable", "input_unit",
+                "reference_source")
+      cols <- intersect(cols, names(models_doc))
+      head(models_doc[, cols, drop = FALSE], 100)
+    } else {
+      NULL
+    }
   })
 }
 
