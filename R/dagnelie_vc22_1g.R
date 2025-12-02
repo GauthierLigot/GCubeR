@@ -138,56 +138,41 @@ dagnelie_vc22_1g <- function(data, output = NULL) {
     )
   
   ## Check data$c130 constraint ----
-  valid <- !is.na(data$c130) & 
-    !is.na(data$min_c130) & 
-    !is.na(data$max_c130)
-  
-  rows_out <- which(
-    valid & (data$c130 < data$min_c130 | data$c130 > data$max_c130)
+  rows_out_c130 <- which(
+    !is.na(data$c130) & !is.na(data$min_c130) & !is.na(data$max_c130) &
+      (data$c130 < data$min_c130 | data$c130 > data$max_c130)
   )
-  
-  ## Check data$hdom constraint ----
-  valid <- !is.na(data$hdom) & 
-    !is.na(data$min_hdom) & 
-    !is.na(data$max_hdom)
-  
-  rows_out <- which(
-    valid & (data$hdom < data$min_hdom | data$hdom > data$max_hdom)
-  )
-  
-  if (length(rows_out) > 0) {
-    
+  if (length(rows_out_c130) > 0) {
     details <- paste0(
-      "row ", rows_out,
-      " (species ", data$species_code[rows_out],
-      ", min=", data$min_hdom[rows_out],
-      ", max=", data$max_hdom[rows_out],
-      ", found=", data$hdom[rows_out], ")"
+      "row ", rows_out_c130,
+      " (species ", data$species_code[rows_out_c130],
+      ", min=", data$min_c130[rows_out_c130],
+      ", max=", data$max_c130[rows_out_c130],
+      ", found=", data$c130[rows_out_c130], ")"
     )
-    
     warning(
-      paste(
-        "hdom out of range for", length(rows_out), "tree(s):",
-        paste(details, collapse = " | ")
-      ),
+      paste("c130 out of range for", length(rows_out_c130), "tree(s):",
+            paste(details, collapse = " | ")),
       call. = FALSE
     )
   }
-  if (length(rows_out) > 0) {
-    
+  
+  ## Check data$hdom constraint ----
+  rows_out_hdom <- which(
+    !is.na(data$hdom) & !is.na(data$min_hdom) & !is.na(data$max_hdom) &
+      (data$hdom < data$min_hdom | data$hdom > data$max_hdom)
+  )
+  if (length(rows_out_hdom) > 0) {
     details <- paste0(
-      "row ", rows_out,
-      " (species ", data$species_code[rows_out],
-      ", min=", data$min_c130[rows_out],
-      ", max=", data$max_c130[rows_out],
-      ", found=", data$c130[rows_out], ")"
+      "row ", rows_out_hdom,
+      " (species ", data$species_code[rows_out_hdom],
+      ", min=", data$min_hdom[rows_out_hdom],
+      ", max=", data$max_hdom[rows_out_hdom],
+      ", found=", data$hdom[rows_out_hdom], ")"
     )
-    
     warning(
-      paste(
-        "c130 out of range for", length(rows_out), "tree(s):",
-        paste(details, collapse = " | ")
-      ),
+      paste("hdom out of range for", length(rows_out_hdom), "tree(s):",
+            paste(details, collapse = " | ")),
       call. = FALSE
     )
   }

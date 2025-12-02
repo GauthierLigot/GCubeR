@@ -142,10 +142,10 @@ dagnelie_vc22_2 <- function(data, output = NULL) {
   if (length(miss) > 0) {         
     stop("Missing column : ", paste(miss, collapse = ", "))
   }
-  if (!is.numeric(data$c130) && !is.numeric(data$htot)) {      #numeric data
+  if (!is.numeric(data$c130)) {
     stop("c130 must be numeric")
   }
-  if (!is.numeric(data$htot) && !is.numeric(data$htot)) {      #numeric data
+  if (!is.numeric(data$htot)) {
     stop("htot must be numeric")
   }
   
