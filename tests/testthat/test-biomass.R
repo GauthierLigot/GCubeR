@@ -2,7 +2,7 @@
 
 test_that("biomass_calc errors when species_code missing or no usable volume (na_action = 'error')", {
   df <- data.frame(
-    species_code     = NA_character_,  # colonne présente mais NA
+    species_code     = NA_character_, 
     dagnelie_vc22_1  = NA_real_,
     vallet_vc22      = NA_real_,
     rondeux_vc22     = NA_real_,

@@ -248,11 +248,11 @@ dagnelie_vc22_2 <- function(data, output = NULL) {
       call. = FALSE
     )
   }
-  ## Initialisation des colonnes de sortie ----
+  ## Initialize output column ----
   data$dagnelie_vc22_2  <- NA_real_
   nline <- nrow(data)
   
-  # Iteration ----
+  # Compute tarif_2 volume ----
   data$dagnelie_vc22_2 <- with(
     data,
     coeff_a + coeff_b * c130 + coeff_c * c130^2 + coeff_d * c130^3 + coeff_e*htot + coeff_f* htot * c130^2

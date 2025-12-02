@@ -49,16 +49,15 @@ test_that("bouvard_vta handles multiple rows with mixed species", {
   )
   result <- bouvard_vta(df)
   
-  # Vérifie que la colonne existe
   expect_true("bouvard_vta" %in% names(result))
   
-  # Ligne 1 : QUERCUS_SP → calculé
+  # Row 1 : QUERCUS_SP → compute
   expect_equal(result$bouvard_vta[1], 0.5 * (0.30^2) * 20, tolerance = 1e-8)
   
-  # Ligne 2 : PICEA_ABIES → NA
+  # Row 2 : PICEA_ABIES → NA
   expect_true(is.na(result$bouvard_vta[2]))
   
-  # Ligne 3 : QUERCUS_SP → calculé
+  # Row 3 : QUERCUS_SP → compute
   expect_equal(result$bouvard_vta[3], 0.5 * (0.40^2) * 22, tolerance = 1e-8)
 })
 

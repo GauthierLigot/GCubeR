@@ -105,7 +105,6 @@ test_that("gcuber produces enriched dataframe with expected structure", {
   expect_true(all(c("c130", "dbh") %in% names(res)))
   expect_true(any(grepl("dagnelie", names(res))))
   expect_true(any(grepl("vallet", names(res))))
-  # Colonnes conditionnelles
   if (any(grepl("rondeux", names(res)))) {
     expect_true(any(grepl("rondeux", names(res))))
   }

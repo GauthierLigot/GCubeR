@@ -24,7 +24,6 @@ test_that("export_output writes CSV successfully and returns TRUE", {
   res <- export_output(df, tmp)
   expect_true(res)
   expect_true(file.exists(tmp))
-  # Vérifier contenu
   content <- read.csv2(tmp)
   expect_equal(nrow(content), 3)
   expect_equal(names(content), c("id", "volume"))

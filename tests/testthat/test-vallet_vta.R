@@ -26,7 +26,7 @@ test_that("vallet_vta handles NA values with na_action = 'omit'", {
     htot = 25
   )
   result <- vallet_vta(df, na_action = "omit")
-  expect_equal(nrow(result), 1) # ligne conservée
+  expect_equal(nrow(result), 1)
   if ("vallet_vta" %in% names(result)) {
     expect_true(is.na(result$vallet_vta) || is.nan(result$vallet_vta))
   } else {
@@ -42,7 +42,7 @@ test_that("vallet_vta computes correct volume for known species", {
   )
   result <- suppressWarnings(vallet_vta(df))
   
-  # Coefficients du CSV
+  # Coefficients from CSV
   a <- 0.631
   b <- -0.000946
   c <- 0
@@ -100,11 +100,11 @@ test_that("vallet_vta works with multiple rows and mixed species", {
   )
   result <- suppressWarnings(vallet_vta(df))
   
-  # Row 1 valide
+  # Row 1 
   expect_false(is.na(result$vallet_vta[1]))
-  # Row 2 espèce inconnue → NA ou NaN
+  # Row 2 
   expect_true(is.na(result$vallet_vta[2]) || is.nan(result$vallet_vta[2]))
-  # Row 3 c130 < 45 → NA ou NaN
+  # Row 3 
   expect_true(is.na(result$vallet_vta[3]) || is.nan(result$vallet_vta[3]))
 })
 

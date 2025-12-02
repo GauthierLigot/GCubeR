@@ -69,7 +69,6 @@ test_that("rondeux_vc22_vtot invalidates volumes when c130 out of range", {
     expect_true(is.na(result$rondeux_vtot))
     expect_true(is.na(result$rondeux_vc22))
   } else {
-    # si toutes les valeurs sont invalides, les colonnes sont supprimées
     expect_false("rondeux_vtot" %in% names(result))
     expect_false("rondeux_vc22" %in% names(result))
   }

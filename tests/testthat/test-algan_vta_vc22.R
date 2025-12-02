@@ -27,10 +27,8 @@ test_that("algan_vta_vc22 computes vc22 for compatible species", {
   )
   result <- algan_vta_vc22(df)
   
-  # Vérifie que la colonne existe
   expect_true("algan_vc22" %in% names(result))
   
-  # Vérifie les calculs
   expect_equal(result$algan_vc22[1], 0.33 * (0.30^2) * 20, tolerance = 1e-8)
   expect_equal(result$algan_vc22[2], 0.33 * (0.25^2) * 18, tolerance = 1e-8)
   expect_equal(result$algan_vc22[3], 0.33 * (0.20^2) * 15, tolerance = 1e-8)
@@ -46,16 +44,12 @@ test_that("algan_vta_vc22 computes vta only for ABIES_ALBA with dbh > 15", {
   )
   result <- algan_vta_vc22(df)
   
-  # Vérifie que la colonne existe
   expect_true("algan_vta" %in% names(result))
   
-  # Premier cas : ABIES_ALBA avec dbh > 15 → calculé
   expect_equal(result$algan_vta[1], 0.4 * (0.30^2) * 20, tolerance = 1e-8)
   
-  # Deuxième cas : ABIES_ALBA avec dbh <= 15 → NA
   expect_true(is.na(result$algan_vta[2]))
   
-  # Troisième cas : PICEA_ABIES → NA
   expect_true(is.na(result$algan_vta[3]))
 })
 
@@ -93,19 +87,19 @@ test_that("algan_vta_vc22 cleans species names (case and whitespace)", {
 })
 
 test_that("algan_vta_vc22 creates columns only when applicable", {
-  # Cas 1 : espèce compatible → colonne créée
+  # Case 1 
   df <- data.frame(species_code = "BETULA_SP", dbh = 22, htot = 10)
   result <- algan_vta_vc22(df)
   expect_true("algan_vc22" %in% names(result))
   expect_false("algan_vta" %in% names(result)) # BETULA_SP ne calcule pas vta
   
-  # Cas 2 : espèce non compatible → aucune colonne créée
+  # Case 2 
   df2 <- data.frame(species_code = "QUERCUS_ROBUR", dbh = 30, htot = 20)
   result2 <- algan_vta_vc22(df2)
   expect_false("algan_vc22" %in% names(result2))
   expect_false("algan_vta" %in% names(result2))
   
-  # Cas 3 : ABIES_ALBA avec dbh > 15 → les deux colonnes créées
+  # Case 3 
   df3 <- data.frame(species_code = "ABIES_ALBA", dbh = 30, htot = 20)
   result3 <- algan_vta_vc22(df3)
   expect_true("algan_vc22" %in% names(result3))

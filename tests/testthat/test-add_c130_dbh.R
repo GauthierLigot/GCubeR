@@ -1,10 +1,8 @@
 # tests/testthat/test-add_c130_dbh.R
 
 test_that("add_c130_dbh errors on invalid input", {
-  # Pas un data.frame
   expect_error(add_c130_dbh(list()), "is.data.frame")
   
-  # Aucun des deux colonnes
   df <- data.frame(x = 1:3)
   expect_error(add_c130_dbh(df), "Data must contain either")
 })
@@ -28,13 +26,13 @@ test_that("add_c130_dbh fills missing values correctly", {
   )
   result <- add_c130_dbh(df)
   
-  # Cas 1 : c130 manquant → rempli
+  # Case 1
   expect_equal(result$c130[1], 10 * pi, tolerance = 1e-8)
   
-  # Cas 2 : dbh manquant → rempli
+  # Case 2 
   expect_equal(result$dbh[2], 31.4 / pi, tolerance = 1e-8)
   
-  # Cas 3 : les deux NA → restent NA
+  # Case 3 
   expect_true(is.na(result$c130[3]))
   expect_true(is.na(result$dbh[3]))
 })
@@ -56,16 +54,12 @@ test_that("add_c130_dbh handles multiple rows consistently", {
   )
   result <- add_c130_dbh(df)
   
-  # Ligne 1 : dbh calculé
   expect_equal(result$dbh[1], 31.4 / pi, tolerance = 1e-8)
-  
-  # Ligne 2 : c130 calculé
+
   expect_equal(result$c130[2], 10 * pi, tolerance = 1e-8)
   
-  # Ligne 3 : dbh calculé
   expect_equal(result$dbh[3], 62.8 / pi, tolerance = 1e-8)
   
-  # Ligne 4 : les deux NA → restent NA
   expect_true(is.na(result$c130[4]))
   expect_true(is.na(result$dbh[4]))
 })

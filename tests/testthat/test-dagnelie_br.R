@@ -69,7 +69,7 @@ test_that("dagnelie_br works with multiple rows and mixed species", {
     regexp = "Unknown species"
   )
   
-  # Ligne 1 : PINUS_NIGRA
+  # Row 1 : PINUS_NIGRA
   coeff <- GCubeR::danbr
   a <- as.numeric(coeff$coeff_a[coeff$species_code == "PINUS_NIGRA"])
   b <- as.numeric(coeff$coeff_b[coeff$species_code == "PINUS_NIGRA"])
@@ -79,7 +79,7 @@ test_that("dagnelie_br works with multiple rows and mixed species", {
   expected <- a + b*150 + c*150^2 + d*150^3
   expect_equal(result$dagnelie_br[1], expected, tolerance = 1e-8)
   
-  # Ligne 2 : QUERCUS_RUBRA
+  # Row 2 : QUERCUS_RUBRA
   a <- as.numeric(coeff$coeff_a[coeff$species_code == "QUERCUS_RUBRA"])
   b <- as.numeric(coeff$coeff_b[coeff$species_code == "QUERCUS_RUBRA"])
   c <- as.numeric(coeff$coeff_c[coeff$species_code == "QUERCUS_RUBRA"])
@@ -88,7 +88,7 @@ test_that("dagnelie_br works with multiple rows and mixed species", {
   expected <- a + b*200 + c*200^2 + d*200^3
   expect_equal(result$dagnelie_br[2], expected, tolerance = 1e-8)
   
-  # Ligne 3 : espèce inconnue → NA
+  # Row 3 : UNKNOWN_SPECIES → NA
   expect_true(is.na(result$dagnelie_br[3]))
 })
 

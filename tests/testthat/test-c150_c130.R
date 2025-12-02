@@ -1,6 +1,5 @@
 # tests/testthat/test-c150_c130.R
 
-# Pour les tests, on crée une table de coefficients factice
 fake_coeff <- data.frame(
   species_code = c("PINUS_SYLVESTRIS", "QUERCUS_RUBRA"),
   coeff_a = c(1.0064, 1.0154),
@@ -33,7 +32,6 @@ test_that("c150_c130 computes c130 from c150 within range", {
 test_that("c150_c130 warns when c150 out of range", {
   df <- data.frame(species_code = "PINUS_SYLVESTRIS", c150 = 9999)
   expect_warning(result <- c150_c130(df), "c150 out of range")
-  # c130 ne doit pas être calculé car hors plage
   expect_true(is.na(result$c130[1]))
 })
 
@@ -53,7 +51,6 @@ test_that("c150_c130 handles NA values gracefully", {
 
 test_that("c150_c130 warns for unknown species", {
   df <- data.frame(species_code = "UNKNOWN_SPECIES", c150 = 120)
-  # Comme l'espèce n'est pas dans fake_coeff, les coeffs sont NA
   result <- c150_c130(df)
   expect_true(is.na(result$c130[1]))
 })
@@ -73,7 +70,6 @@ test_that("c150_c130 adds missing c150 column when only c130 is provided", {
   )
   result <- c150_c130(df)
   
-  # Vérifie que la colonne c150 a bien été ajoutée
   expect_true("c150" %in% names(result))
   expect_s3_class(result, "data.frame")
   expect_true(!is.na(result$c150[1]))

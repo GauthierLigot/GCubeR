@@ -85,7 +85,7 @@ test_that("vallet_vc22 returns early if no compatible species", {
                    "No compatible species found"),
     "Unknown species"
   )
-  # La colonne peut être supprimée
+  
   expect_false("vallet_vc22" %in% names(result))
 })
 
@@ -97,11 +97,11 @@ test_that("vallet_vc22 works with multiple rows and mixed species", {
   )
   result <- suppressWarnings(vallet_vc22(df))
   
-  # Row 1 valide
+  # Row 1 
   expect_false(is.na(result$vallet_vc22[1]))
-  # Row 2 espèce inconnue → NA ou NaN
+  # Row 2 
   expect_true(is.na(result$vallet_vc22[2]) || is.nan(result$vallet_vc22[2]))
-  # Row 3 dbh < 7 → NA ou NaN
+  # Row 3 
   expect_true(is.na(result$vallet_vc22[3]) || is.nan(result$vallet_vc22[3]))
 })
 

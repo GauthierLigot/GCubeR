@@ -49,7 +49,6 @@ test_that("volume_by_class produces correct table structure", {
   tbl <- res$table
   expect_true("TOTAL" %in% tbl$species_code)
   expect_true(all(c("QUERCUS_ROBUR", "PICEA_ABIES") %in% tbl$species_code))
-  # Colonnes doivent être des classes de c130
   expect_true(any(grepl("\\[", names(tbl))))
 })
 
@@ -93,7 +92,6 @@ test_that("volume_by_class respects small_limit and medium_limit", {
   )
   res <- volume_by_class(df, small_limit = 55, medium_limit = 110)
   expect_s3_class(res$plot, "ggplot")
-  # Vérifier que les limites apparaissent dans le plot (geom_vline)
   layers <- sapply(res$plot$layers, function(l) class(l$geom)[1])
   expect_true("GeomVline" %in% layers)
 })
