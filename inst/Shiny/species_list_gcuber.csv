@@ -1,0 +1,55 @@
+﻿code;nom_fr;nom_latin;species_code
+1;Chênes indigènes;Quercus robur / Q. petraea;QUERCUS_SPP
+2;Chêne rouge;Quercus rubra;QUERCUS_RUBRA
+3;Hêtre;Fagus sylvatica;FAGUS_SYLVATICA
+4;Érable sycomore;Acer pseudoplatanus;ACER_PSEUDOPLATANUS
+5;Frêne;Fraxinus excelsior;FRAXINUS_EXCELSIOR
+6;Ormes;Ulmus spp.;ULMUS_SPP
+7;Merisier;Prunus avium;PRUNUS_AVIUM
+8;Aubépines;Crataegus spp.;CRATAEGUS_SPP
+9;Prunellier;Prunus spinosa;PRUNUS_SPINOSA
+10;Feuillus divers;;FEUILLUS_DIVERS
+11;Bouleau;Betula pendula / B. pubescens;BETULA_SP
+12;Aulne blanc;Alnus incana;ALNUS_INCANA
+13;Aulne glutineux;Alnus glutinosa;ALNUS_GLUTINOSA
+14;Charme;Carpinus betulus;CARPINUS_BETULUS
+15;Châtaignier;Castanea sativa;CASTANEA_SATIVA
+16;Érable plane;Acer platanoides;ACER_PLATANOIDES
+17;Érable champêtre;Acer campestre;ACER_CAMPESTRE
+18;Sorbier;Sorbus aucuparia;SORBUS_AUCUPARIA
+19;Marronnier;Aesculus hippocastanum;AESCULUS_HIPPOCASTANUM
+20;Noisetier;Corylus avellana;CORYLUS_AVELLANA
+21;Noyers;Juglans regia / Juglans nigra;JUGLANS_SPP
+24;Peuplier hybride;Populus × euramericana;POPULUS_HYBRID
+25;Peuplier tremble;Populus tremula;POPULUS_TREMULA
+26;Robinier;Robinia pseudoacacia;ROBINIA_PSEUDOACACIA
+27;Saule marsault;Salix caprea;SALIX_CAPREA
+28;Autres saules;Salix spp.;SALIX_SPP
+29;Tilleuls;Tilia cordata / T. platyphyllos;TILIA_SPP
+30;Pommier;Malus domestica;MALUS_DOMESTICA
+31;Poirier;Pyrus communis;PYRUS_COMMUNIS
+32;Alisiers;Sorbus torminalis / S. aria;SORBUS_SPP
+33;Sureaux;Sambucus nigra / Sambucus spp.;SAMBUCUS_SPP
+34;Bourdaine;Frangula alnus;FRANGULA_ALNUS
+35;Cerisiers;Prunus avium / P. cerasus;PRUNUS_SPP
+41;Épicéa commun;Picea abies;PICEA_ABIES
+42;Épicéa de Sitka;Picea sitchensis;PICEA_SITCHENSIS
+43;Sapin de Douglas;Pseudotsuga menziesii;PSEUDOTSUGA_MENZIESII
+44;Mélèze;Larix decidua / L. kaempferi;LARIX_SPP
+45;Pin sylvestre;Pinus sylvestris;PINUS_SYLVESTRIS
+46;Pin noir Autriche;Pinus nigra subsp. nigra;PINUS_NIGRA
+47;Pin noir de Corse;Pinus nigra subsp. laricio;PINUS_LARICIO
+48;Pin weymouth;Pinus strobus;PINUS_STROBUS
+49;Sapin pectiné;Abies alba;ABIES_ALBA
+50;Sapin de Vancouver;Abies grandis;ABIES_GRANDIS
+51;Autres sapins;Abies spp.;ABIES_SPP
+52;Cyprès;Cupressus spp.;CUPRESSUS_SPP
+53;Tsuga;Tsuga heterophylla;TSUGA_HETEROPHYLLA
+54;Thuya;Thuja plicata / T. occidentalis;THUJA_SPP
+55;Autres résineux;;RESINEUX_AUTRES
+56;If;Taxus baccata;TAXUS_BACCATA
+110;Toutes essences feuillues;;FEUILLUS_TOUT
+120;Toutes essences résineuses;;RESINEUX_TOUT
+150;Feuillus nobles;;FEUILLUS_NOBLES
+210;Autres feuillus;;FEUILLUS_AUTRES
+220;Autres résineux;;RESINEUX_AUTRES
