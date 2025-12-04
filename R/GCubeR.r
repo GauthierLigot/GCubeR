@@ -24,7 +24,7 @@
 #'   failures trigger warnings without interrupting execution.
 #'   
 #' @param volume_col Optional character string naming the column of volume to use
-#'   for plotting in \code{plotage_volume_by_class}. If NULL (default), the function
+#'   for plotting in \code{plot_by_class}. If NULL (default), the function
 #'   will automatically select the first available column among:
 #'   \code{dagnelie_vc22_1}, \code{dagnelie_vc22_1g}, \code{dagnelie_vc22_2},
 #'   \code{dagnelie_br}, \code{vallet_vta}, \code{vallet_vc22}, \code{bouvard_vta},
@@ -97,7 +97,7 @@ GCubeR <- function(data, output = NULL, volume_col = NULL) {
   }
   
   if (!is.null(volume_col) && any(!is.na(data[[volume_col]]))) {
-    plotage <- plotage_volume_by_class(data, volume_col = volume_col)
+    plotage <- plot_by_class(data, volume_col = volume_col)
     print(plotage$plot)
     print(plotage$table)
   } else {

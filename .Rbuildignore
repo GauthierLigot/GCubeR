@@ -1,5 +1,6 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^\.gitlab-ci\.yml$
 ^GCubeR\.Rproj$
 ^data-raw$
 ^doc$

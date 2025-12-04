@@ -20,7 +20,7 @@ Export is handled by the utility function \code{export_output()} and
 failures trigger warnings without interrupting execution.}
 
 \item{volume_col}{Optional character string naming the column of volume to use
-for plotting in \code{plotage_volume_by_class}. If NULL (default), the function
+for plotting in \code{plot_by_class}. If NULL (default), the function
 will automatically select the first available column among:
 \code{dagnelie_vc22_1}, \code{dagnelie_vc22_1g}, \code{dagnelie_vc22_2},
 \code{dagnelie_br}, \code{vallet_vta}, \code{vallet_vc22}, \code{bouvard_vta},
