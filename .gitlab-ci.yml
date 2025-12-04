@@ -4,9 +4,10 @@ stages:
 test-coverage:
   image: rocker/tidyverse:latest
   stage: test
+  coverage: '/[0-9.]+(?=%)/'
   script:
     - R -e 'install.packages("covr")'
-    - R -e 'cov <- covr::package_coverage(); cat(as.numeric(covr::percent_coverage(cov)), file="coverage.txt")'
+    - R -e 'cov <- covr::package_coverage(); cat(as.numeric(covr::percent_coverage(cov)), "%\n")'
   artifacts:
     paths:
       - coverage.txt
