@@ -27,7 +27,7 @@ otherwise not created.
 }
 }
 \description{
-Computes aerial total volume (\code{bouvard_vta}) according to the Bouvard method.
+Computes aerial total volume (\code{bouvard_vta}) according to the Bouvard metho.
 The function validates input data, ensures required columns are present,
 and applies the formula only to species \code{"QUERCUS_SP"}.
 }

@@ -79,7 +79,7 @@
 #'
 #' # Example: compute Dagnelie tarif 2 volume, then summarise and plot
 #' df <- dagnelie_vc22_2(df)
-#' res <- plotage_volume_by_class(df, volume_col = "dagnelie_vc22_2")
+#' res <- plot_by_class(df, volume_col = "dagnelie_vc22_2")
 #'
 #' # Inspect the table
 #' res$table
