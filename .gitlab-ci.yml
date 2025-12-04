@@ -1,0 +1,9 @@
+stages:
+  - test
+
+test-coverage:
+  image: rocker/tidyverse:latest   # image Docker avec R et tidyverse
+  stage: test
+  script:
+    - R -e 'install.packages("covr")'
+    - R -e 'cov <- covr::package_coverage(); covr::codecov(token = Sys.getenv("CODECOV_TOKEN"))'
