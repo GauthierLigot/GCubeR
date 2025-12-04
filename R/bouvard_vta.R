@@ -1,6 +1,6 @@
 #' Volume Estimation Using the Bouvard Method
 #'
-#' Computes aerial total volume (`bouvard_vta`) according to the Bouvard method.
+#' Computes aerial total volume (`bouvard_vta`) according to the Bouvard metho.
 #' The function validates input data, ensures required columns are present,
 #' and applies the formula only to species `"QUERCUS_SP"`.
 #'
