@@ -10,6 +10,3 @@ test-coverage:
   artifacts:
     paths:
       - coverage.json
-  reports:
-    coverage_report:
-      path: coverage.json
