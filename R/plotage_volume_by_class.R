@@ -88,7 +88,7 @@
 #' print(res$plot)
 #'
 #' @export
-plotage_volume_by_class <- function(
+plot_by_class <- function(
     data,
     volume_col   = "dagnelie_vc22_2",
     breaks       = seq(30, 230, by = 25),

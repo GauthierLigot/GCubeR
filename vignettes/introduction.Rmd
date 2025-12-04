@@ -59,10 +59,10 @@ To be able to use **all** functions in the package, your data frame should conta
 GCubeR provides tools to transform basic measurements so they fit the requirements
 of the different volume and biomass equations:
 
-- **`c150_c130`** : converts stem circumference measured at 1.50 m (c150)
-  to circumference at 1.30 m (c130)
-- **`add_c130_dbh`** : converts circumference at 1.30 m (c130) to
-  diameter at breast height (dbh), and can also back-calculate c130
+- **`c150_c130`** : converts stem circumference measured at 1.50 m (`c150`)
+  to circumference at 1.30 m (`c130`)
+- **`add_c130_dbh`** : converts circumference at 1.30 m (`c130`) to
+  diameter at breast height (`dbh`), and can also back-calculate `c130`
   from dbh when needed
 
 ---
@@ -80,13 +80,13 @@ Available for the folowing `species_code`:
 
 - `LARIX_SP`
 
-Required column:
+### Required column:
 
 - `htot`
 - `species_code`
 - `c130`
 
-Formula:
+### Formula:
 
 \[
 v_{\mathrm{c22}} =
@@ -105,19 +105,21 @@ You can load them with:
 
 data("rondeux_vc22_vtot", package = "GCubeR")
 
-### Bouvard method (parametric) — `bouvard_vta()`
+---
 
-Required columns:
+## Bouvard method (parametric) — `bouvard_vta()`
+
+### Required columns:
 
 - `dbh`
 - `species_code`
 - `htot`
 
-Available for the folowing `species_code` :
+### Available for the folowing `species_code` :
 
 - `QUERCUS_SP`
 
-Formula:
+### Formula:
 
 \[
 v_{\mathrm{vta}} = 0.5 \times \left(\frac{dbh}{100}\right)^2 \times h_{tot}
@@ -127,19 +129,19 @@ v_{\mathrm{vta}} = 0.5 \times \left(\frac{dbh}{100}\right)^2 \times h_{tot}
 
 ---
 
-### Algan method (parametric) — `algan_vta_vc22()`
+## Algan method (parametric) — `algan_vta_vc22()`
 
-Required columns:
+### Required columns:
 
 - `dbh`
 - `species_code`
 - `htot`
 
-Available for the following `species_code`:
+### Available for the following `species_code`:
 
 - `ABIES_ALBA`
 
-Formula:
+### Formula:
 
 \[
 v_{\mathrm{vta}} = 0.4 \times \left(\frac{dbh}{100}\right)^2 \times h_{tot}
@@ -147,15 +149,15 @@ v_{\mathrm{vta}} = 0.4 \times \left(\frac{dbh}{100}\right)^2 \times h_{tot}
 
 ---
 
-### Vallet method — `vallet_vta()`
+## Vallet method — `vallet_vta()`
 
-Required columns:
+### Required columns:
 
 - `c130`
 - `species_code`
 - `htot`
 
-Available for the following species:
+### Available for the following species:
 
 - `PICEA_ABIES`  
 - `QUERCUS_ROBUR`  
@@ -165,20 +167,23 @@ Available for the following species:
 - `ABIES_ALBA`  
 - `PSEUDOTSUGA_MENZIESII`  
 
-Formula:
+### Formula:
 
+#### Form coeficcient term 1:
 \[
 \text{term}_{1,c}
 = 
 c \left( \frac{\sqrt{c_{130}}}{h_{\mathrm{tot}}} \right)
 \]
 
+#### Form coeficcient term 2:
 \[
 \text{term}_{2,d}
 =
 1 + \frac{d}{c_{130}^{2}}
 \]
 
+#### Form coeficcient:
 \[
 \mathrm{form}
 =
@@ -187,7 +192,7 @@ c \left( \frac{\sqrt{c_{130}}}{h_{\mathrm{tot}}} \right)
 \text{term}_{2,d}
 \]
 
-
+#### vta:
 \[
 v_{\mathrm{vta}} =
 \mathrm{form} \times \frac{1}{\pi \cdot 40000} \times c_{130}^2 \times h_{tot}
@@ -210,16 +215,22 @@ methods.
 The non parametric equations are based on empirical volume tables which give them 
 a better fitness for trees evaluated in the same environment as those used for model construction.
 
+In this package, all non-parametric models rely on Dagnelie’s equations. These equations are practical because they allow volume estimation for a wide range of tree species.
+
+- *The single-entry method* provides the simplest way to estimate tree volume, requiring only `c130`.
+- *The single-entry graduated method* offers improved accuracy for pure even-aged stands.
+- *The two-entry method* is the most precise model, but it requires measuring `htot`, which may be difficult in large stands. It should therefore be used mainly for high-value trees.
+
 ---
 
 ### Dagnelie single-entry method — `dagnelie_vc22_1()`
 
-Required columns:
+#### Required columns:
 
 - `c130`
 - `species_code`
 
-Available for the following `species_code`:
+#### Available for the following `species_code`:
 <div style="display: flex; gap: 40px;">
 
 <div style="flex: 1;">
@@ -280,7 +291,7 @@ Available for the following `species_code`:
 
 </div>
 
-Formula:
+#### Formula:
 
 \[
 v_{\mathrm{c22}} = 
@@ -293,19 +304,21 @@ You can load them with:
 
 `data("dan1", package = "GCubeR")`
 
+---
+
 ### Graduated single-entry Dagnelie method — `dagnelie_vc22_1g()`
 
-Required columns:
+#### Required columns:
 
 - `c130`
 - `species_code`
 - `hdom`
 
-Available for the following `species_code`:
+#### Available for the following `species_code`:
 
 see at Dagnelie single entry method
 
-Formula:
+#### Formula:
 
 \[
 v_{\mathrm{c22}} =
@@ -322,19 +335,21 @@ You can load them with:
 
 data("dan1g", package = "GCubeR")
 
+---
+
 ### Dagnelie two entry model - `dagnelie_vc22_2()`
 
-Required column:
+#### Required column:
 
 - `c130`
 - `species_code`
 - `htot`
 
-Available for the folowing `species_code`:
+#### Available for the folowing `species_code`:
 
 See at Dagnelie single entry method
 
-Formula :
+#### Formula :
 
 \[
 v =
@@ -356,20 +371,23 @@ You can load them with:
 
 data("dan2", package = "GCubeR")
 
+---
+
 ## Parametric equations
 
 Parametric models provide stable and interpretable equations that remain valid 
-across a wide range of tree dimensions.
+across a wide range of tree dimensions. Based on geometrical parameter they are 
+more precise to evaluate coniferous trees (because of their shape homogenity)
 
 ### Vallet 2 entry method - `vallet_vc22()`
 
-Required columns:
+#### Required columns:
 
 - `dbh`
 - `species_code`
 - `htot`
 
-Available for the folowing `species_code`:
+#### Available for the folowing `species_code`:
 <div style="display: flex; gap: 40px;">
 
 <div style="flex: 1;">
@@ -397,7 +415,7 @@ Available for the folowing `species_code`:
 
 </div>
 
-Formula:
+#### Formula:
 
 \[
 \text{term}_{1,a} = a \times \left( \frac{h_{\mathrm{tot}}}{dbh} \right)
@@ -419,26 +437,29 @@ v_{\mathrm{c22,dm3}} =
 \text{term}_{2,bc} \times \text{term}_{3,\mathrm{geom}}
 \]
 
+
 All coefficients used in this model are provided in the dataset `vallet_vc22()`.  
 You can load them with:
 
 data("vallet_vc22", package = "GCubeR")
 
+---
+
 ### Rondeux 2 entry method - `rondeux_vc22_vtot()`
 
 This function compute VTA **AND** VC22
 
-Available for the folowing `species_code`:
+#### Available for the folowing `species_code`:
 
 - `LARIX_SP`
 
-Required column:
+#### Required column:
 
 - `htot`
 - `species_code`
 - `c130`
 
-Formula:
+#### Formula:
 
 \[
 v_{\mathrm{c22}} =
@@ -452,31 +473,136 @@ v_{\mathrm{vta}} =
 a_{\mathrm{vtot}} \, c_{130}^{2} \, h_{\mathrm{tot}}
 \]
 
-# Merchendising volume
+---
 
-Regroup all soldable part of the trunc and branches 
+# Biomass/carbon/CO2 storage module
 
-```{r c150_c130-example}
-GCubeR::c150_c130(data.frame(
-  c130 = 130,
-  species_code = "QUERCUS_ROBUR",
-  htot = 25
-))
-```
- 
-```{r add_c130_dbh-example}
-GCubeR::add_c130_dbh(data.frame(
-  c130 = 130,
-  species_code = "QUERCUS_ROBUR",
-  htot = 25
-))
-```
+Computes total biomass (aboveground + root), carbon content and CO2 equivalent
+for tree species using CNIEFEB (with multiple trunk volume sources) and Vallet methods.
 
-```{r vallet_vc22-example}
-GCubeR::vallet_vc22(data.frame(
-  dbh = 45,
-  species_code = "QUERCUS_ROBUR",
-  htot = 25
-))
-```
+## Biomass/carbon/CO2 calculator :`biomass_calc()`
+
+This function include 2 several method:
+
+### 1. CNIFEB method
+
+CNIFEB (Compagnie Nationale des Ingenieurs et Experts Forestiers et des Experts Bois)
+Computes the total biomass, carbon and CO2 content of trees (branches, roots and scorce included).
+This method is computed automaticly for all vc22 included in the dataframe. If diffrent 
+vc22 computed with dagnelies method are mentionned in the dataframe `biomass_calc()`
+will prior the most precise method.
+
+#### Required columns :
+
+- `species_code`
+- at least one *vc22* computed with the module above
+
+
+#### Formula : 
+
+##### Stem biomass (wood + bark)
+
+The above-ground stem biomass, \(B_{\mathrm{Ag}}\) (bag), is computed from  
+the stem volume \(v_{c22}\), the bark factor \(F_{\mathrm{eb}}\), and wood density \(\rho\):
+
+\[
+B_{\mathrm{Ag}} = v_{c22} \times F_{\mathrm{eb}} \times \rho
+\]
+
+##### Branch biomass
+
+The branch biomass, \(B_{\mathrm{Bg}}\) (bbg), is estimated using an allometric exponential model:
+
+\[
+B_{\mathrm{Bg}} =
+\exp\left(
+-1.0587
+\;+\;
+0.8836 \, \ln(B_{\mathrm{Ag}})
+\;+\;
+0.2840
+\right)
+\]
+
+##### Total above-ground biomass
+
+The total above-ground biomass, \(B_{\mathrm{Tot}}\) (btot), is:
+
+\[
+B_{\mathrm{Tot}} = B_{\mathrm{Ag}} + B_{\mathrm{Bg}}
+\]
+
+##### Carbon contained in the biomass
+
+\[
+C = B_{\mathrm{Tot}} \times 0.475
+\]
+
+##### Conversion carbon → CO\(_2\)
+
+\[
+CO_{2} = C \times \frac{44}{12}
+\]
+
+
+All coefficients used in this model are provided in the dataset `biomass_calc()`.  
+You can load them with:
+
+data("density_table", package = "GCubeR")
+
+### 2. Vallet method
+
+Based on statistical regression on parameter taken on even aged stand (parametric equation) 
+this method is widely used to evaluate biomass and validated for trees in sylvicultural
+and ecological situation. This method is automaticly applied to the `vallet_vta` entry.
+
+#### Required columns :
+
+- `species_code`
+- `vallet_vta`
+
+#### Formula :
+
+##### Stem biomass (wood + bark)
+
+\[
+B_{\mathrm{Ag}} = B_{\mathrm{stem}} = v_{\mathrm{vta}} \times \rho
+\]
+
+where \(v_{\mathrm{vta}}\) is the total tree volume (`vallet_vta`) and \(\rho\) is the wood density.
+
+##### Branch biomass
+
+\[
+B_{\mathrm{Bg}} = \exp\Big(
+-1.0587 + 0.8836 \cdot \ln(B_{\mathrm{Ag}}) + 0.2840
+\Big)
+\]
+
+##### Total above-ground biomass
+
+\[
+B_{\mathrm{Tot}} = B_{\mathrm{Ag}} + B_{\mathrm{Bg}}
+\]
+
+##### Carbon contained in the biomass
+
+\[
+C = B_{\mathrm{Tot}} \times 0.475
+\]
+
+##### Conversion carbon → CO\(_2\)
+
+\[
+CO_2 = C \times \frac{44}{12}
+\]
+
+
+All coefficients used in this model are provided in the dataset `biomass_calc()`.  
+You can load them with:
+
+data("density_table", package = "GCubeR")
+
+
+
  
