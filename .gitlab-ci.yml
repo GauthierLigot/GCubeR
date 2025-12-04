@@ -8,6 +8,3 @@ test-coverage:
   script:
     - R -e 'install.packages("covr")'
     - R -e 'cov <- covr::package_coverage(); cat(paste0(as.numeric(covr::percent_coverage(cov)), "%\n"))'
-  artifacts:
-    paths:
-      - coverage.txt
