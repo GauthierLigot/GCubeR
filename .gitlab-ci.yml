@@ -1,8 +1,15 @@
-script:
-  - R -e 'cov <- covr::package_coverage(); covr::codecov(token = Sys.getenv("CODECOV_TOKEN")); covr::save_coverage(cov, file = "coverage.json")'
-artifacts:
-  paths:
-    - coverage.json
+stages:
+  - test
+
+test-coverage:
+  image: rocker/tidyverse:latest
+  stage: test
+  script:
+    - R -e 'install.packages("covr")'
+    - R -e 'cov <- covr::package_coverage(); covr::codecov(token = Sys.getenv("CODECOV_TOKEN")); covr::save_coverage(cov, file = "coverage.json")'
+  artifacts:
+    paths:
+      - coverage.json
   reports:
     coverage_report:
       path: coverage.json
