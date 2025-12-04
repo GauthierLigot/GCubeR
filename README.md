@@ -1,5 +1,5 @@
 # GCubeR: Estimation of Forest Volume, Biomass, and Carbon
-
+[![codecov](https://codecov.io/gitlab/gcuber/GCuber/graph/badge.svg?token=WF4996H0MX)](https://codecov.io/gitlab/gcuber/GCuber)
 The goal of GCubeR is to provide a reliable, modular, and scientifically tool for estimating key forest metrics (volume, biomass, and carbon) by applying allometric equations. It builds upon the coding standards of the Dagnelie package, allowing users and scientists to easily audit and extend the internal database of equations.
 
 ## Installation
