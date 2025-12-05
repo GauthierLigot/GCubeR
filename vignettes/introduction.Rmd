@@ -8,11 +8,40 @@ vignette: >
 ---
 
 ```{r setup, include = FALSE}
+library(GCubeR)
+library(dplyr)
+library(knitr)
+library(kableExtra)
+
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  fig.align = "center",
+  fig.width = 7,
+  fig.height = 5,
+  message = FALSE,
+  warning = FALSE
 )
+gembloux_kable <- function(x, caption = NULL, digits = 3) {
+  # nombre de colonnes du data.frame (à garder avant le pipe)
+  last_col <- ncol(x)
+
+  pal_dark   <- "#004B87"  # dark green
+  pal_light  <- "#e8f5e9"  # light green
+  pal_accent <- "#2e7d32"  # mid green
+
+  x %>%
+    kable(format = "html", digits = digits, caption = caption) %>%
+    kable_styling(
+      full_width        = FALSE,
+      bootstrap_options = c("striped", "hover", "condensed")
+    ) %>%
+    row_spec(0, background = pal_dark, color = "white", bold = TRUE) %>%
+    column_spec(1, background = pal_light, bold = TRUE) %>%
+    column_spec(last_col, background = pal_accent, color = "white", bold = TRUE)
+}
 ```
+
 
 # Welcome to GCubeR
 
@@ -36,6 +65,10 @@ and shows how to extract the most useful information from your forest inventory.
 ---
 
 # Global structure of GCubeR
+
+```{r, echo=FALSE, out.width="100%", fig.align="center"}
+knitr::include_graphics("img/function_diag.png")
+```
 
 ## User input
 
@@ -74,7 +107,8 @@ three different methods.
 
 ## Rondeux 2 entry method (parametric) - `rondeux_vc22_vtot()`
 
-This function compute VTA **AND** VC22
+This equation is only available for `c130` range between 10 and 70cm.
+It computes both VTA **AND** VC22
 
 Available for the folowing `species_code`:
 
@@ -105,6 +139,29 @@ You can load them with:
 
 data("rondeux_vc22_vtot", package = "GCubeR")
 
+### Example :
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+
+# Data creation
+data <- data.frame(
+  species_code = c("LARIX_SP","LARIX_SP","LARIX_SP","LARIX_SP"),
+  htot = c(12,13,10,11),
+  c130 = c(65,56,52,68)
+)
+
+# Computes volumes (function from package)
+data <- rondeux_vc22_vtot(data)
+
+```
+
+#### Results :
+
+```{r, echo=FALSE}
+gembloux_kable(data)
+```
+
+
 ---
 
 ## Bouvard method (parametric) — `bouvard_vta()`
@@ -119,13 +176,36 @@ data("rondeux_vc22_vtot", package = "GCubeR")
 
 - `QUERCUS_SP`
 
-### Formula:
+### Formula :
 
 \[
 v_{\mathrm{vta}} = 0.5 \times \left(\frac{dbh}{100}\right)^2 \times h_{tot}
 \]
 
 `dbh` is in cm, `htot` in m, result in m³ per tree.
+
+### Example :
+
+```{r}
+# Data creation
+data <- data.frame(
+  species_code = c("QUERCUS_SP","QUERCUS_SP","QUERCUS_SP","QUERCUS_SP"),
+  htot = c(28,35,21,36),
+  c130 = c(180,235,175,238)
+)
+# Adding dbh
+data <- add_c130_dbh(data)
+
+# Computes volumes
+data <- bouvard_vta(data)
+
+```
+
+#### Results :
+
+```{r, echo=FALSE}
+gembloux_kable(data)
+```
 
 ---
 
@@ -146,6 +226,30 @@ v_{\mathrm{vta}} = 0.5 \times \left(\frac{dbh}{100}\right)^2 \times h_{tot}
 \[
 v_{\mathrm{vta}} = 0.4 \times \left(\frac{dbh}{100}\right)^2 \times h_{tot}
 \]
+
+### Example :
+
+```{r}
+# Data creation
+data <- data.frame(
+  species_code = c("ABIES_ALBA","ABIES_ALBA","ABIES_ALBA","ABIES_ALBA"),
+  htot = c(28,35,21,36),
+  c130 = c(180,235,175,238)
+)
+
+# Adding dbh
+data <- add_c130_dbh(data)
+
+# Computes volumes
+data <- algan_vta_vc22(data)
+
+```
+
+#### Results :
+
+```{r, echo=FALSE}
+gembloux_kable(data)
+```
 
 ---
 
@@ -203,6 +307,27 @@ You can load them with:
 
 data("vallet_vta", package = "GCubeR")
 
+### Example :
+
+```{r}
+# Data creation
+data <- data.frame(
+  species_code = c("ABIES_ALBA","QUERCUS_ROBUR","PINUS_PINASTER","ABIES_ALBA"),
+  htot = c(28,35,21,36),
+  c130 = c(180,235,175,238)
+)
+
+# Computes volumes
+data <- vallet_vta(data)
+
+```
+
+#### Results :
+
+```{r, echo=FALSE}
+gembloux_kable(data)
+```
+
 ---
 
 # VC22 module
@@ -210,7 +335,7 @@ data("vallet_vta", package = "GCubeR")
 The **VC22 module** computes the trunk volume until 22 cm circumference using different
 methods.
 
-## Non parametric equations
+*Non parametric equations*
 
 The non parametric equations are based on empirical volume tables which give them 
 a better fitness for trees evaluated in the same environment as those used for model construction.
@@ -223,14 +348,14 @@ In this package, all non-parametric models rely on Dagnelie’s equations. These
 
 ---
 
-### Dagnelie single-entry method — `dagnelie_vc22_1()`
+## Dagnelie single-entry method — `dagnelie_vc22_1()`
 
-#### Required columns:
+### Required columns:
 
 - `c130`
 - `species_code`
 
-#### Available for the following `species_code`:
+### Available for the following `species_code`:
 <div style="display: flex; gap: 40px;">
 
 <div style="flex: 1;">
@@ -291,7 +416,7 @@ In this package, all non-parametric models rely on Dagnelie’s equations. These
 
 </div>
 
-#### Formula:
+### Formula:
 
 \[
 v_{\mathrm{c22}} = 
@@ -304,21 +429,41 @@ You can load them with:
 
 `data("dan1", package = "GCubeR")`
 
+### Example :
+
+```{r}
+# Data creation
+data <- data.frame(
+  species_code = c("ABIES_ALBA","QUERCUS_ROBUR","PINUS_SYLVESTRIS","ABIES_ALBA"),
+  htot = c(28,35,21,36),
+  c130 = c(180,235,175,238)
+)
+
+# Computes volumes
+data <- dagnelie_vc22_1(data)
+```
+
+#### Results :
+
+```{r, echo=FALSE}
+gembloux_kable(data)
+```
+
 ---
 
-### Graduated single-entry Dagnelie method — `dagnelie_vc22_1g()`
+## Graduated single-entry Dagnelie method — `dagnelie_vc22_1g()`
 
-#### Required columns:
+### Required columns:
 
 - `c130`
 - `species_code`
 - `hdom`
 
-#### Available for the following `species_code`:
+### Available for the following `species_code`:
 
 see at Dagnelie single entry method
 
-#### Formula:
+### Formula:
 
 \[
 v_{\mathrm{c22}} =
@@ -335,21 +480,42 @@ You can load them with:
 
 data("dan1g", package = "GCubeR")
 
+### Example :
+
+```{r}
+# Data creation
+data <- data.frame(
+  species_code = c("ABIES_ALBA","QUERCUS_ROBUR","PINUS_SYLVESTRIS","ABIES_ALBA"),
+  hdom = c(20,25,18,35),
+  c130 = c(180,235,175,238)
+)
+
+# Computes volumes
+data <- dagnelie_vc22_1g(data)
+
+```
+
+#### Results :
+
+```{r, echo=FALSE}
+gembloux_kable(data)
+```
+
 ---
 
-### Dagnelie two entry model - `dagnelie_vc22_2()`
+## Dagnelie two entry model - `dagnelie_vc22_2()`
 
-#### Required column:
+### Required column:
 
 - `c130`
 - `species_code`
 - `htot`
 
-#### Available for the folowing `species_code`:
+### Available for the folowing `species_code`:
 
 See at Dagnelie single entry method
 
-#### Formula :
+### Formula :
 
 \[
 v =
@@ -371,23 +537,44 @@ You can load them with:
 
 data("dan2", package = "GCubeR")
 
+### Example :
+
+```{r}
+# Data creation
+data <- data.frame(
+  species_code = c("ABIES_ALBA","QUERCUS_ROBUR","PINUS_SYLVESTRIS","ABIES_ALBA"),
+  htot = c(20,25,18,35),
+  c130 = c(180,235,175,238)
+)
+
+# Computes volumes
+data <- dagnelie_vc22_2(data)
+
+```
+
+#### Results :
+
+```{r, echo=FALSE}
+gembloux_kable(data)
+```
+
 ---
 
-## Parametric equations
+*Parametric equations*
 
 Parametric models provide stable and interpretable equations that remain valid 
 across a wide range of tree dimensions. Based on geometrical parameter they are 
 more precise to evaluate coniferous trees (because of their shape homogenity)
 
-### Vallet 2 entry method - `vallet_vc22()`
+## Vallet 2 entry method - `vallet_vc22()`
 
-#### Required columns:
+### Required columns:
 
 - `dbh`
 - `species_code`
 - `htot`
 
-#### Available for the folowing `species_code`:
+### Available for the folowing `species_code`:
 <div style="display: flex; gap: 40px;">
 
 <div style="flex: 1;">
@@ -415,7 +602,7 @@ more precise to evaluate coniferous trees (because of their shape homogenity)
 
 </div>
 
-#### Formula:
+### Formula:
 
 \[
 \text{term}_{1,a} = a \times \left( \frac{h_{\mathrm{tot}}}{dbh} \right)
@@ -443,23 +630,46 @@ You can load them with:
 
 data("vallet_vc22", package = "GCubeR")
 
+### Example :
+
+```{r}
+# Data creation
+data <- data.frame(
+  species_code = c("ABIES_ALBA","QUERCUS_ROBUR","PINUS_PINASTER","ABIES_ALBA"),
+  htot = c(28,35,21,36),
+  c130 = c(180,235,175,238)
+)
+
+# Adding dbh
+data <- add_c130_dbh(data)
+
+# Computes volumes
+data <- vallet_vc22(data)
+```
+
+#### Results :
+
+```{r, echo=FALSE}
+gembloux_kable(data)
+```
+
 ---
 
-### Rondeux 2 entry method - `rondeux_vc22_vtot()`
+## Rondeux 2 entry method - `rondeux_vc22_vtot()`
 
 This function compute VTA **AND** VC22
 
-#### Available for the folowing `species_code`:
+### Available for the folowing `species_code`:
 
 - `LARIX_SP`
 
-#### Required column:
+### Required column :
 
 - `htot`
 - `species_code`
 - `c130`
 
-#### Formula:
+### Formula :
 
 \[
 v_{\mathrm{c22}} =
@@ -473,6 +683,26 @@ v_{\mathrm{vta}} =
 a_{\mathrm{vtot}} \, c_{130}^{2} \, h_{\mathrm{tot}}
 \]
 
+### Example :
+
+```{r}
+# Data creation
+data <- data.frame(
+  species_code = c("LARIX_SP","LARIX_SP","LARIX_SP","LARIX_SP"),
+  htot = c(12,13,10,11),
+  c130 = c(65,56,52,68)
+)
+
+# Computes volumes
+data <- rondeux_vc22_vtot(data)
+
+```
+
+#### Results :
+
+```{r, echo=FALSE}
+gembloux_kable(data)
+```
 ---
 
 # Biomass/carbon/CO2 storage module
@@ -550,6 +780,30 @@ You can load them with:
 
 data("density_table", package = "GCubeR")
 
+#### Example :
+
+```{r}
+# Data creation
+data <- data.frame(
+  species_code = c("ABIES_ALBA","QUERCUS_ROBUR","PINUS_SYLVESTRIS","ABIES_ALBA"),
+  htot = c(20,25,18,35),
+  c130 = c(180,235,175,238)
+)
+
+# Computes volumes
+data <- dagnelie_vc22_2(data)
+
+# Computes biomass
+data <- biomass_calc(data)
+
+```
+
+##### Results :
+
+```{r, echo=FALSE}
+gembloux_kable(data)
+```
+
 ### 2. Vallet method
 
 Based on statistical regression on parameter taken on even aged stand (parametric equation) 
@@ -603,6 +857,125 @@ You can load them with:
 
 data("density_table", package = "GCubeR")
 
+#### Example : 
+
+```{r}
+# Data creation
+data <- data.frame(
+  species_code = c("ABIES_ALBA","QUERCUS_ROBUR","PINUS_SYLVESTRIS","ABIES_ALBA"),
+  htot = c(20,25,18,35),
+  c130 = c(180,235,175,238)
+)
+
+# Computes volumes
+data <- vallet_vta(data)
+
+# Computes biomass
+data <- biomass_calc(data)
+
+```
+
+##### Result:
+
+```{r, echo=FALSE}
+gembloux_kable(data)
+```
+
+# Data exportation functionality
+
+## ouput usage
+
+For each function above a parameter named `output` can be filled by a file path to write a csv containing all the data available in the dataframe.
+
+Example : 
+
+```{r}
+# Data creation
+data <- data.frame(
+  species_code = c("ABIES_ALBA","QUERCUS_ROBUR","PINUS_SYLVESTRIS","ABIES_ALBA"),
+  c130 = c(180,235,175,238)
+)
+
+# Type of path needed
+filepath <- "file/path/example.csv"
+```
+```{r, echo=FALSE}
+# For the example (do not run)
+filepath <- tempfile(fileext = ".csv")
+```
+```{r, message=FALSE}
+# Computes volumes and export csv
+data <- dagnelie_vc22_1(data, output= filepath)
+
+```
+
+##### Result:
+
+```{r, echo=FALSE}
+gembloux_kable(data)
+```
+
+## Plot and output module - `plot_by_class()`
+
+This function allows you to automaticly create a histogram plot with c130 classes
+for x and volume for the y. If an output is mentionned a csv is written following the 
+file path. In lines you have the several c130 classes in column the different species
+code and a total and all the volume per species per class in cells.
+
+### Example
+
+```{r, echo=FALSE}
+set.seed(123)  # reproductible
+
+n <- 150
+
+# c130 entre 50 et 200
+c130 <- runif(n, min = 50, max = 200)
+
+# hauteur proportionnelle (ex: htot ≈ 0.25 * c130 + bruit aléatoire)
+htot <- 0.25 * c130 + rnorm(n, mean = 0, sd = 3)
+
+# bornes réalistes (hauteur min 5 m, max 45 m)
+htot <- pmax(5, pmin(htot, 45))
+
+# quelques espèces possibles
+species_list <- c(
+  "PINUS_SYLVESTRIS", "PICEA_ABIES", "QUERCUS_ROBUR",
+  "FAGUS_SYLVATICA", "BETULA_SP"
+)
+
+species_code <- sample(species_list, n, replace = TRUE)
+
+# construction
+df <- data.frame(
+  c130 = round(c130, 1),
+  htot = round(htot, 1),
+  species_code = species_code
+)
+```
+```{r, echo=TRUE}
+filepath <- "my/file/path.csv"
+```
+```{r, echo=FALSE}
+# For the example
+filepath <- tempfile(fileext = ".csv")
+
+# Calcul des volumes
+data <- dagnelie_vc22_1(df)
+```
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.width=6, fig.height=6, fig.align="center"}
+# Plot + export CSV
+res <- plot_by_class(data, volume_col = "dagnelie_vc22_1", output = filepath)
+
+# Affichage du plot (important !)
+res$plot
+```
+```{r, echo=FALSE}
+# read the exported csv
+csv_data <- read.csv2(filepath)
+
+# display it with gembloux style
+gembloux_kable(csv_data, caption = "CSV Output Preview")
+```
 
 
- 
