@@ -26,7 +26,7 @@ gembloux_kable <- function(x, caption = NULL, digits = 3) {
   # nombre de colonnes du data.frame (à garder avant le pipe)
   last_col <- ncol(x)
 
-  pal_dark   <- "#004B87"  # dark green
+  pal_dark   <- "#004B87"  # dark blue
   pal_light  <- "#e8f5e9"  # light green
   pal_accent <- "#2e7d32"  # mid green
 
@@ -107,8 +107,9 @@ three different methods.
 
 ## Rondeux 2 entry method (parametric) - `rondeux_vc22_vtot()`
 
-This equation is only available for `c130` range between 10 and 70cm.
-It computes both VTA **AND** VC22
+This equation is valid for trees with `c130` values between 10 and 70 cm.
+It estimates both VTA and VC22, and was calibrated specifically for larch
+(`LARIX_SP`) growing in the southern part of Belgium.
 
 Available for the folowing `species_code`:
 
@@ -122,12 +123,16 @@ Available for the folowing `species_code`:
 
 ### Formula:
 
+vc22 :
+
 \[
 v_{\mathrm{c22}} =
 a_{\mathrm{vc22}}
 \;+\;
 b_{\mathrm{vc22}} \, c_{130}^{2} \, h_{\mathrm{tot}}
 \]
+
+vta :
 
 \[
 v_{\mathrm{vta}} =
@@ -164,7 +169,11 @@ gembloux_kable(data)
 
 ---
 
-## Bouvard method (parametric) — `bouvard_vta()`
+## Bouvard method — `bouvard_vta()`
+
+This equation applies specifically to oaks growing in coppice-with-standards systems.
+It is based on simple geometric properties of the stem and was historically developed
+to provide a quick and practical method for estimating tree volume in the field.
 
 ### Required columns:
 
@@ -209,7 +218,11 @@ gembloux_kable(data)
 
 ---
 
-## Algan method (parametric) — `algan_vta_vc22()`
+## Algan method — `algan_vta_vc22()`
+
+The Algan method is a simplified volume estimator based on geometric properties of the stem,
+with a correction factor applied to account for stem taper. This function computes both
+VC22 and VTA and appends the results to the input data frame.
 
 ### Required columns:
 
@@ -223,9 +236,18 @@ gembloux_kable(data)
 
 ### Formula:
 
+vta :
+
 \[
 v_{\mathrm{vta}} = 0.4 \times \left(\frac{dbh}{100}\right)^2 \times h_{tot}
 \]
+
+vc22 :
+
+\[
+v_{\mathrm{c22}} = 0.33 \, d_{\mathrm{bh}}^{2} \, h_{\mathrm{tot}}
+\]
+
 
 ### Example :
 
@@ -254,6 +276,10 @@ gembloux_kable(data)
 ---
 
 ## Vallet method — `vallet_vta()`
+
+This equation is derived from statistical regression models based on tree size parameters.
+It was calibrated using a dataset that included relatively small-diameter trees, and therefore
+predictions for very small trees should be interpreted with caution.
 
 ### Required columns:
 
@@ -332,19 +358,22 @@ gembloux_kable(data)
 
 # VC22 module
 
-The **VC22 module** computes the trunk volume until 22 cm circumference using different
-methods.
+The **VC22 module** estimates stem volume up to the point where the circumference
+reaches 22 cm, using several modelling approaches.
 
-*Non parametric equations*
+## Non-parametric equations
 
-The non parametric equations are based on empirical volume tables which give them 
-a better fitness for trees evaluated in the same environment as those used for model construction.
+The non-parametric equations are derived from empirical volume tables. Because these
+tables reflect locally observed growth patterns, they typically perform well for trees
+growing under conditions similar to those used to construct the models.
 
-In this package, all non-parametric models rely on Dagnelie’s equations. These equations are practical because they allow volume estimation for a wide range of tree species.
+In GCubeR, all non-parametric models are based on **Dagnelie’s equations**. These equations
+are practical because they allow volume estimation for a wide range of tree species and
+require only a small number of input variables.
 
-- *The single-entry method* provides the simplest way to estimate tree volume, requiring only `c130`.
-- *The single-entry graduated method* offers improved accuracy for pure even-aged stands.
-- *The two-entry method* is the most precise model, but it requires measuring `htot`, which may be difficult in large stands. It should therefore be used mainly for high-value trees.
+- *The single-entry method* provides the simplest volume estimate and requires only `c130`.
+- *The graduated single-entry method* improves accuracy in pure, even-aged stands by incorporating dominant height.
+- *The two-entry method* is the most accurate, but it requires `htot`, which can be difficult to measure in large stands. It is therefore recommended primarily for high-value trees.
 
 ---
 
@@ -562,11 +591,16 @@ gembloux_kable(data)
 
 *Parametric equations*
 
-Parametric models provide stable and interpretable equations that remain valid 
-across a wide range of tree dimensions. Based on geometrical parameter they are 
-more precise to evaluate coniferous trees (because of their shape homogenity)
+Parametric models provide stable and interpretable equations that remain valid
+across a broad range of tree dimensions. Because they are based on geometric
+parameters, they tend to perform well for trees with predictable stem shapes.
 
 ## Vallet 2 entry method - `vallet_vc22()`
+
+The Vallet method relies on a geometrically adjusted model, with species-specific
+coefficients calibrated to reflect the structural characteristics of each species
+covered by the function.
+
 
 ### Required columns:
 
@@ -657,7 +691,9 @@ gembloux_kable(data)
 
 ## Rondeux 2 entry method - `rondeux_vc22_vtot()`
 
-This function compute VTA **AND** VC22
+This equation is only available for `c130` range between 10 and 70cm.
+It computes both VTA **AND** VC22. Adapted only for Laryx species and in the
+southern part of Belgium.
 
 ### Available for the folowing `species_code`:
 
@@ -703,14 +739,71 @@ data <- rondeux_vc22_vtot(data)
 ```{r, echo=FALSE}
 gembloux_kable(data)
 ```
+
+## Algan method — `algan_vta_vc22()`
+
+The algan method is a simplified volume calculator made to calculate volumes. It's 
+driven by geometrical properties of the stem with a correction factor. This function
+computes both vc22 *and* vta and add it to your dataframe.
+
+### Required columns:
+
+- `dbh`
+- `species_code`
+- `htot`
+
+### Available for the following `species_code`:
+
+- `ABIES_ALBA`
+
+### Formula:
+
+vta :
+
+\[
+v_{\mathrm{vta}} = 0.4 \times \left(\frac{dbh}{100}\right)^2 \times h_{tot}
+\]
+
+vc22 :
+
+\[
+v_{\mathrm{c22}} = 0.33 \, d_{\mathrm{bh}}^{2} \, h_{\mathrm{tot}}
+\]
+
+
+### Example :
+
+```{r}
+# Data creation
+data <- data.frame(
+  species_code = c("ABIES_ALBA","ABIES_ALBA","ABIES_ALBA","ABIES_ALBA"),
+  htot = c(28,35,21,36),
+  c130 = c(180,235,175,238)
+)
+
+# Adding dbh
+data <- add_c130_dbh(data)
+
+# Computes volumes
+data <- algan_vta_vc22(data)
+
+```
+
+#### Results :
+
+```{r, echo=FALSE}
+gembloux_kable(data)
+```
+
+
 ---
 
-# Biomass/carbon/CO2 storage module
+# Biomass/carbon/CO\(_2\) storage module
 
 Computes total biomass (aboveground + root), carbon content and CO2 equivalent
 for tree species using CNIEFEB (with multiple trunk volume sources) and Vallet methods.
 
-## Biomass/carbon/CO2 calculator :`biomass_calc()`
+## Biomass/carbon/CO\(_2\)calculator :`biomass_calc()`
 
 This function include 2 several method:
 
@@ -801,7 +894,11 @@ data <- biomass_calc(data)
 ##### Results :
 
 ```{r, echo=FALSE}
-gembloux_kable(data)
+scroll_box(
+  gembloux_kable(data),
+  width = "100%",
+  height = "200px"
+)
 ```
 
 ### 2. Vallet method
@@ -887,7 +984,7 @@ gembloux_kable(data)
 
 For each function above a parameter named `output` can be filled by a file path to write a csv containing all the data available in the dataframe.
 
-Example : 
+### Example : 
 
 ```{r}
 # Data creation
@@ -909,7 +1006,7 @@ data <- dagnelie_vc22_1(data, output= filepath)
 
 ```
 
-##### Result:
+#### Result:
 
 ```{r, echo=FALSE}
 gembloux_kable(data)
@@ -922,7 +1019,7 @@ for x and volume for the y. If an output is mentionned a csv is written followin
 file path. In lines you have the several c130 classes in column the different species
 code and a total and all the volume per species per class in cells.
 
-### Example
+### Example :
 
 ```{r, echo=FALSE}
 set.seed(123)  # reproductible
