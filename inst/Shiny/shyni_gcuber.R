@@ -91,8 +91,6 @@ species_choices_gcuber <- setNames(
 )
 
 ## 1.3 - Table de codes numériques (Dagnelie) ----
-## Gardée uniquement pour information dans la liste des essences,
-## plus utilisée pour la normalisation des entrées.
 
 species_codes_num <- data.frame(
   code = as.character(c(
@@ -124,8 +122,6 @@ species_lookup <- merge(
 )
 
 ## 1.4 - Normalisation des essences (batch) ----
-## On NE prend plus en charge les codes numériques dagnelie :
-## uniquement species_code et nom français.
 
 normalize_species <- function(x) {
   x_chr <- as.character(x)
@@ -239,8 +235,6 @@ read_table_any <- function(path, ext = "csv",
 }
 
 ## 2.3 - Normalisation des mesures ----
-# d130 = D à 1.30 m  -> dbh (1.30 m)
-# d150 supprimé
 
 build_base_uni <- function(species_code,
                            meas_type, meas_vals,
@@ -304,6 +298,7 @@ build_base_uni <- function(species_code,
 }
 
 ## 2.4 - Version batch de la normalisation ----
+## (modifiée pour permettre Htot, Hdom ou les deux, tous deux en colonnes)
 
 build_base_batch <- function(df_in,
                              col_species,
@@ -311,6 +306,7 @@ build_base_batch <- function(df_in,
                              meas_type_batch,
                              h_mode_batch,
                              col_htot,
+                             col_hdom = "",
                              hdom_value) {
   n <- nrow(df_in)
   
@@ -361,10 +357,19 @@ build_base_batch <- function(df_in,
     base$dbh  <- tmp$dbh
   }
   
-  if (identical(h_mode_batch, "htot") && nzchar(col_htot)) {
-    base$htot <- suppressWarnings(as.numeric(df_in[[col_htot]]))
-  } else if (identical(h_mode_batch, "hdom")) {
-    base$hdom <- rep(hdom_value, n)
+  # Hauteurs
+  if (identical(h_mode_batch, "htot") || identical(h_mode_batch, "htot_hdom")) {
+    if (nzchar(col_htot)) {
+      base$htot <- suppressWarnings(as.numeric(df_in[[col_htot]]))
+    }
+  }
+  if (identical(h_mode_batch, "hdom") || identical(h_mode_batch, "htot_hdom")) {
+    if (nzchar(col_hdom)) {
+      base$hdom <- suppressWarnings(as.numeric(df_in[[col_hdom]]))
+    } else if (!is.null(hdom_value) && !is.na(hdom_value)) {
+      # Fallback éventuel si on garde un Hdom numérique
+      base$hdom <- rep(hdom_value, n)
+    }
   }
   
   base
@@ -508,7 +513,6 @@ ui <- fluidPage(
             "Pour plusieurs arbres, utilise des virgules : ex. 100,110,125."
           ),
           
-          # 1) Choix de l’essence
           selectInput(
             "species_uni",
             label   = "Essence :",
@@ -517,7 +521,6 @@ ui <- fluidPage(
             multiple = FALSE
           ),
           
-          # 2) Liste des types de volumes / équations disponibles
           checkboxGroupInput(
             "vol_type_uni",
             label = HTML(
@@ -532,7 +535,6 @@ ui <- fluidPage(
             selected = "vc22"
           ),
           
-          # 3) Biomasse en option, séparée
           checkboxInput(
             "biomass_uni",
             label = "Calculer aussi biomasse / C / CO₂ (t)",
@@ -546,7 +548,6 @@ ui <- fluidPage(
             )
           ),
           
-          # 4) Type de mesure
           selectInput(
             "meas_type_uni",
             label = "Type de mesure de la tige (cm) :",
@@ -637,6 +638,8 @@ ui <- fluidPage(
           checkboxGroupInput(
             "vol_type_batch",
             "Types de volumes / résultats à calculer :",
+            
+            
             choices = c(
               "vc22 (volume marchand, m³)"                = "vc22",
               "vtot (volume total tige, m³)"              = "vtot",
@@ -701,13 +704,14 @@ ui <- fluidPage(
             "volume_model_plot",
             "Équation de volume à utiliser :",
             choices = c(
-              "Dagnelie tarif 2 (dagnelie_vc22_2)"      = "dagnelie_vc22_2",
-              "Dagnelie tarif 1 (dagnelie_vc22_1)"      = "dagnelie_vc22_1",
-              "Vallet vc22 (vallet_vc22)"               = "vallet_vc22",
-              "Rondeux vc22 (rondeux_vc22_vtot)"        = "rondeux_vc22",
-              "Algan vc22 (algan_vta_vc22)"             = "algan_vc22"
+              "vc22 combiné (toutes équations disponibles)" = "vc22_combined",
+              "Dagnelie tarif 2 (dagnelie_vc22_2)"          = "dagnelie_vc22_2",
+              "Dagnelie tarif 1 (dagnelie_vc22_1)"          = "dagnelie_vc22_1",
+              "Vallet vc22 (vallet_vc22)"                   = "vallet_vc22",
+              "Rondeux vc22 (rondeux_vc22_vtot)"            = "rondeux_vc22",
+              "Algan vc22 (algan_vta_vc22)"                 = "algan_vc22"
             ),
-            selected = "dagnelie_vc22_2"
+            selected = "vc22_combined"
           ),
           actionButton("calc_plot", "Calculer et tracer", class = "btn btn-primary")
         ),
@@ -793,8 +797,32 @@ server <- function(input, output, session) {
     res
   }
   
+  # Biomasse arbre unique : éviter l'appel si aucune essence couverte
   safe_run_biomass_uni <- function(df) {
-    safe_run_gcuber_uni(df, GCubeR::biomass_calc, "biomass_calc", na_action = "omit")
+    biomass_all <- c("cniefeb_dagnelie_bag",
+                     "cniefeb_dagnelie_bbg",
+                     "cniefeb_dagnelie_btot",
+                     "cniefeb_dagnelie_c",
+                     "cniefeb_dagnelie_co2")
+    
+    # Si pas de table de densité ou aucune essence couverte -> seulement colonnes NA
+    if (is.null(density_table) ||
+        !any(df$species_code %in% density_table$species_code)) {
+      for (col in biomass_all) {
+        if (!col %in% names(df)) {
+          df[[col]] <- NA_real_
+        }
+      }
+      return(df)
+    }
+    
+    res <- safe_run_gcuber_uni(df, GCubeR::biomass_calc, "biomass_calc", na_action = "omit")
+    for (col in biomass_all) {
+      if (!col %in% names(res)) {
+        res[[col]] <- NA_real_
+      }
+    }
+    res
   }
   
   safe_run_gcuber_batch <- function(df, fun, fun_label, ...) {
@@ -822,6 +850,80 @@ server <- function(input, output, session) {
     res
   }
   
+  # Biomasse (lot d'arbres) : appel espèce par espèce et capture des erreurs
+  safe_run_biomass_batch <- function(df) {
+    w_local <- character()
+    biomass_cols <- c("cniefeb_dagnelie_bag",
+                      "cniefeb_dagnelie_bbg",
+                      "cniefeb_dagnelie_btot",
+                      "cniefeb_dagnelie_c",
+                      "cniefeb_dagnelie_co2")
+    
+    # Initialiser les colonnes de biomasse à NA si elles n'existent pas
+    for (col in biomass_cols) {
+      if (!col %in% names(df)) {
+        df[[col]] <- NA_real_
+      }
+    }
+    
+    # Si pas de table de densité ou pas de species_code, on laisse tout à NA
+    if (is.null(density_table) || !"species_code" %in% names(df)) {
+      old <- batch_warnings()
+      batch_warnings(unique(c(
+        old,
+        "[biomass_calc] Table de densité absente ou species_code manquant ; biomasses mises à NA."
+      )))
+      return(df)
+    }
+    
+    # Liste des essences présentes dans le lot
+    sp_all <- unique(df$species_code)
+    sp_all <- sp_all[!is.na(sp_all)]
+    
+    for (sp in sp_all) {
+      # On ne traite que les essences présentes dans density_table
+      if (!sp %in% density_table$species_code) next
+      
+      idx <- which(df$species_code == sp)
+      if (length(idx) == 0) next
+      
+      df_sub <- df[idx, , drop = FALSE]
+      
+      res_sub <- tryCatch(
+        withCallingHandlers(
+          GCubeR::biomass_calc(data = df_sub, na_action = "omit"),
+          warning = function(w) {
+            w_local <<- c(w_local,
+                          paste0("Espèce ", sp, " : ", conditionMessage(w)))
+            invokeRestart("muffleWarning")
+          }
+        ),
+        error = function(e) {
+          # En cas d'erreur pour cette espèce, on laisse les biomasses à NA
+          w_local <<- c(
+            w_local,
+            paste0("Erreur dans biomass_calc pour l'espèce ", sp, " : ", conditionMessage(e))
+          )
+          df_sub
+        }
+      )
+      
+      # Recopie des colonnes de biomasse si elles existent dans res_sub
+      for (col in biomass_cols) {
+        if (col %in% names(res_sub)) {
+          df[idx, col] <- res_sub[[col]]
+        }
+      }
+    }
+    
+    if (length(w_local) > 0) {
+      old <- batch_warnings()
+      batch_warnings(unique(c(old, paste0("[biomass_calc] ", w_local))))
+    }
+    
+    df
+  }
+  
   ## 4.1 Arbre unique ----
   
   output$h_value_ui <- renderUI({
@@ -841,12 +943,10 @@ server <- function(input, output, session) {
     )
   })
   
-  ## Filtrage dynamique des types de volume + gestion de la biomasse (arbre unique)
   observeEvent(input$species_uni, {
     sp <- input$species_uni
     allowed_types <- get_allowed_volume_types_for_species(sp)
     
-    # Codes de volumes et mapping vers labels
     volume_codes <- c("vc22", "vtot", "vta", "br")
     all_choices <- c(
       "Volume marchand vc22 (m³)"             = "vc22",
@@ -871,7 +971,6 @@ server <- function(input, output, session) {
       selected = new_sel
     )
     
-    # Biomasse possible ou non
     has_biomass <- "biomass" %in% allowed_types
     if (isTRUE(has_biomass)) {
       updateCheckboxInput(
@@ -937,7 +1036,6 @@ server <- function(input, output, session) {
       df <- safe_run_biomass_uni(df)
     }
     
-    # Colonnes à afficher
     base_cols <- c("species_code", "c130", "dbh", "c150", "htot", "hdom")
     vol_cols  <- intersect(
       c("dagnelie_vc22_1", "dagnelie_vc22_1g", "dagnelie_vc22_2",
@@ -1083,12 +1181,13 @@ server <- function(input, output, session) {
         choices = c(
           "Sans hauteur"                                   = "none",
           "Hauteur totale individuelle (htot, colonne)"    = "htot",
-          "Hauteur dominante commune (Hdom, valeur unique)"= "hdom"
+          "Hauteur dominante individuelle (Hdom, colonne)" = "hdom",
+          "Htot et Hdom (2 colonnes)"                      = "htot_hdom"
         ),
         selected = "none"
       ),
       conditionalPanel(
-        condition = "input.h_mode_batch == 'htot'",
+        condition = "input.h_mode_batch == 'htot' || input.h_mode_batch == 'htot_hdom'",
         selectInput(
           "col_htot",
           "Colonne hauteur totale htot (m) :",
@@ -1096,20 +1195,15 @@ server <- function(input, output, session) {
         )
       ),
       conditionalPanel(
-        condition = "input.h_mode_batch == 'hdom'",
-        numericInput(
-          "hdom_value",
-          "Hauteur dominante Hdom (m) :",
-          value = 20,
-          min = 0
+        condition = "input.h_mode_batch == 'hdom' || input.h_mode_batch == 'htot_hdom'",
+        selectInput(
+          "col_hdom",
+          "Colonne hauteur dominante Hdom (m) :",
+          choices = cols
         )
       )
     )
   })
-  
-  ## NB : plus de filtrage dynamique des types de volumes pour le lot.
-  ## L'utilisateur peut toujours sélectionner tous les types, même si certaines
-  ## essences ne sont pas couvertes : les colonnes correspondantes resteront NA.
   
   calc_res_batch <- eventReactive(input$calc_batch, {
     batch_warnings(character())
@@ -1126,7 +1220,8 @@ server <- function(input, output, session) {
       meas_type_batch = input$meas_type_batch,
       h_mode_batch   = input$h_mode_batch,
       col_htot       = if (!is.null(input$col_htot)) input$col_htot else "",
-      hdom_value     = if (!is.null(input$hdom_value)) input$hdom_value else NA_real_
+      col_hdom       = if (!is.null(input$col_hdom)) input$col_hdom else "",
+      hdom_value     = NA_real_
     )
     
     df <- base_df
@@ -1156,10 +1251,10 @@ server <- function(input, output, session) {
     }
     
     if ("biomass" %in% vol_types) {
-      df <- safe_run_gcuber_batch(df, GCubeR::biomass_calc,      "biomass_calc", na_action = "omit")
+      df <- safe_run_biomass_batch(df)
     }
     
-    ## FORCE LA PRÉSENCE DES COLONNES DE RÉSULTATS DEMANDÉES (même si GCubeR n’a rien calculé)
+    ## FORCE LA PRÉSENCE DES COLONNES DEMANDÉES
     vol_type_to_cols <- list(
       vc22 = c("dagnelie_vc22_1", "dagnelie_vc22_1g", "dagnelie_vc22_2",
                "vallet_vc22", "algan_vc22", "rondeux_vc22", "rondeux_vtot"),
@@ -1346,6 +1441,7 @@ server <- function(input, output, session) {
       meas_type_batch= input$meas_type_plot,
       h_mode_batch   = h_mode,
       col_htot       = col_ht,
+      col_hdom       = "",
       hdom_value     = hdom_val
     )
     
@@ -1353,7 +1449,45 @@ server <- function(input, output, session) {
     model <- input$volume_model_plot
     vol_col_name <- NULL
     
-    if (model == "dagnelie_vc22_2") {
+    if (model == "vc22_combined") {
+      # Calcul de toutes les équations vc22 disponibles
+      df <- safe_run_gcuber_batch(df, GCubeR::dagnelie_vc22_1,   "dagnelie_vc22_1")
+      df <- safe_run_gcuber_batch(df, GCubeR::dagnelie_vc22_1g,  "dagnelie_vc22_1g")
+      df <- safe_run_gcuber_batch(df, GCubeR::dagnelie_vc22_2,   "dagnelie_vc22_2")
+      df <- safe_run_gcuber_batch(df, GCubeR::vallet_vc22,       "vallet_vc22")
+      df <- safe_run_gcuber_batch(df, GCubeR::algan_vta_vc22,    "algan_vta_vc22")
+      df <- safe_run_gcuber_batch(df, GCubeR::rondeux_vc22_vtot, "rondeux_vc22_vtot")
+      
+      # Colonnes attendues pour la combinaison
+      needed_cols <- c("dagnelie_vc22_2",
+                       "dagnelie_vc22_1",
+                       "vallet_vc22",
+                       "rondeux_vc22",
+                       "algan_vc22")
+      for (col in needed_cols) {
+        if (!col %in% names(df)) {
+          df[[col]] <- NA_real_
+        }
+      }
+      
+      # Colonne combinée : priorité Dagnelie 2 > Dagnelie 1 > Vallet > Rondeux > Algan
+      df$vc22_combined <- NA_real_
+      if (nrow(df) > 0) {
+        for (i in seq_len(nrow(df))) {
+          vals <- c(df$dagnelie_vc22_2[i],
+                    df$dagnelie_vc22_1[i],
+                    df$vallet_vc22[i],
+                    df$rondeux_vc22[i],
+                    df$algan_vc22[i])
+          idx <- which(!is.na(vals))[1]
+          if (!is.na(idx)) {
+            df$vc22_combined[i] <- vals[idx]
+          }
+        }
+      }
+      vol_col_name <- "vc22_combined"
+      
+    } else if (model == "dagnelie_vc22_2") {
       df <- safe_run_gcuber_batch(df, GCubeR::dagnelie_vc22_2, "dagnelie_vc22_2")
       vol_col_name <- "dagnelie_vc22_2"
     } else if (model == "dagnelie_vc22_1") {
@@ -1398,7 +1532,6 @@ server <- function(input, output, session) {
   
   output$species_table <- renderTable({
     df <- species_lookup
-    # On ne garde que les lignes avec species_code renseigné
     df <- df[!is.na(df$species_code) & nzchar(df$species_code), ]
     df_out <- data.frame(
       species_code = df$species_code,
