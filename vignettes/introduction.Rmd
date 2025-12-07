@@ -1062,7 +1062,9 @@ data <- dagnelie_vc22_1(df)
 ```
 ```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.width=6, fig.height=6, fig.align="center"}
 # Plot + export CSV
-res <- plot_by_class(data, volume_col = "dagnelie_vc22_1", output = filepath)
+res <- plot_by_class(data, volume_col = "dagnelie_vc22_1",
+                    breaks= 25,
+                    output = filepath)
 
 # Affichage du plot (important !)
 res$plot
