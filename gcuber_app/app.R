@@ -948,6 +948,16 @@ server <- function(input, output, session) {
       group_by(class_lower, class_label, species_code) %>%
       summarise(volume = sum(volume, na.rm = TRUE), .groups = "drop")
     
+    # --- NEW: force class_label order by class_lower ---
+    class_levels <- agg %>%
+      dplyr::distinct(class_label, class_lower) %>%
+      dplyr::arrange(class_lower) %>%
+      dplyr::pull(class_label)
+    
+    agg <- agg %>%
+      mutate(class_label = factor(class_label, levels = class_levels))
+    
+    # Build wide table with rows ordered by increasing c130 class
     tab_mat <- xtabs(volume ~ class_label + species_code, data = agg)
     tab_df  <- as.data.frame.matrix(tab_mat)
     tab_df$Total <- rowSums(tab_df)
