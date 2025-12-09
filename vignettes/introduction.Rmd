@@ -111,15 +111,17 @@ This equation is valid for trees with `c130` values between 10 and 70 cm.
 It estimates both VTA and VC22, and was calibrated specifically for larch
 (`LARIX_SP`) growing in the southern part of Belgium.
 
-Available for the folowing `species_code`:
-
-- `LARIX_SP`
-
 ### Required column:
 
 - `htot`
 - `species_code`
 - `c130`
+
+### Available for :
+
+- `LARIX_SP`
+
+*validity range : c130 < 70*
 
 ### Formula:
 
@@ -181,7 +183,7 @@ to provide a quick and practical method for estimating tree volume in the field.
 - `species_code`
 - `htot`
 
-### Available for the folowing `species_code` :
+### Available for `species_code` :
 
 - `QUERCUS_SP`
 
@@ -230,9 +232,21 @@ VC22 and VTA and appends the results to the input data frame.
 - `species_code`
 - `htot`
 
-### Available for the following `species_code`:
+### Available for `species_code` :
+
+#### VTA :
 
 - `ABIES_ALBA`
+
+#### VC22 :
+
+- `ABIES_ALBA`  
+- `PICEA_ABIES`  
+- `ALNUS_GLUTINOSA`  
+- `PRUNUS_AVIUM`  
+- `BETULA_SP`
+
+*validity range : dbh > 15cm*
 
 ### Formula:
 
@@ -296,6 +310,8 @@ predictions for very small trees should be interpreted with caution.
 - `PINUS_PINASTER`  
 - `ABIES_ALBA`  
 - `PSEUDOTSUGA_MENZIESII`  
+
+*validity range : c130 > 45*
 
 ### Formula:
 
@@ -389,8 +405,8 @@ require only a small number of input variables.
 
 <div style="flex: 1;">
 
-- `ABIES_ALBA`
-- `ACER_CAMPESTRE`
+- `ABIES_ALBA` 
+- `ACER_CAMPESTRE` 
 - `ACER_PLATANOIDES`
 - `ACER_PSEUDOPLATANUS`
 - `AESCULUS_HIPPOCASTANUM`
@@ -453,7 +469,7 @@ a \;+\; b\,c_{130} \;+\; c\,c_{130}^2 \;+\; d\,c_{130}^3
 \]
 
 
-All coefficients used in this model are provided in the dataset `dan1`.  
+All coefficients and validity range used in this model are provided in the dataset `dan1`.  
 You can load them with:
 
 `data("dan1", package = "GCubeR")`
@@ -504,7 +520,7 @@ e\,h_{\mathrm{dom}} \;+\;
 f\,h_{\mathrm{dom}}\,c_{130}^{2}
 \]
 
-All coefficients used in this model are provided in the dataset `dan1g`.  
+All coefficients and validity range used in this model are provided in the dataset `dan1g`.  
 You can load them with:
 
 data("dan1g", package = "GCubeR")
@@ -561,7 +577,7 @@ f\,h_{\mathrm{tot}}\,c_{130}^{2}
 \]
 
 
-All coefficients used in this model are provided in the dataset `dan2`.  
+All coefficients and validity range used in this model are provided in the dataset `dan2`.  
 You can load them with:
 
 data("dan2", package = "GCubeR")
@@ -659,7 +675,7 @@ v_{\mathrm{c22,dm3}} =
 \]
 
 
-All coefficients used in this model are provided in the dataset `vallet_vc22()`.  
+All coefficients and validity range used in this model are provided in the dataset `vallet_vc22()`.  
 You can load them with:
 
 data("vallet_vc22", package = "GCubeR")
@@ -1063,7 +1079,6 @@ data <- dagnelie_vc22_1(df)
 ```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.width=6, fig.height=6, fig.align="center"}
 # Plot + export CSV
 res <- plot_by_class(data, volume_col = "dagnelie_vc22_1",
-                    breaks= 25,
                     output = filepath)
 
 # Affichage du plot (important !)
