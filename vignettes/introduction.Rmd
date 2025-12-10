@@ -105,7 +105,7 @@ of the different volume and biomass equations:
 The **VTA module** computes total aboveground volume (trunk + branches) using
 three different methods.
 
-## Rondeux 2 entry method (parametric) - `rondeux_vc22_vtot()`
+## Rondeux 2 entry method - `rondeux_vc22_vtot()`
 
 This equation is valid for trees with `c130` values between 10 and 70 cm.
 It estimates both VTA and VC22, and was calibrated specifically for larch
@@ -377,15 +377,14 @@ gembloux_kable(data)
 The **VC22 module** estimates stem volume up to the point where the circumference
 reaches 22 cm, using several modelling approaches.
 
-## Non-parametric equations
+## Dagnelie's equation
 
-The non-parametric equations are derived from empirical volume tables. Because these
+Dagnelie's equations are derived from empirical volume tables. Because these
 tables reflect locally observed growth patterns, they typically perform well for trees
 growing under conditions similar to those used to construct the models.
 
-In GCubeR, all non-parametric models are based on **Dagnelie’s equations**. These equations
-are practical because they allow volume estimation for a wide range of tree species and
-require only a small number of input variables.
+These equations are practical because they allow volume estimation for a wide range 
+of tree species and require only a small number of input variables.
 
 - *The single-entry method* provides the simplest volume estimate and requires only `c130`.
 - *The graduated single-entry method* improves accuracy in pure, even-aged stands by incorporating dominant height.
@@ -604,12 +603,6 @@ gembloux_kable(data)
 ```
 
 ---
-
-*Parametric equations*
-
-Parametric models provide stable and interpretable equations that remain valid
-across a broad range of tree dimensions. Because they are based on geometric
-parameters, they tend to perform well for trees with predictable stem shapes.
 
 ## Vallet 2 entry method - `vallet_vc22()`
 

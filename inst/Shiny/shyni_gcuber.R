@@ -581,6 +581,10 @@ ui <- fluidPage(
       .tab-pane {
         padding: 15px 20px 20px 20px;
       }
+      /* Forcer le menu déroulant au-dessus de la navbar */
+      #lang .selectize-dropdown {
+        z-index: 9999 !important;
+      }
     "))
   ),
   
@@ -614,15 +618,18 @@ ui <- fluidPage(
     
     # Partie droite : sélecteur de langue
     div(
-      style = 'margin-left:auto; min-width:140px;',
+      style = 'margin-left:auto; min-width:70px;',
       selectInput(
         'lang',
         label   = NULL,
-        choices = c('Français' = 'fr', 'English' = 'en'),
+        # Libellés courts
+        choices = c('FR' = 'fr', 'EN' = 'en'),
         selected = 'fr',
-        width   = '140px'
+        # Largeur plus petite
+        width   = '80px'
       )
     )
+    
   ),
   
   navbarPage(

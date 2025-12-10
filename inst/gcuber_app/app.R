@@ -1,6 +1,4 @@
-#############################################################
-# GCubeR Shiny App
-#############################################################
+
 
 library(shiny)
 library(shinythemes)
@@ -10,32 +8,28 @@ library(knitr)
 library(kableExtra)
 library(ggplot2)
 
-#############################################################
-# TABLE FORMATTER
-#############################################################
+# Création du tableur de résultat ----
 
 gembloux_kable <- function(x, caption = NULL, digits = 3) {
-  last_col <- ncol(x)
+  last_col <- ncol(x) # get the number of the las col
   
   pal_dark   <- "#004B87"  # dark blue
   pal_light  <- "#e8f5e9"  # light green
   pal_accent <- "#2e7d32"  # mid green
   
   x %>%
-    kable(format = "html", digits = digits, caption = caption) %>%
+    kable(format = "html", digits = digits, caption = caption) %>% #html = type of tabler, digits for amount of decimal number,
     kable_styling(
-      full_width        = TRUE,
-      bootstrap_options = c("striped", "hover", "condensed")
+      full_width        = TRUE, # take the whole widht of the container
+      bootstrap_options = c("striped", "hover", "condensed") # design option for the tabler
     ) %>%
-    row_spec(0, background = pal_dark, color = "white", bold = TRUE) %>%
+    row_spec(0, background = pal_dark, color = "white", bold = TRUE) %>% # put colors for certain row or column of the html tabler => color = text background = cells bold= thicker letters
     column_spec(1, background = pal_light, bold = TRUE) %>%
     column_spec(last_col, background = pal_accent, color = "white", bold = TRUE)
 }
 
-#############################################################
-# SPECIES LISTS
-#############################################################
-
+# Species list and method definition ----
+## Dagnelie's species list ----
 dagnelie_vc22_species <- c(
   "ABIES_ALBA","ACER_CAMPESTRE","ACER_PLATANOIDES","ACER_PSEUDOPLATANUS",
   "AESCULUS_HIPPOCASTANUM","ALNUS_GLUTINOSA","ALNUS_INCANA","BETULA_SP","CARPINUS_SP",
@@ -47,7 +41,7 @@ dagnelie_vc22_species <- c(
   "RHAMNUS_FRANGULA","ROBINIA_PSEUDOACACIA","SALIX_SP","SAMBUCUS_SP","SORBUS_ARIA",
   "SORBUS_AUCUPARIA","TAXUS_BACCATA","THUJA_PLICATA","TILIA_SP","ULMUS_SP"
 )
-
+## vallet's species list ----
 vallet_vta_species <- c(
   "PICEA_ABIES","QUERCUS_ROBUR","FAGUS_SYLVATICA","PINUS_SYLVESTRIS",
   "PINUS_PINASTER","ABIES_ALBA","PSEUDOTSUGA_MENZIESII"
@@ -61,19 +55,17 @@ vallet_vc22_species <- c(
 
 rondeux_vc22_vtot_species <- "LARIX_SP"
 bouvard_vta_species       <- "QUERCUS_SP"
-algan_vta_vc22_species    <- "ABIES_ALBA"
+algan_vta_vc22_species    <- c("ABIES_ALBA", "PICEA_ABIES","ALNUS_GLUTINOSA","PRUNUS_AVIUM","BETULA_SP")
 
-#############################################################
-# METHOD DEFINITIONS
-#############################################################
 
+## Dagnelie's method ----
 method_defs <- list(
   dagnelie_vc22_1 = list(
-    label           = "VC22 : Dagnelie single entry",
-    fun             = GCubeR::dagnelie_vc22_1,
-    required_cols   = c("species_code","c130"),
+    label           = "VC22 : Dagnelie single entry", # title
+    fun             = GCubeR::dagnelie_vc22_1, # function form GCubeR
+    required_cols   = c("species_code","c130"), # column requirement
     short_desc      = "VC22 from c130.",
-    species_allowed = dagnelie_vc22_species
+    species_allowed = dagnelie_vc22_species # species's list
   ),
   dagnelie_vc22_1g = list(
     label           = "VC22 : Dagnelie graduated",
@@ -128,23 +120,19 @@ method_defs <- list(
 
 method_choices <- setNames(
   names(method_defs),
-  vapply(method_defs, function(m) m$label, character(1))
+  vapply(method_defs, function(m) m$label, character(1)) # fonction tidyverse qui collecte toute les valeur de label dans un vecteur function(m) initie la bouche pour aller chercher label
 )
 
-#############################################################
-# HELPER
-#############################################################
+# Helper ----
 
 is_numeric_col <- function(df, col) {
-  is.numeric(df[[col]]) || is.integer(df[[col]])
+  is.numeric(df[[col]]) || is.integer(df[[col]]) # create a list with the numeric column of the dataframe
 }
 
-#############################################################
-# UI
-#############################################################
+# UI ----
 
-ui <- fluidPage(
-  theme = shinytheme("flatly"),
+ui <- fluidPage( # determin the style of app fluidpage = most comon for technical app you can see example on shiny gallery
+  theme = shinytheme("flatly"), # color theme for fluidpage gallery available on the web
   
   # ==== CSS GLOBAL (UN SEUL tags$head) ====
   tags$head(
@@ -448,7 +436,7 @@ ui <- fluidPage(
       )
     ),
     
-        
+    
     
     #########################################################
     # TAB PLOT
@@ -510,7 +498,7 @@ ui <- fluidPage(
   )
 )
 
-    
+
 #############################################################
 # SERVER
 #############################################################
@@ -895,19 +883,42 @@ server <- function(input, output, session) {
   
   output$plot_volume_col_ui <- renderUI({
     df <- dat_plot()
-    num <- names(df)[vapply(names(df), function(nm) is_numeric_col(df, nm), logical(1))]
     
-    if (length(num) == 0) {
+    # 1. Colonnes numériques
+    numeric_cols <- names(df)[
+      vapply(names(df), function(nm) is_numeric_col(df, nm), logical(1))
+    ]
+    
+    if (length(numeric_cols) == 0) {
       return(helpText("No numeric column found in the file."))
+    }
+    
+    # 2. Colonnes structurelles à exclure (pas des volumes)
+    structural <- c("c130","c150" , "dbh", "htot", "hdom")
+    volume_candidates <- setdiff(numeric_cols, structural)
+    
+    # 3. Si, pour une raison quelconque, il ne reste rien,
+    #    on retombe sur toutes les colonnes numériques
+    if (length(volume_candidates) == 0) {
+      volume_candidates <- numeric_cols
+    }
+    
+    # 4. Colonne sélectionnée par défaut :
+    #    priorité à dagnelie_vc22_1 si elle existe, sinon la première
+    selected_col <- if ("dagnelie_vc22_1" %in% volume_candidates) {
+      "dagnelie_vc22_1"
+    } else {
+      volume_candidates[1]
     }
     
     selectInput(
       "plot_volume_col",
       "Volume column:",
-      choices  = num,
-      selected = if ("dagnelie_vc22_1" %in% num) "dagnelie_vc22_1" else num[1]
+      choices  = volume_candidates,
+      selected = selected_col
     )
   })
+  
   
   plot_data <- reactive({
     req(dat_plot())
@@ -1046,7 +1057,7 @@ server <- function(input, output, session) {
     }
   )
 }
-  
+
 #############################################################
 # RUN
 #############################################################
