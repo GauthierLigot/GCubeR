@@ -1,13 +1,13 @@
 #' Equations metadata for GCubeR
 #'
 #' A reference table compiling metadata about allometric equations used in GCubeR
-#' (Vallet, Dagnelie, Algan, Rondeux, CNIEFEB, etc.). This dataset is provided
+#' (Vallet, Dagnelie, Algan, Rondeux, CNPF, etc.). This dataset is provided
 #' for information purposes only and is not directly used by package functions.
 #'
 #' @format A data frame with columns:
 #' \describe{
 #'   \item{eq_id}{Equation identifier (character)}
-#'   \item{method}{Method family (Vallet, Dagnelie, Algan, Rondeux, CNIEFEB…)}
+#'   \item{method}{Method family (Vallet, Dagnelie, Algan, Rondeux, CNPF…)}
 #'   \item{predicted_variable}{Predicted variable (volume, biomass, carbon…)}
 #'   \item{output_unit}{Unit of the output (m3, kg, tdm…)}
 #'   \item{species_id}{Numeric species identifier (integer)}
@@ -178,7 +178,7 @@
 #' Wood density table for biomass calculation
 #'
 #' Provides species-specific wood density values (t/m3) and species group
-#' classification (conifer vs broadleaf) used in CNIEFEB and Vallet biomass
+#' classification (conifer vs broadleaf) used in CNPF and Vallet biomass
 #' estimation methods.
 #'
 #' @format A data frame with columns:
