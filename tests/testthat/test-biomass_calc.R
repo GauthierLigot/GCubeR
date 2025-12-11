@@ -73,59 +73,59 @@ test_that("Unknown species are reported against density table", {
   expect_message(biomass_calc(df), "Unknown species : UNKNOWN_SPECIES")
 })
 
-test_that("CNIEFEB computation for Dagnelie source produces all output columns and finite values", {
+test_that("CNPF computation for Dagnelie source produces all output columns and finite values", {
   df <- data.frame(
     species_code     = "PICEA_ABIES",  # conifer, density 0.37, feb 1.3
     dagnelie_vc22_1  = 0.20
   )
   res <- suppressMessages(biomass_calc(df))
-  need <- c("cniefeb_dagnelie_bag", "cniefeb_dagnelie_bbg",
-            "cniefeb_dagnelie_btot", "cniefeb_dagnelie_c", "cniefeb_dagnelie_co2")
+  need <- c("cnpf_dagnelie_bag", "cnpf_dagnelie_bbg",
+            "cnpf_dagnelie_btot", "cnpf_dagnelie_c", "cnpf_dagnelie_co2")
   expect_true(all(need %in% names(res)))
-  expect_true(is.finite(res$cniefeb_dagnelie_bag[1]))
+  expect_true(is.finite(res$cnpf_dagnelie_bag[1]))
   # Check a precise expected bag using density table value for PICEA_ABIES (0.37) and feb=1.3
   expected_bag <- 0.20 * 1.3 * 0.37
-  expect_equal(res$cniefeb_dagnelie_bag[1], expected_bag, tolerance = 1e-12)
+  expect_equal(res$cnpf_dagnelie_bag[1], expected_bag, tolerance = 1e-12)
 })
 
-test_that("CNIEFEB computation for Vallet vc22 produces columns", {
+test_that("CNPF computation for Vallet vc22 produces columns", {
   df <- data.frame(
     species_code     = "FAGUS_SYLVATICA", # broadleaf, density 0.55, feb 1.56
     vallet_vc22      = 0.18
   )
   res <- suppressMessages(biomass_calc(df))
-  need <- c("cniefeb_vallet_bag", "cniefeb_vallet_bbg",
-            "cniefeb_vallet_btot", "cniefeb_vallet_c", "cniefeb_vallet_co2")
+  need <- c("cnpf_vallet_bag", "cnpf_vallet_bbg",
+            "cnpf_vallet_btot", "cnpf_vallet_c", "cnpf_vallet_co2")
   expect_true(all(need %in% names(res)))
   expected_bag <- 0.18 * 1.56 * 0.55
-  expect_equal(res$cniefeb_vallet_bag[1], expected_bag, tolerance = 1e-12)
+  expect_equal(res$cnpf_vallet_bag[1], expected_bag, tolerance = 1e-12)
 })
 
-test_that("CNIEFEB computation for Rondeux vc22 produces columns", {
+test_that("CNPF computation for Rondeux vc22 produces columns", {
   df <- data.frame(
     species_code     = "PICEA_ABIES",
     rondeux_vc22     = 0.22
   )
   res <- suppressMessages(biomass_calc(df))
-  need <- c("cniefeb_rondeux_bag", "cniefeb_rondeux_bbg",
-            "cniefeb_rondeux_btot", "cniefeb_rondeux_c", "cniefeb_rondeux_co2")
+  need <- c("cnpf_rondeux_bag", "cnpf_rondeux_bbg",
+            "cnpf_rondeux_btot", "cnpf_rondeux_c", "cnpf_rondeux_co2")
   expect_true(all(need %in% names(res)))
   expected_bag <- 0.22 * 1.3 * 0.37
-  expect_equal(res$cniefeb_rondeux_bag[1], expected_bag, tolerance = 1e-12)
+  expect_equal(res$cnpf_rondeux_bag[1], expected_bag, tolerance = 1e-12)
 })
 
-test_that("CNIEFEB computation for Algan vc22 produces columns", {
+test_that("CNPF computation for Algan vc22 produces columns", {
   df <- data.frame(
     species_code = "ABIES_ALBA",
     algan_vc22   = 0.16,
     vallet_vc22  = 0.10  # ajout pour satisfaire la condition
   )
   res <- suppressMessages(biomass_calc(df))
-  need <- c("cniefeb_algan_bag", "cniefeb_algan_bbg",
-            "cniefeb_algan_btot", "cniefeb_algan_c", "cniefeb_algan_co2")
+  need <- c("cnpf_algan_bag", "cnpf_algan_bbg",
+            "cnpf_algan_btot", "cnpf_algan_c", "cnpf_algan_co2")
   expect_true(all(need %in% names(res)))
   expected_bag <- 0.16 * 1.3 * 0.38  # density ABIES_ALBA = 0.38
-  expect_equal(res$cniefeb_algan_bag[1], expected_bag, tolerance = 1e-12)
+  expect_equal(res$cnpf_algan_bag[1], expected_bag, tolerance = 1e-12)
 })
 
 test_that("Vallet method outputs computed only for supported species and when vallet_vta present", {

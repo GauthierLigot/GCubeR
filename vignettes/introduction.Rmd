@@ -56,7 +56,7 @@ most commonly used allometric equations in forestry. With only a few input
 variables, the package handles all calculations for you.
 
 GCubeR includes implementations of Algan, Rondeux, Dagnelie, and Vallet
-volume equations, as well as CNIEFEB and Vallet's methods for estimating
+volume equations, as well as CNPF and Vallet's methods for estimating
 biomass, carbon content, and CO₂ equivalent.
 
 This vignette walks you through the workflow of applying GCubeR to your dataset
@@ -810,15 +810,15 @@ gembloux_kable(data)
 # Biomass/carbon/CO\(_2\) storage module
 
 Computes total biomass (aboveground + root), carbon content and CO2 equivalent
-for tree species using CNIEFEB (with multiple trunk volume sources) and Vallet methods.
+for tree species using CNPF (with multiple trunk volume sources) and Vallet methods.
 
 ## Biomass/carbon/CO\(_2\)calculator :`biomass_calc()`
 
 This function include 2 several method:
 
-### 1. CNIFEB method
+### 1. CNPF method
 
-CNIFEB (Compagnie Nationale des Ingenieurs et Experts Forestiers et des Experts Bois)
+CNPF (Compagnie Nationale des Ingenieurs et Experts Forestiers et des Experts Bois)
 Computes the total biomass, carbon and CO2 content of trees (branches, roots and scorce included).
 This method is computed automaticly for all vc22 included in the dataframe. If diffrent 
 vc22 computed with dagnelies method are mentionned in the dataframe `biomass_calc()`

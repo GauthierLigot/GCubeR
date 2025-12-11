@@ -14,7 +14,7 @@ Must include:
 matched against a density table.
 \item At least one volume column:
 \itemize{
-\item For CNIEFEB method (trunk volume):
+\item For CNPF method (trunk volume):
 \itemize{
 \item Dagnelie equations: \code{dagnelie_vc22_2}, \code{dagnelie_vc22_1g}, \code{dagnelie_vc22_1}
 (priority order: \code{dagnelie_vc22_2} > \code{dagnelie_vc22_1g} > \code{dagnelie_vc22_1})
@@ -26,7 +26,7 @@ matched against a density table.
 }
 }
 
-If multiple trunk volumes are provided, CNIEFEB is computed separately for each source.
+If multiple trunk volumes are provided, CNPF is computed separately for each source.
 If only one is available, the corresponding method is applied.
 All volume columns must be numeric and expressed in cubic meters (m3).}
 
@@ -45,30 +45,30 @@ A data frame with one row per tree, including:
 \item \code{dagnelie_vc22_1}, \code{dagnelie_vc22_1g}, \code{dagnelie_vc22_2}, \code{vallet_vc22}, \code{rondeux_vc22},\code{algan_vc22}:
 optional trunk volume inputs (in m3).
 \item \code{vallet_vta}: optional total aboveground volume (in m3) for Vallet method.
-\item \code{vc22_dagnelie}: selected trunk volume used for CNIEFEB (Dagnelie), based on priority.
+\item \code{vc22_dagnelie}: selected trunk volume used for CNPF (Dagnelie), based on priority.
 \item \code{vc22_source}: name of the Dagnelie column used to populate \code{vc22}.
 }
-\subsection{CNIEFEB method outputs:}{
+\subsection{CNPF method outputs:}{
 \itemize{
 \item From Dagnelie (priority selection):
 \itemize{
-\item \code{cniefeb_dagnelie_bag}, \code{cniefeb_dagnelie_bbg}, \code{cniefeb_dagnelie_btot},
-\code{cniefeb_dagnelie_c}, \code{cniefeb_dagnelie_co2}
+\item \code{cnpf_dagnelie_bag}, \code{cnpf_dagnelie_bbg}, \code{cnpf_dagnelie_btot},
+\code{cnpf_dagnelie_c}, \code{cnpf_dagnelie_co2}
 }
 \item From Vallet trunk volume (\code{vallet_vc22}):
 \itemize{
-\item \code{cniefeb_vallet_bag}, \code{cniefeb_vallet_bbg}, \code{cniefeb_vallet_btot},
-\code{cniefeb_vallet_c}, \code{cniefeb_vallet_co2}
+\item \code{cnpf_vallet_bag}, \code{cnpf_vallet_bbg}, \code{cnpf_vallet_btot},
+\code{cnpf_vallet_c}, \code{cnpf_vallet_co2}
 }
 \item From Rondeux trunk volume (\code{rondeux_vc22}):
 \itemize{
-\item \code{cniefeb_rondeux_bag}, \code{cniefeb_rondeux_bbg}, \code{cniefeb_rondeux_btot},
-\code{cniefeb_rondeux_c}, \code{cniefeb_rondeux_co2}
+\item \code{cnpf_rondeux_bag}, \code{cnpf_rondeux_bbg}, \code{cnpf_rondeux_btot},
+\code{cnpf_rondeux_c}, \code{cnpf_rondeux_co2}
 }
 \item From Algan trunk volume (\code{algan_vc22}):
 \itemize{
-\item \code{cniefeb_algan_bag}, \code{cniefeb_algan_bbg}, \code{cniefeb_algan_btot},
-\code{cniefeb_algan_c}, \code{cniefeb_algan_co2}
+\item \code{cnpf_algan_bag}, \code{cnpf_algan_bbg}, \code{cnpf_algan_btot},
+\code{cnpf_algan_c}, \code{cnpf_algan_co2}
 }
 }
 }
@@ -81,7 +81,7 @@ optional trunk volume inputs (in m3).
 }
 \description{
 Computes total biomass (aboveground + root), carbon content and CO2 equivalent
-for tree species using CNIEFEB (with multiple trunk volume sources) and Vallet methods.
+for tree species using CNPF (with multiple trunk volume sources) and Vallet methods.
 }
 \details{
 \itemize{
@@ -97,7 +97,7 @@ for tree species using CNIEFEB (with multiple trunk volume sources) and Vallet m
 }
 \item Dagnelie trunk volume (\code{vc22_dagnelie}) is automatically selected from the best available column,
 in the following priority: \code{dagnelie_vc22_2} > \code{dagnelie_vc22_1g} > \code{dagnelie_vc22_1}.
-\item CNIEFEB outputs are computed separately for each trunk volume source (Dagnelie, Vallet, Rondeux, Algan).
+\item CNPF outputs are computed separately for each trunk volume source (Dagnelie, Vallet, Rondeux, Algan).
 \item Vallet method is applied only to a predefined list of compatible species using \code{vallet_vta}.
 \item If required columns are missing, the corresponding method is skipped with a warning.
 \item Warnings are also displayed if trunk volume columns exist but contain missing values (\code{NA}).

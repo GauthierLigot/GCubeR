@@ -101,7 +101,7 @@ test_that("GCubeR always applies biomass_calc at the end", {
   if (file.exists("Rplots.pdf")) file.remove("Rplots.pdf")
   
   # Biomass_calc outputs
-  expect_true(any(grepl("cniefeb", names(res))) || any(grepl("vallet_c", names(res))))
+  expect_true(any(grepl("cnpf", names(res))) || any(grepl("vallet_c", names(res))))
 })
 
 test_that("GCubeR can export output to CSV", {
@@ -150,7 +150,7 @@ test_that("GCubeR produces enriched dataframe with expected structure", {
   if (any(grepl("bouvard", names(res)))) {
     expect_true(any(grepl("bouvard", names(res))))
   }
-  expect_true(any(grepl("cniefeb", names(res))))
+  expect_true(any(grepl("cnpf", names(res))))
 })
 
 test_that("GCubeR allows user to choose volume_col explicitly", {

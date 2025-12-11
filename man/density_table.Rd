@@ -20,7 +20,7 @@ data(density_table)
 }
 \description{
 Provides species-specific wood density values (t/m3) and species group
-classification (conifer vs broadleaf) used in CNIEFEB and Vallet biomass
+classification (conifer vs broadleaf) used in CNPF and Vallet biomass
 estimation methods.
 }
 \keyword{datasets}
