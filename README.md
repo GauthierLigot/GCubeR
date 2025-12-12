@@ -7,11 +7,10 @@ The goal of GCubeR is to provide a reliable, modular, and scientifically tool fo
 You can install the development version of GCubeR directly from your GitLab repository using the `devtools` package like so:
 
 ```r
-# Assurez-vous d'avoir 'devtools' installé
-# install.packages("devtools") 
+# Assurez-vous d'avoir devtools installé
+# install.packages("devtools")
 
-devtools::install_gitlab("David.Linchant/gcuber") 
-# Cette commande télécharge et installe le package depuis votre dépôt.
+devtools::install_git("https://gitlab.uliege.be/David.Linchant/gcuber.git")
 ```
 ## Instructions for Developers (ULiège Team)
 
