@@ -1,4 +1,4 @@
-# 
+# GCubeR equations
 
 ![](img/logo.png)
 
