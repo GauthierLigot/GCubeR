@@ -1,0 +1,107 @@
+---
+title: "Get started to GCubeR"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Get started to GCubeR}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+library(GCubeR)
+library(dplyr)
+library(knitr)
+library(kableExtra)
+library(ggplot2)
+
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.align = "center",
+  fig.width = 7,
+  fig.height = 5,
+  message = FALSE,
+  warning = FALSE
+)
+
+gembloux_kable <- function(x, caption = NULL, digits = 3) {
+  # nombre de colonnes du data.frame (à garder avant le pipe)
+  last_col <- ncol(x)
+
+  pal_dark   <- "#004B87"  # dark blue
+  pal_light  <- "#e8f5e9"  # light green
+  pal_accent <- "#2e7d32"  # mid green
+
+  x %>%
+    kable(format = "html", digits = digits, caption = caption) %>%
+    kable_styling(
+      full_width        = FALSE,
+      bootstrap_options = c("striped", "hover", "condensed")
+    ) %>%
+    row_spec(0, background = pal_dark, color = "white", bold = TRUE) %>%
+    column_spec(1, background = pal_light, bold = TRUE) %>%
+    column_spec(last_col, background = pal_accent, color = "white", bold = TRUE)
+}
+```
+
+
+This vignette provides a quick introduction to the main functionalities of GCubeR using the example dataset included in the package, `GCubeR::data_rondeux`.
+
+```{r echo=TRUE}
+data("data_rondeux")
+```
+
+
+The dataset comes from a mixed, uneven-aged stand in the Bois Jacques Rondeux forest near Gembloux (Wallonia, Belgium). Tree diameters were measured at 1.50 m above ground and converted to circumference (`c150`). Total tree height was also measured, allowing the use of allometric equations that require both circumference and height (e.g., the Dagnelie two-entry equations).
+
+```{r echo=FALSE}
+data_rondeux %>% 
+  ggplot(aes(x = c150, fill = species)) +
+  geom_histogram() +
+  theme_classic() +
+  labs(x = "Circunference at 1m50 (in cm)",
+       y = "Number of trees")
+```
+
+# Dagnelie equations
+
+Most allometric equations require circumference measured at 1.30 m above ground (`c130`). Therefore, the first step is to convert `c150` into `c130`. The `c150_c130()` function automatically performs this conversion when supplied with a data frame containing the variables `c150` and the GCubeR species code.
+
+```{r echo=TRUE}
+data <- GCubeR::c150_c130(data_rondeux)
+```
+
+The Dagnelie one-entry equations estimate standing volume, \eqn{v_{c,22}} (m3 per tree), using only the circumference at 1.30 m (`c130`).
+
+```{r}
+data <- GCubeR::dagnelie_vc22_1(data)
+```
+
+Because the dataset also includes total tree height, we can use the Dagnelie two-entry equations, which estimate standing volume from both circumference at 1.30 m (`c130`) and total tree height (`htot`).
+
+```{r echo=TRUE}
+data <- GCubeR::dagnelie_vc22_2(data)
+```
+
+
+The predictions obtained from the one-entry and two-entry equations can then be compared.
+
+For this dataset, the two-entry equations generally predict larger standing volumes than the one-entry equations, particularly for Quercus rubra. This difference likely reflects the fact that the inventories trees are taller than the average trees used to calibrate the one-entry equations, allowing the two-entry equations to better account for their observed height.
+
+```{r echo=FALSE}
+data %>% 
+  ggplot(aes(y = dagnelie_vc22_2, x = dagnelie_vc22_1)) +
+  facet_wrap(~species) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  geom_abline(slope = 1, intercept = 0,
+              colour = "gray50", linetype = "dashed") +
+  theme_classic() +
+  labs(x = "Standing volume using 1-entry Dagnelie (dagnelie_vc22_1)",
+       y = "Standing volume using 2-entry Dagnelie (dagnelie_vc22_2)")
+```
+
+
+
+
+

@@ -105,24 +105,23 @@ c150_c130 <- function(data, output = NULL) {
       max_c150 = as.numeric(max_c150)
     )
   
-  # Compute c130 if c150 exists
+  # Create columns c130 and c150 if they do not exist
   has_c150 <- "c150" %in% names(data)
   if (!has_c150) data$c150 <- NA_real_
-  idx_c150 <- !is.na(data$c150) & !is.na(data$coeff_a) & !is.na(data$coeff_b)
   
-  # c150 limits (set c130 to NA if out of bounds)
-  out_of_range <- idx_c150 & (data$c150 < data$min_c150 | data$c150 > data$max_c150)
-  if (any(out_of_range, na.rm = TRUE)) {
-    warning("c150 out of range for rows: ", paste(which(out_of_range), collapse = ", "))
-  }
-  safe_c150 <- idx_c150 & !out_of_range
-  data$c130[safe_c150] <- data$coeff_a[safe_c150] * data$c150[safe_c150] + data$coeff_b[safe_c150]
-  
-  # Compute c150 if missing but c130 exists
   has_c130 <- "c130" %in% names(data)
   if (!has_c130) data$c130 <- NA_real_
+  
+  
+  # Compute c130 if c150 exist
+  idx_c150 <- !is.na(data$c150) & !is.na(data$coeff_a) & !is.na(data$coeff_b)
+  if (sum(idx_c150) > 0)
+    data$c130[idx_c150] <- data$coeff_a[idx_c150] * data$c150[idx_c150] + data$coeff_b[idx_c150]
+  
+  # Compute c150 if missing but c130 exists
   idx_back <- is.na(data$c150) & !is.na(data$c130) & !is.na(data$coeff_a) & !is.na(data$coeff_b)
-  data$c150[idx_back] <- (data$c130[idx_back] - data$coeff_b[idx_back]) / data$coeff_a[idx_back]
+  if (sum(idx_back) > 0)
+    data$c150[idx_back] <- (data$c130[idx_back] - data$coeff_b[idx_back]) / data$coeff_a[idx_back]
   
   # Clean technical columns 
   data <- dplyr::select(
