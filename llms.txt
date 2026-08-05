@@ -66,6 +66,8 @@ retrieve the team’s configured project.
 
 ## All functions
 
+- [`GCubeR()`](https://gauthierligot.github.io/GCubeR/reference/GCubeR.md)
+  : GCubeR main workflow
 - [`add_c130_dbh()`](https://gauthierligot.github.io/GCubeR/reference/add_c130_dbh.md)
   : Add or compute c130 and dbh columns
 - [`algan_vta_vc22()`](https://gauthierligot.github.io/GCubeR/reference/algan_vta_vc22.md)
@@ -102,21 +104,19 @@ retrieve the team’s configured project.
   : Equations metadata for GCubeR
 - [`export_output()`](https://gauthierligot.github.io/GCubeR/reference/export_output.md)
   : Export data frame to CSV with warnings instead of errors
-- [`GCubeR()`](https://gauthierligot.github.io/GCubeR/reference/GCubeR.md)
-  : GCubeR main workflow
 - [`plot_by_class()`](https://gauthierligot.github.io/GCubeR/reference/plot_by_class.md)
   : Summarise and plot standing volume by c130 class and species
 - [`rondeux_vc22_vtot()`](https://gauthierligot.github.io/GCubeR/reference/rondeux_vc22_vtot.md)
   : Calculate Total and Commercial Stem Volume (Rondeux, larch)
+- [`val_vc22`](https://gauthierligot.github.io/GCubeR/reference/val_vc22.md)
+  : Vallet coefficients for merchantable volume (vc22)
+- [`val_vta`](https://gauthierligot.github.io/GCubeR/reference/val_vta.md)
+  : Vallet coefficients for total aboveground volume (VTA)
 - [`vallet_vc22()`](https://gauthierligot.github.io/GCubeR/reference/vallet_vc22.md)
   : Calculate Commercial Volume (vc22) up to 7cm Diameter at Breast
   Height (dbh)
 - [`vallet_vta()`](https://gauthierligot.github.io/GCubeR/reference/vallet_vta.md)
   : Calculate Total Aboveground Volume (VTA) Vallet Method
-- [`val_vc22`](https://gauthierligot.github.io/GCubeR/reference/val_vc22.md)
-  : Vallet coefficients for merchantable volume (vc22)
-- [`val_vta`](https://gauthierligot.github.io/GCubeR/reference/val_vta.md)
-  : Vallet coefficients for total aboveground volume (VTA)
 
 # Articles
 

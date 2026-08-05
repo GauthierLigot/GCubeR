@@ -67,7 +67,9 @@ If one or more species codes are not found in `danbr`, the function
 issues a warning and returns `NA`-values for missing coefficients and
 volumes. Trees with `c130` values outside the recommended
 species-specific range produce a warning but still receive a computed
-branch volume.
+branch volume. In some specific cases (mainly for small trees), the
+equation returns negative volume estimates. In these cases, the
+estimates are replaced by 0 and a warning is issued.
 
 ## Supported species
 

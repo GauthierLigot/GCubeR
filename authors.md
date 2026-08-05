@@ -15,7 +15,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/gauthierligot/GCubeR/blob/HEAD/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/gauthierligot/GCubeR/blob/main/DESCRIPTION)
 
 Defontaine J, Linchant D, Douin S, Luizi T, Bosman P (2026). *GCubeR:
 Estimation of Forest Volume, Biomass, and Carbon*. R package version
