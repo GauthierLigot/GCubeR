@@ -1,3 +1,21 @@
+#' Example dataset for using GCubeR
+#'
+#' An inventory dataset in the Bois Jacques Rondeux in Gembloux (Belgium, Wallonia).
+#' Data were collected during a student project from Gembloux AgroBio Tech
+#'
+#' @format A data frame with columns:
+#' \describe{
+#'   \item{id_tree}{Unique ID of the tree (integer)}
+#'   \item{species}{Latin name of the species (character)}
+#'   \item{species_code}{Species code in GCubeR (character)}
+#'   \item{c150}{Circumference of the tree at 1m50 (numeric, cm)}
+#'   \item{htot}{Total height of the tree (numeric, m)}
+#' }
+#'
+#' @source Gauthier Ligot and Hugues Claessens
+#' @usage data(data_rondeux)
+"data_rondeux"
+
 #' Equations metadata for GCubeR
 #'
 #' A reference table compiling metadata about allometric equations used in GCubeR
