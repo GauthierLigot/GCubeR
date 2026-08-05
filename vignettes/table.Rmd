@@ -1,8 +1,8 @@
 ---
-title: 
+title: GCubeR equations
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{table}
+  %\VignetteIndexEntry{GCubeR equations}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
