@@ -92,6 +92,8 @@
 #' a warning and returns \code{NA}-values for missing coefficients and volumes.  
 #' Trees with \code{c130} values outside the recommended species-specific range
 #' produce a warning but still receive a computed branch volume.
+#' In some specific cases (mainly for small trees), the equation returns negative volume estimates.
+#' In these cases, the estimates are replaced by 0 and a warning is issued.
 #'
 #' @seealso \code{\link{danbr}} for species-specific coefficients.
 #'
@@ -186,6 +188,27 @@ dagnelie_br <- function(data, output = NULL) {
     data,
     coeff_a + coeff_b * c130 + coeff_c * c130^2 + coeff_d * c130^3
   )
+  
+  ## Check for negative volume estimates ----
+  rows_negest<-which(data$dagnelie_br < 0)
+  
+  if(length(rows_negest)>0){
+    
+    data$dagnelie_br[rows_negest]<-0
+    
+    details <- paste0(
+      "row ", rows_negest,
+      " (species ", data$species_code[rows_negest],
+      ", c130 =", data$min_c130[rows_negest], ")"
+    )
+    
+    warning(
+      paste("dagnelie_br : negative volume estimates were found for ", length(rows_negest), "tree(s). These estimates were replaced by 0. \n",
+            paste(details, collapse = "\n")),
+      call. = FALSE
+    )
+  }
+  
   
   ## Remove technical columns from dan1, keep everything else + dagnelie_br ----
   data <- dplyr::select(
