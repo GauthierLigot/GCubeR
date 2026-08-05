@@ -1,0 +1,4 @@
+# License
+
+    YEAR: 2025
+    COPYRIGHT HOLDER: Samuel Douin, Juliette Defontaine, David Linchant, Pierre Bosman, Timon Luizi

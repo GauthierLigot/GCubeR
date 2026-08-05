@@ -1,0 +1,130 @@
+# GCubeR: Estimation of Forest Volume, Biomass, and Carbon
+
+![](articles/img/logo_verysmall.png)
+
+GCubeR is an R package designed to provide reliable, modular, and
+scientifically robust tools for estimating key forest attributes,
+including tree volume, biomass, and carbon stocks through the
+application of allometric equations.
+
+The package is primarily intended for forest researchers, practitioners,
+and managers working in Southern Belgium, while its flexible framework
+also facilitates adaptation to other regions and contexts.
+
+## Acknowledgement
+
+GCubeR is the result of a collaborative effort involving several
+generations of contributors:
+
+- Gauthier Ligot developed the first version of the package, named
+  Dagnelie.
+- Anthonin Gaussin (Master’s student in Gembloux Agro-Bio Tech, ULiege)
+  developed the second version, named Gcuber.
+- Pierre Bosman, Juliette Defontaine, Samuel Douin, David Linchant, and
+  Timon Luizi (Master’s students in Gembloux Agro-Bio Tech, ULiege)
+  developed the third version, named GCubeR, which became the first
+  release published on CRAN.
+- Gauthier Ligot and Nathéo Beauchamp subsequently enhanced and expanded
+  the package, improving its functionality, documentation, and
+  maintainability.
+
+## Installation
+
+You can install GCubeR directly from the CRAN :
+
+``` r
+
+# install.packages("GCubeR")
+```
+
+You can also install the lastest development version (for developers
+mostly) :
+
+``` r
+
+# It requires to install the devtools package
+# install.packages("devtools")
+devtools::install_git("https://github.com/GauthierLigot/GCubeR.git")
+```
+
+## Instructions for Developers (ULiège Team)
+
+This section is addressed to the project’s developers and details how to
+retrieve the team’s configured project.
+
+1.  Clone the Project:Use RStudio: `File` \> `New Project` \>
+    `Version Control` \> `Git`. Paste your GitLab repository URL:
+    `https://github.com/GauthierLigot/GCubeR`
+2.  Open:\*\* Open the `GCubeR.Rproj` file.
+3.  Synchronization:
+    - Before Coding:Perform a Pull to fetch the latest changes from the
+      team.
+    - After Each <Session:Complete> a Commit followed by a Push to
+      update the central repository.
+
+# Package index
+
+## All functions
+
+- [`add_c130_dbh()`](https://gauthierligot.github.io/GCubeR/reference/add_c130_dbh.md)
+  : Add or compute c130 and dbh columns
+- [`algan_vta_vc22()`](https://gauthierligot.github.io/GCubeR/reference/algan_vta_vc22.md)
+  : Volume Estimation Using the Algan Method
+- [`biomass_calc()`](https://gauthierligot.github.io/GCubeR/reference/biomass_calc.md)
+  : Total Biomass, Carbon and CO2 Estimation for Tree Species
+- [`bouvard_vta()`](https://gauthierligot.github.io/GCubeR/reference/bouvard_vta.md)
+  : Volume Estimation Using the Bouvard Method
+- [`c150_c130()`](https://gauthierligot.github.io/GCubeR/reference/c150_c130.md)
+  : Convert circumference between 1.50 m and 1.30 m
+- [`c150_c130_coeff`](https://gauthierligot.github.io/GCubeR/reference/c150_c130_coeff.md)
+  : Coefficients for circumference conversion (1.50 m ↔ 1.30 m)
+- [`dagnelie_br()`](https://gauthierligot.github.io/GCubeR/reference/dagnelie_br.md)
+  : Single-entry Dagnelie branch volume (tarif "br")
+- [`dagnelie_vc22_1()`](https://gauthierligot.github.io/GCubeR/reference/dagnelie_vc22_1.md)
+  : Single-entry Dagnelie volume (tarif 1)
+- [`dagnelie_vc22_1g()`](https://gauthierligot.github.io/GCubeR/reference/dagnelie_vc22_1g.md)
+  : Graduated single-entry Dagnelie volume (tarif 1g)
+- [`dagnelie_vc22_2()`](https://gauthierligot.github.io/GCubeR/reference/dagnelie_vc22_2.md)
+  : Two-entry Dagnelie volume (tarif 2)
+- [`dan1`](https://gauthierligot.github.io/GCubeR/reference/dan1.md) :
+  Dagnelie coefficients (tarif 1)
+- [`dan1g`](https://gauthierligot.github.io/GCubeR/reference/dan1g.md) :
+  Dagnelie coefficients (tarif 1g)
+- [`dan2`](https://gauthierligot.github.io/GCubeR/reference/dan2.md) :
+  Dagnelie coefficients (tarif 2)
+- [`danbr`](https://gauthierligot.github.io/GCubeR/reference/danbr.md) :
+  Dagnelie branch coefficients (tarif "br")
+- [`data_rondeux`](https://gauthierligot.github.io/GCubeR/reference/data_rondeux.md)
+  : Example dataset for using GCubeR
+- [`density_table`](https://gauthierligot.github.io/GCubeR/reference/density_table.md)
+  : Wood density table for biomass calculation
+- [`equations_GCubeR`](https://gauthierligot.github.io/GCubeR/reference/equations_GCubeR.md)
+  : Equations metadata for GCubeR
+- [`export_output()`](https://gauthierligot.github.io/GCubeR/reference/export_output.md)
+  : Export data frame to CSV with warnings instead of errors
+- [`GCubeR()`](https://gauthierligot.github.io/GCubeR/reference/GCubeR.md)
+  : GCubeR main workflow
+- [`plot_by_class()`](https://gauthierligot.github.io/GCubeR/reference/plot_by_class.md)
+  : Summarise and plot standing volume by c130 class and species
+- [`rondeux_vc22_vtot()`](https://gauthierligot.github.io/GCubeR/reference/rondeux_vc22_vtot.md)
+  : Calculate Total and Commercial Stem Volume (Rondeux, larch)
+- [`vallet_vc22()`](https://gauthierligot.github.io/GCubeR/reference/vallet_vc22.md)
+  : Calculate Commercial Volume (vc22) up to 7cm Diameter at Breast
+  Height (dbh)
+- [`vallet_vta()`](https://gauthierligot.github.io/GCubeR/reference/vallet_vta.md)
+  : Calculate Total Aboveground Volume (VTA) Vallet Method
+- [`val_vc22`](https://gauthierligot.github.io/GCubeR/reference/val_vc22.md)
+  : Vallet coefficients for merchantable volume (vc22)
+- [`val_vta`](https://gauthierligot.github.io/GCubeR/reference/val_vta.md)
+  : Vallet coefficients for total aboveground volume (VTA)
+
+# Articles
+
+### All vignettes
+
+- [Get started to
+  GCubeR](https://gauthierligot.github.io/GCubeR/articles/get_started.md):
+- [Introduction to
+  GCubeR](https://gauthierligot.github.io/GCubeR/articles/introduction.md):
+- [UNKNOWN
+  TITLE](https://gauthierligot.github.io/GCubeR/articles/table.md):
