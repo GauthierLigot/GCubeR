@@ -155,7 +155,7 @@ results <- biomass_calc(data, output = output_path)
 #> The following rows have no trunk volume values in column 'vallet_vc22'. CNPF (Vallet) will be skipped for these rows: 1, 3
 #> The following rows have no trunk volume values in column 'rondeux_vc22'. CNPF (Rondeux) will be skipped for these rows: 1, 2
 #> The following rows have no trunk volume values in column 'algan_vc22'. CNPF (Algan) will be skipped for these rows: 1, 3
-#> File successfully written to: /tmp/RtmpVjzPwY/file1a3f4650ab1c.csv
+#> File successfully written to: /tmp/Rtmps0X2bX/file1acc723735da.csv
 if (file.exists(output_path)) {
   message("CSV file successfully created.")
 } else {
