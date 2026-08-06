@@ -6,7 +6,7 @@ GCubeR is an R package designed to provide reliable, modular, and scientifically
 
 The package is primarily intended for forest researchers, practitioners, and managers working in Southern Belgium, while its flexible framework also facilitates adaptation to other regions and contexts.
 
-## Acknowledgement
+## Acknowledgement 
 
 GCubeR is the result of a collaborative effort involving several generations of contributors:
 
